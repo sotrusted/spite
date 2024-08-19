@@ -1,0 +1,9 @@
+.DS_Store
+*.pyc
+/.spite/
+/static/
+/static*/
+/staticfiles/
+db.sqlite3
+*.sqlite3
+__pycache__/
