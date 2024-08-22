@@ -1,0 +1,17 @@
+<div class="feed"> 
+    <h2 class="section-header">recent posts</h2>
+    <div class="posts">
+        {% for post in posts %}
+        <div class="preview" id="post-preview-{{post.id}}">
+
+            {% include 'blog/preview.html' with post=post %}
+
+        </div>
+
+        <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
+            {% include 'blog/detail.html' with post=post nested=True %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+

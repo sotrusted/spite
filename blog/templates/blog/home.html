@@ -1,0 +1,53 @@
+{% extends 'blog/spite_base.html' %}
+{% load static %}
+{% block content %}
+<div class="home content">
+<div class="flexbox">
+    <div class="left-content">
+        <h2>How Spite Started</h2>
+        <div class="text-box">
+            <p>In my capacity as a <b>digital visionary</b>, I was recently hired by a <b>notorious alt-lit figure</b> to help create a new <b>online periodical</b>.</p>
+        </div>
+        <div class="center-box">
+            <em>
+            Another tool to divide us. A cesspool in the guise of a sanctuary.
+            </em>
+        </div>
+    </div>
+    <div class="image-container">
+        <div class="shadow-container">
+
+            <img :hover src="{% static 'media/anon.jpg' %}" alt="Alt Lit Meme Image">
+            <div class="shadow"></div>
+        </div>
+    </div>
+</div>
+        <div class="mb-4 flexbox">
+            <div class="left-content">
+                <h2>Fighting The System</h2>
+                <div class="text-box">
+                    <p>Despite my misgivings <b>I worked hard</b> until this individual conspired to <b>hoard the literary clout for himself</b>. I only had one question.</p>
+                <div class="center-box">
+                    <h2 class="center-highlight">“HOW CAN I FIGHT BACK?”</h2>
+                </div>
+            </div>
+            </div>
+            <div class="image-container">
+                <img :hover src="{% static 'media/spitemagazine.gif' %}" alt="Spite Meme Image">
+            </div>
+        </div>
+        <div class="ml-4 outlined-box">
+		<p>My only choice is to create my own online publication. I have playfully dubbed it <em>Spite</em>.</p>
+		<p><em>Anyone can write for Spite.</em></p>
+        </div>
+        <div class="cta">
+            <p>Tired of biting your tongue? </p>
+            <div class="post-button">
+                <p><a href="{% url 'post-create' %}">Write for Spite!</a><<</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block feed %}
+    {% include 'blog/feed.html' with posts=posts%}
+{% endblock %}
