@@ -1,0 +1,16 @@
+{% extends 'blog/spite_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="detail mb-3">
+<a class="back" href="{% url 'home' %}">Back to Spite</a>
+
+{% include 'blog/detail.html' with post=post nested=False %}
+
+</div>
+{% endblock %}
+{% block feed %}
+{% include 'blog/feed.html' with posts=posts%}
+{% endblock %}

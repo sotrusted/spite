@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spite - Online Publication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% block stylesheets %}
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <a href="{% url 'home' %}">
+            <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
+        </a>
+        <p>In Spite of it all since 3 days ago</p>
+        <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    {% block form %}
+    {% endblock %}
+    
+    {% block  spite %}
+        <div class="spite">
+            <p>Every time you post, the SPITE COUNTER goes up!</p>
+            <br>
+            <p class="spite-counter">SPITE COUNTER: {{spite}}</p>
+        </div>
+    {% endblock %}
+
+    {% block feed %}
+    {% endblock %}
+
+    <footer class="site-footer">
+        <div class="crawling-text">
+            <p>© 2024 Spite. A So Trusted Network Solution with Deepfake FaceTime in a Teacher Girlfriend Production. All spite reserved.</p>
+        </div>
+    </footer>
+
+
+    {% block scripts %}
+    <script>
+        function toggleContent(postId) {
+            var detailDiv = document.getElementById('post-detail-' + postId);
+            var previewDiv = document.getElementById('post-preview-' + postId);
+            if (detailDiv.style.display === 'none') {
+                detailDiv.style.display = 'flex';
+                previewDiv.style.display = 'none';
+            } else {
+                detailDiv.style.display = 'none';
+                previewDiv.style.display = '';
+            }
+        }
+    </script>
+    {% endblock %}
+</div>
+</body>
+</html>

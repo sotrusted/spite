@@ -1,0 +1,33 @@
+<div class="post flexbox">
+
+<div class="text-content">
+    <h2 class="post-title">
+        <a href="{% url 'post-detail' post.id %}">
+            {{ post.title }}
+        </a>
+    </h2>
+    <div class="post-content">
+        {% if post.content < 30 %}
+            <p>>{{ post.content|safe }}</p>
+        {% else %}
+            <p>{{ post.content|truncatewords:30 }}</p>
+        {% endif %}
+    </div>
+    
+    <a href="javascript:void(0);" class="toggle-link" onclick="toggleContent({{ post.id }})">Read more</a>
+    {% if post.author %}
+        <p class="post-author">by {{ post.author }}</p>
+    {% endif %}
+</div>
+
+{% if post.image %}
+<div class="image-content">
+    <div class="image-container">
+        <a href="{% url 'post-detail' post.id %}">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+        </a>
+    </div>  
+</div>
+{% endif %}
+
+</div>
