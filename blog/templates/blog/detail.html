@@ -1,22 +1,4 @@
 <div class="post flexbox">
-    <div class="text-content">
-
-        <h1 class="post-title">
-            {{ post.title }}
-        </h1>
-
-        {% if post.content %}
-        <div class="post-content">
-            <p>{{ post.content }}</p>
-        </div>
-        {% endif %}
-
-        {% if post.author %}
-            <p class="post-author">by {{ post.author }}</p>
-        {% else %}
-            <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
-        {% endif %}
-    </div>
 
     {% if post.image %}
     <div class="image-content">
@@ -27,7 +9,24 @@
         </div>  
     </div>
     {% endif %}
+
+    <div class="text-content">
+
+        <h1 class="post-title">
+            {{ post.title }}
+        </h1>
+
+        <div class="post-content">
+            <p>{{ post.content }}</p>
+        </div>
+
+        {% if post.author %}
+            <p class="post-author">by {{ post.author }}</p>
+        {% else %}
+            <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
+        {% endif %}
+    </div>
     <div class="menu">
-        <a href="javascript:void(0);" class="toggle-link" onclick="toggleContent({{ post.id }})">Read more</a>
+	    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Collapse</a>
     </div> 
 </div>

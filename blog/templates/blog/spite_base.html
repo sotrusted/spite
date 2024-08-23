@@ -4,15 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spite - Online Publication</title>
+    <title>SPITE MAGAZINE</title>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
     {% block stylesheets %}
         <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     {% endblock %}
 </head>
 <body>
+
 <div class="container">
+
+    {% block spitebar %}
+    <div class="spite-bar">
+        <p class="spite-counter">SPITE COUNTER: {{spite}}</p>
+    </div>
+    {% endblock %}
+
+    {% block header %}
     <div class="header">
         <a href="{% url 'home' %}">
             <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
@@ -20,6 +30,8 @@
         <p>In Spite of it all since 3 days ago</p>
         <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
     </div>
+    {% endblock %}
+
 
     {% block content %}
     {% endblock %}
@@ -31,7 +43,7 @@
         <div class="spite">
             <p>Every time you post, the SPITE COUNTER goes up!</p>
             <br>
-            <p class="spite-counter">SPITE COUNTER: {{spite}}</p>
+	    <p class="spite-counter" style="font-size: {{spite}}px;">SPITE COUNTER: {{spite}}</p>
         </div>
     {% endblock %}
 
@@ -50,12 +62,15 @@
         function toggleContent(postId) {
             var detailDiv = document.getElementById('post-detail-' + postId);
             var previewDiv = document.getElementById('post-preview-' + postId);
+	    var toggleButton = document.getElementById('toggle-link-' + postId); 
             if (detailDiv.style.display === 'none') {
                 detailDiv.style.display = 'flex';
                 previewDiv.style.display = 'none';
+		toggleButton.textContent = 'Collapse';
             } else {
                 detailDiv.style.display = 'none';
-                previewDiv.style.display = '';
+                previewDiv.style.display = 'flex';
+		toggleButton.textContent = 'Expand';
             }
         }
     </script>

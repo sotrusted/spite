@@ -15,10 +15,12 @@ class PostForm(forms.ModelForm):
         required=False
         )
     
-    description = forms.CharField(
+    content  = forms.CharField(
         widget=forms.Textarea, 
-        label=''
+        label='', 
+        required=False
         )
+
 #    images = MultipleImageField(
  #       label='pics', 
   #      required=False
@@ -35,7 +37,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'city', 'description', 'image', \
+        fields = ('title', 'city', 'content', 'image', \
                   'contact')
 
 
@@ -51,7 +53,7 @@ class PostForm(forms.ModelForm):
                     Column('city', css_class='form-group col-md-3 mb-0'),
                     css_class='form-row'
                 ),
-                Row('description', css_class='form-group col-md-9 mb-0'),
+                Row('content', css_class='form-group col-md-9 mb-0'),
                 Row('image', css_class='form-group col-md-9 mb-0'),
                 Row('contact', css_class='form-group col-md-9 mb-0'
                 ),
