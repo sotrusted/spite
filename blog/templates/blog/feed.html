@@ -1,6 +1,7 @@
 <div class="feed"> 
     <h2 class="section-header">recent posts</h2>
     <div class="posts">
+	{% if posts %}
         {% for post in posts %}
         <div class="preview" id="post-preview-{{post.id}}">
 
@@ -12,6 +13,15 @@
             {% include 'blog/detail.html' with post=post nested=True %}
         </div>
         {% endfor %}
+	{% else %}
+	<p class="oops">No one seems to have posted yet! Click below to post!</p>
+	{% endif %}
     </div>
+    <div class="cta">
+	    <div class="post-button">
+		<p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
+	    </div>
+    </div>
+
 </div>
 

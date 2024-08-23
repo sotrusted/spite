@@ -14,9 +14,11 @@ class Post(models.Model):
     anon_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     title = models.CharField(max_length=100, verbose_name='What\'s your problem?')
+    
     city = models.CharField(max_length=100, blank=True, null=True, verbose_name='city or neighborhood')
-    content = models.TextField(max_length=400, verbose_name='description', default='')
+    content = models.TextField(verbose_name='content', default='', null=True, blank=True)
     contact = models.TextField(blank=True, null=True, verbose_name='contact info')
+    description = models.TextField()
     image = models.ImageField(blank=True, null=True, verbose_name=f'image', upload_to='images/')
     date_posted = models.DateTimeField(auto_now_add=True)
 
@@ -29,7 +31,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.author:
             self.anonymous_uuid = uuid.uuid4()
-        super.save(*args, **kwargs)
+        super(Post, self).save(*args, **kwargs)
 
 
 def get_image_filename(instance, filename):
