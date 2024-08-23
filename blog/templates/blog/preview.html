@@ -7,14 +7,12 @@
         </a>
     </h2>
     <div class="post-content">
-        {% if post.content < 30 %}
-            <p>>{{ post.content|safe }}</p>
-        {% else %}
+        {% if post.content %}
             <p>{{ post.content|truncatewords:30 }}</p>
         {% endif %}
     </div>
     
-    <a href="javascript:void(0);" class="toggle-link" onclick="toggleContent({{ post.id }})">Read more</a>
+    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Expand</a>
     {% if post.author %}
         <p class="post-author">by {{ post.author }}</p>
     {% endif %}

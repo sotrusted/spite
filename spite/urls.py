@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+import spite.views as core_views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('favicon.ico', core_views.favicon),
     path('',include('blog.urls'))
 ]
