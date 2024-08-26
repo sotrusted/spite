@@ -16,6 +16,7 @@
     {% if post.author %}
         <p class="post-author">by {{ post.author }}</p>
     {% endif %}
+    <p class="post-date">{{post.date_posted }}</p>
 </div>
 
 {% if post.image %}
@@ -27,5 +28,9 @@
     </div>  
 </div>
 {% endif %}
+<!--
+<button class="like-button">Like</button>
+<span class="like-count">{{ post.like_count }}</span>
+-->
 
 </div>
