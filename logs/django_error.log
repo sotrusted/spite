@@ -335,3 +335,666 @@ Traceback (most recent call last):
   File "/home/sargent/spite/blog/views.py", line 9, in home
     return render(request, 'blog/home.html',context)
 NameError: name 'context' is not defined
+ERROR 2024-08-23 09:01:42,297 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.like_count
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 26, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 46, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 7, in load_posts
+    'spite' : len(posts)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.like_count
+ERROR 2024-08-23 10:25:45,357 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 10:37:38,671 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:10:33,987 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:10:36,835 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:12:23,720 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:12:26,704 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:12:31,791 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:54:01,212 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 13:56:16,260 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 14:00:06,293 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 16:10:51,294 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 16:21:14,786 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 17:25:13,332 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 17:25:16,150 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 17:25:22,728 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 17:29:14,796 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 14, in wrapper
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+AttributeError: 'PostCreateView' object has no attribute 'META'
+ERROR 2024-08-23 17:33:36,230 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request)
+  File "/home/sargent/spite/blog/views.py", line 20, in log_ip1
+    if args or kwargs:
+NameError: name 'args' is not defined
+ERROR 2024-08-23 17:33:37,608 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request)
+  File "/home/sargent/spite/blog/views.py", line 20, in log_ip1
+    if args or kwargs:
+NameError: name 'args' is not defined
+ERROR 2024-08-23 18:24:28,021 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 18:39:58,146 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 79, in post
+    log_ip1(request, 'post-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 18:40:33,192 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 79, in post
+    log_ip1(request, 'post-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 18:58:45,133 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 18:58:45,628 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 19:59:12,975 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 20:44:07,882 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 20:44:10,757 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 20:44:22,597 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:00:02,879 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:13:15,931 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:21:44,115 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:29:12,918 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:43:46,331 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 79, in post
+    log_ip1(request, 'post-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:51:05,604 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:51:16,395 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:53:32,887 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:53:34,339 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 21:58:05,003 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 22:25:49,962 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 22:40:44,078 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 22:40:46,439 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 22:40:48,387 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-23 22:40:49,540 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 70, in get
+    log_ip1(request, 'get-post')
+  File "/home/sargent/spite/blog/views.py", line 21, in log_ip1
+    log.write(f': {" ".join(args + kwargs)}')
+TypeError: can only concatenate tuple (not "dict") to tuple
+ERROR 2024-08-24 07:53:00,654 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 40, in wrapper
+    write_ip(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 15, in write_ip
+    entry = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f'-- {ip}'
+NameError: name 'ip' is not defined
