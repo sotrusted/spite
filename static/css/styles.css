@@ -242,6 +242,26 @@ body {
     width: 100%;
 }
 
+
+.like-button {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.like-count {
+    font-size: 20px;
+    margin-left: 10px;
+}
+
 /* Post styles */
 .post {
     border-bottom: 2px solid #000;
@@ -250,13 +270,11 @@ body {
 }
 
 .post .post-title {
-    font-size: 36px;
     font-weight: bold;
     margin: 0;
 }
 
 .post-author {
-    font-size: 24px;
     font-style: italic;
 }
 

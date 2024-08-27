@@ -1,12 +1,34 @@
 from django.shortcuts import redirect, render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView
 from .models import Post
 from django.contrib import messages
 from .forms import PostForm
 import functools
+from datetime import datetime 
 # Create your views here.
 
-def log_ip_args(view_func):
+
+def write_ip(ip, *args, **kwargs):
+    with open('iplog', 'a+') as log:
+            entry = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f' -- {ip}'
+            log.write(entry)
+            if args or kwargs:
+                log.write(f'--- {" ".join([*args, *kwargs.values()])}')
+            log.write('\n')
+
+
+def log_ip1(request, *args, **kwargs):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    if ip:
+        ip = ip.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    write_ip(ip, *args, **kwargs)
+    
+def log_ip(view_func):
     @functools.wraps(view_func)
     def wrapper(request, *args, **kwargs):
         ip = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -15,31 +37,17 @@ def log_ip_args(view_func):
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        with open('iplog', 'a+') as log:
-            log.write(ip)
-            log.write(f': {args.join()}')
-            log.write('\n')
+        write_ip(ip, *args, **kwargs)
 
         return view_func(request, *args, **kwargs)
 
     return wrapper
 
+
 @log_ip
 def home(request):
-
-    ip = request.META.get('HTTP_X_FORWARDED_FOR')
-
-    if ip:
-        ip = ip.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-
-    with open('iplog', 'a+') as log:
-        log.write(ip)
-        
-        log.write('\n')
-
     return render(request, 'blog/home.html')
+
 
 class PostCreateView(CreateView):
     model = Post
@@ -47,24 +55,17 @@ class PostCreateView(CreateView):
 
     template_name = 'blog/post_form.html'
     
-    @log_ip
     def get(self, request, *args, **kwargs):
+        log_ip1(request, 'get-post')
         context = {
             'postForm': PostForm(),
         }
         
-        ip = request.META.get('HTTP_X_FORWARDED_FOR')
-        if ip:
-           ip = ip.split(',')[0]
-        else:
-           ip = request.META.get('REMOTE_ADDR')
-        
-
         return render(request, self.template_name, context)
     
-    @log_ip_args
     def post(self, request, *args, **kwargs):
 
+        log_ip1(request, 'post-post')
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
@@ -73,7 +74,7 @@ class PostCreateView(CreateView):
             return redirect('home')
 
         return render(request, self.template_name, {'postForm': form})
-            
+
 
 class PostDetailView(DetailView):
     model = Post
@@ -83,3 +84,16 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         return context
+
+
+@csrf_exempt
+@log_ip
+def like_post(request, post_id):
+    if request.method == 'POST':
+        try:
+            post = Post.objects.get(id=post_id)
+            post.like_count += 1
+            post.save()
+            return JsonResponse({'like_count': post.like_count})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
