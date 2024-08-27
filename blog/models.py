@@ -21,6 +21,7 @@ class Post(models.Model):
     description = models.TextField()
     image = models.ImageField(blank=True, null=True, verbose_name=f'image', upload_to='images/')
     date_posted = models.DateTimeField(auto_now_add=True)
+    like_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
