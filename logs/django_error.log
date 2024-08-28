@@ -1144,3 +1144,522 @@ Traceback (most recent call last):
   File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/fields/__init__.py", line 2119, in get_prep_value
     raise e.__class__(
 ValueError: Field 'id' expected a number but got 'ff0f6f9deef04fe08e655bf5b5544292'.
+ERROR 2024-08-27 04:41:58,467 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 78, in post
+    subprocess.run(['python', 'backup_database.py'], check=True)
+  File "/usr/lib/python3.10/subprocess.py", line 503, in run
+    with Popen(*popenargs, **kwargs) as process:
+  File "/usr/lib/python3.10/subprocess.py", line 971, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.10/subprocess.py", line 1863, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'python'
+ERROR 2024-08-27 04:47:36,459 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 77, in post
+    venv_activate = os.path.join('home','sargent','spite','.spite','bin','activate')
+NameError: name 'os' is not defined
+ERROR 2024-08-27 04:47:38,354 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 77, in post
+    venv_activate = os.path.join('home','sargent','spite','.spite','bin','activate')
+NameError: name 'os' is not defined
+ERROR 2024-08-27 04:47:46,345 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 77, in post
+    venv_activate = os.path.join('home','sargent','spite','.spite','bin','activate')
+NameError: name 'os' is not defined
+ERROR 2024-08-28 05:52:22,402 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:52:27,109 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:53:06,650 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:53:09,212 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:53:13,469 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:29,825 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:37,382 log Internal Server Error: /post/240/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:37,408 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:38,192 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:54,191 log Internal Server Error: /post/253/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 05:54:58,277 log Internal Server Error: /post/253/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 251, in bind_template
+    processors = template.engine.template_context_processors + self._processors
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in template_context_processors
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 118, in <genexpr>
+    return tuple(import_string(path) for path in context_processors)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+  File "/usr/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
+    from count_users import count_ips
+ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
