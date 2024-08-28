@@ -27,7 +27,7 @@
         <a href="{% url 'home' %}">
             <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
         </a>
-        <p>In Spite of it all since 3 days ago</p>
+	<p>In Spite of it all since {{days_since_launch}} days ago</p>
         <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
     </div>
     {% endblock %}
@@ -43,7 +43,8 @@
         <div class="spite">
             <p>Every time you post, the SPITE COUNTER goes up!</p>
             <br>
-	    <p class="spite-counter" style="font-size: {{spite}}px;">{{spite}} spite</p>
+	    <p class="spite-counter" style="font-size: 50px;">{{spite}} spite</p>
+	    <p class="spite-counter" style="font-size: 50px;">{{active_sessions_count}}</p>
         </div>
     {% endblock %}
 
