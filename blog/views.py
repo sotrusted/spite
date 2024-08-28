@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView
@@ -7,6 +8,7 @@ from django.contrib import messages
 from .forms import PostForm
 import functools
 from datetime import datetime 
+import subprocess
 # Create your views here.
 
 
@@ -71,6 +73,17 @@ class PostCreateView(CreateView):
             form.save()
             form.author = request.user
             messages.success(request, "successfully posted")
+
+            
+            venv_activate = '/home/sargent/spite/.spite/bin/activate'
+
+            try: 
+                subprocess.run(f'source {venv_activate} && python backup_database.py', shell=True, check=True, executable='/bin/bash')
+                print('Post uploaded, migrations run, and backup created successfully.')
+
+            except subprocess.CalledProcessError as e:
+                print('Post uploaded and migrations run, but backup failed: {str(e)}')   
+
             return redirect('home')
 
         return render(request, self.template_name, {'postForm': form})
