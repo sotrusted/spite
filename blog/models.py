@@ -31,7 +31,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.author:
-            self.anonymous_uuid = uuid.uuid4()
+            self.anonymous_uuid = uuid.uiid4()
         super(Post, self).save(*args, **kwargs)
 
 
