@@ -118,3 +118,22 @@ class PostListView(ListView):
     template_name = 'blog/post_list.html'  # Specify your template name
     context_object_name = 'posts'  # Name of the context variable to use in the template
     ordering = ['-date_posted']  # Order posts by date posted in descending order
+
+
+class PostReplyView(CreateView):
+    model = Post
+    template_name = 'blog/post_reply.html'
+
+    def form_valid(self, form):
+        parent_post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        reply = form.save(commit=False)
+        reply.author = self.request.user
+        reply.parent_post = parent_post
+        reply.save()
+        messages.success(self.request, "Reply successfully posted")
+        return redirect('post-detail', pk=parent_post.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['parent_post'] = get_object_or_404(Post, pk=self.kwargs['pk'])
+        return context

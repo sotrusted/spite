@@ -3638,3 +3638,54 @@ Traceback (most recent call last):
   File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
     return super().execute(query, params)
 django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:28:24,685 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 73, in post
+    form.save()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/forms/models.py", line 552, in save
+    self.instance.save()
+  File "/home/sargent/spite/blog/models.py", line 35, in save
+    self.anonymous_uuid = uuid.uiid4()
+AttributeError: module 'uuid' has no attribute 'uiid4'
+ERROR 2024-08-29 04:28:30,082 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 73, in post
+    form.save()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/forms/models.py", line 552, in save
+    self.instance.save()
+  File "/home/sargent/spite/blog/models.py", line 35, in save
+    self.anonymous_uuid = uuid.uiid4()
+AttributeError: module 'uuid' has no attribute 'uiid4'
+ERROR 2024-08-29 04:46:30,121 log Internal Server Error: /post/new
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 73, in post
+    form.save()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/forms/models.py", line 552, in save
+    self.instance.save()
+  File "/home/sargent/spite/blog/models.py", line 35, in save
+    self.anonymous_uuid = uuid.uiid4()
+AttributeError: module 'uuid' has no attribute 'uiid4'
