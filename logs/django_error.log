@@ -1663,3 +1663,838 @@ Traceback (most recent call last):
   File "/home/sargent/spite/spite/context_processors.py", line 4, in <module>
     from count_users import count_ips
 ImportError: cannot import name 'count_ips' from 'count_users' (/home/sargent/spite/count_users.py)
+ERROR 2024-08-28 08:10:36,414 log Internal Server Error: /all-posts
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 163, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 63, in render
+    reraise(exc, self.backend)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 84, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+ERROR 2024-08-28 08:11:24,218 log Internal Server Error: /all-posts
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 163, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 63, in render
+    reraise(exc, self.backend)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 84, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+ERROR 2024-08-28 08:11:25,028 log Internal Server Error: /all-posts
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/engine.py", line 163, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 63, in render
+    reraise(exc, self.backend)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 84, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: blog/base.html
+ERROR 2024-08-28 08:29:34,133 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,144 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,140 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,158 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,162 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,166 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,186 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,188 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,196 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,198 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,414 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,460 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,466 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,467 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,507 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,511 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,524 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,567 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,579 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,586 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,608 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,719 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,766 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,770 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,777 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,779 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,878 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:34,921 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,067 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,087 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,115 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,167 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,368 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,435 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,532 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,810 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:35,895 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,131 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,231 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,438 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,587 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,742 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:36,889 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:37,089 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:37,499 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:37,897 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:38,230 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:38,574 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:38,869 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:39,171 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:39,467 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:39,840 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:40,182 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:40,539 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:40,879 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:41,177 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:41,540 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:41,870 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:42,184 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:42,538 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:42,890 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:43,230 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:43,525 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:43,839 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-28 08:29:45,309 exception Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
