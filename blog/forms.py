@@ -61,3 +61,6 @@ class PostForm(forms.ModelForm):
             ),
             Submit('submit', 'Submit'),
         )
+
+class ReplyForm(PostForm):
+    pass

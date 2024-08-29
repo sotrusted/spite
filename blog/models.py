@@ -22,6 +22,7 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True, verbose_name=f'image', upload_to='images/')
     date_posted = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
+    parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -30,8 +31,6 @@ class Post(models.Model):
         return reverse('post-detail', kwargs={'pk' : self.pk})
 
     def save(self, *args, **kwargs):
-        if not self.author:
-            self.anonymous_uuid = uuid.uiid4()
         super(Post, self).save(*args, **kwargs)
 
 
