@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.urls import path
-from .views import home, PostCreateView, PostDetailView, like_post 
+from .views import home, PostCreateView, PostDetailView, like_post, PostListView
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path('post/new', PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
     path('like/<int:pl>/', like_post, name='like_post'),
+    path('all-posts', PostListView.as_view(), name='post-list'),
 ]
 
 if settings.DEBUG:
