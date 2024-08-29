@@ -1,0 +1,23 @@
+{% extends 'blog/spite_base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="feed">
+    <h2 class="section-header">archive</h2>
+    <div class="posts">
+        {% for post in posts %}
+                <div class="detail" id="post-detail-{{ post.id }}">
+            {% include 'blog/detail.html' with post=post nested=True %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="cta">
+            <div class="post-button">
+                <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
+            </div>
+    </div>
+
+</div>
+
+{% endblock %}
