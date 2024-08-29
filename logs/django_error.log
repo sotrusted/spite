@@ -2498,3 +2498,1143 @@ Traceback (most recent call last):
   File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
     raise DisallowedHost(msg)
 django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192-3-30-202-host.colocrossing.com'. You may need to add '192-3-30-202-host.colocrossing.com' to ALLOWED_HOSTS.
+ERROR 2024-08-29 04:19:21,245 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:20:40,276 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:20:50,021 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:20:52,502 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:20:55,998 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:21:03,370 log Internal Server Error: /post/509/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:21:18,256 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:21:19,227 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:21:39,554 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:21:52,810 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:00,527 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:02,647 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:05,712 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:07,419 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:19,663 log Internal Server Error: /post/605/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:33,829 log Internal Server Error: /post/605/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:35,549 log Internal Server Error: /post/605/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:36,665 log Internal Server Error: /post/605/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:46,154 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:49,685 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:50,593 log Internal Server Error: /post/605/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 108, in get
+    self.object = self.get_object()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 53, in get_object
+    obj = queryset.get()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 645, in get
+    num = len(clone)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
+ERROR 2024-08-29 04:22:56,497 log Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: blog_post.anonymous_uuid
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/blog/views.py", line 44, in wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/blog/views.py", line 51, in home
+    return render(request, 'blog/home.html')
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/template/context.py", line 254, in bind_template
+    context = processor(self.request)
+  File "/home/sargent/spite/spite/context_processors.py", line 21, in load_posts
+    'spite' : len(posts),
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: blog_post.anonymous_uuid
