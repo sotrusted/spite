@@ -1,11 +1,12 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.core.paginator import Paginator
 import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView, ListView
 from .models import Post
 from django.contrib import messages
-from .forms import PostForm
+from .forms import PostForm, ReplyForm
 import functools
 from datetime import datetime 
 import subprocess
@@ -50,17 +51,23 @@ def log_ip(view_func):
 def home(request):
     return render(request, 'blog/home.html')
 
-
 class PostCreateView(CreateView):
     model = Post
     fields = ['title', 'city', 'description', 'contact', 'image']
 
     template_name = 'blog/post_form.html'
+    form_context_name = 'postForm'
+    form = PostForm
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context[self.form_context_name] = self.form()
+        return context
+
     def get(self, request, *args, **kwargs):
         log_ip1(request, 'get-post')
         context = {
-            'postForm': PostForm(),
+            self.form_context_name : self.form(),
         }
         
         return render(request, self.template_name, context)
@@ -68,7 +75,7 @@ class PostCreateView(CreateView):
     def post(self, request, *args, **kwargs):
 
         log_ip1(request, 'post-post')
-        form = PostForm(request.POST, request.FILES)
+        form = self.form(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             form.author = request.user
@@ -86,7 +93,28 @@ class PostCreateView(CreateView):
 
             return redirect('home')
 
-        return render(request, self.template_name, {'postForm': form})
+        return render(request, self.template_name, {self.form_context_name: form})
+
+class PostReplyView(PostCreateView):
+    template_name = 'blog/post_reply.html'
+    form_context_name = 'replyForm'
+    form = ReplyForm
+
+    def form_valid(self, form):
+        parent_post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        reply = form.save(commit=False)
+        reply.author = self.request.user
+        reply.parent_post = parent_post
+        reply.save()
+        messages.success(self.request, "Reply successfully posted")
+        return redirect('post-detail', pk=parent_post.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['parent_post'] = get_object_or_404(Post, pk=self.kwargs['pk'])
+        return context
+
+
 
 
 class PostDetailView(DetailView):
@@ -120,20 +148,15 @@ class PostListView(ListView):
     ordering = ['-date_posted']  # Order posts by date posted in descending order
 
 
-class PostReplyView(CreateView):
-    model = Post
-    template_name = 'blog/post_reply.html'
+def load_more_posts(requests):
+    post_list = Posts.objects.all().order_by('-date_posted')
+    paginator - Paginator(post_list, 100)
 
-    def form_valid(self, form):
-        parent_post = get_object_or_404(Post, pk=self.kwargs['pk'])
-        reply = form.save(commit=False)
-        reply.author = self.request.user
-        reply.parent_post = parent_post
-        reply.save()
-        messages.success(self.request, "Reply successfully posted")
-        return redirect('post-detail', pk=parent_post.pk)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['parent_post'] = get_object_or_404(Post, pk=self.kwargs['pk'])
-        return context
+    context = {
+        'posts': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+    }
+    return render(request, 'blog/post_list_partial.html', context)

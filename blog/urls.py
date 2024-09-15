@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.urls import path
-from .views import home, PostCreateView, PostDetailView, like_post, PostListView, PostReplyView
+from .views import home, PostCreateView, PostDetailView, like_post, PostListView, PostReplyView, load_more_posts
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -12,6 +12,7 @@ urlpatterns = [
     path('like/<int:pk>/', like_post, name='like_post'),
     path('all-posts', PostListView.as_view(), name='post-list'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
+    path('load-more-posts/', load_more_posts, name='load-more-posts')
 ]
 
 if settings.DEBUG:
