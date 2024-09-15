@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
+    'spite',
     'crispy_forms',
     'formtools',
     'easy_thumbnails',
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.active_session_middleware.ActiveSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
@@ -205,3 +207,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+
+TIME_ZONE = 'America/New_York'  # EST time zone
+USE_TZ = True  # Enable timezone support

@@ -24,6 +24,8 @@ class Post(models.Model):
     like_count = models.PositiveIntegerField(default=0)
     parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
 
+    is_pinned = models.BooleanField(default=False)
+
     def __str__(self):
         return self.title
     

@@ -63,4 +63,8 @@ class PostForm(forms.ModelForm):
         )
 
 class ReplyForm(PostForm):
-    pass
+    title = forms.CharField(
+        max_length=100, 
+        label='Response to post'
+        ) 
+
