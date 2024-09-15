@@ -1,27 +1,68 @@
-<div class="feed"> 
-    <h2 class="section-header">recent posts</h2>
-    <div class="posts">
-	{% if posts %}
+<!-- templates/feed.html -->
+{% load static %}
+
+<div class="feed">
+
+    <h2 class="section-header">spite issue of the week</h2>
+    <div class="pinned-posts">
+        {% if pinned_posts %}
+        {% for post in pinned_posts %}
+        <div class="detail" id="post-detail-{{post.id}}">
+            {% include 'blog/detail.html' with post=post %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="oops">This section seems to be empty.</p>
+        {% endif %}
+    </div>
+
+    <h2 class="section-header">recent posts</h2> 
+    <div class="posts" id="post-list">
+        {% if posts %}
         {% for post in posts %}
-        <div class="preview" id="post-preview-{{post.id}}">
+        <div class="item preview" id="post-preview-{{post.id}}">
 
             {% include 'blog/preview.html' with post=post %}
 
+	    <div class="menu">
+		    <a href="{% url 'post-reply' post.id %}">Reply</a>
+	    </div>
+		    
+
+
         </div>
 
-        <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
+        <div class="item detail" id="post-detail-{{ post.id }}" style="display: none;">
             {% include 'blog/detail.html' with post=post nested=True %}
         </div>
         {% endfor %}
-	{% else %}
-	<p class="oops">No one seems to have posted yet! Click below to post!</p>
-	{% endif %}
+        {% else %}
+        <p class="oops">No one seems to have posted yet! Click below to post!</p>
+        {% endif %}
     </div>
     <div class="cta">
-	    <div class="post-button">
-		<p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
-	    </div>
+        <div class="post-button">
+            <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
+        </div>
     </div>
 
+	<div class="pagination">
+		<span class="step-links">
+		    {% if posts.has_previous %}
+			<a href="?page=1">&laquo; first</a>
+			<a href="?page={{ posts.previous_page_number }}">previous</a>
+		    {% endif %}
+
+		    <span class="current">
+			Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+		    </span>
+
+		    {% if posts.has_next %}
+			<a href="?page={{ posts.next_page_number }}">next</a>
+			<a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+		    {% endif %}
+		</span>
+	</div>
 </div>
+<script src="{% static 'js/load_more.js' %}" defer></script>
 

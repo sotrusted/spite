@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <div class="post flexbox">
 
 <div class="text-content">
@@ -6,11 +7,17 @@
             {{ post.title }}
         </a>
     </h2>
+
+    {% if post.parent_post %}
+        <p>Replying to: <a href="{% url 'post-detail' post.parent_post.id %}">{{ post.parent_post.title }}</a></p>
+    {% endif %}
+
     <div class="post-content">
         {% if post.content %}
             <p>{{ post.content|truncatewords:30 }}</p>
         {% endif %}
     </div>
+
     
     <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Expand</a>
     {% if post.author %}

@@ -263,7 +263,13 @@ body {
 }
 
 /* Post styles */
-.post {
+
+.pinned-posts {
+	border-bottom: 2px solid #000;
+	margin-bottom: 20px;
+}
+
+.item {
     border-bottom: 2px solid #000;
     padding-left: 20px;
     overflow: hidden;
@@ -284,6 +290,11 @@ body {
 }
 
 /* Preview styles */
+.preview {
+	display: flex;
+	justify-content: space-between;
+	flex-direction:column;
+}
 .preview .text-content, .preview .image-content {
 	flex: 1 1 100%;
 }
@@ -351,6 +362,13 @@ body {
     width: 100%;
     height: auto;
     margin: 0 auto;
+}
+
+.menu {
+    display: flex;
+    justify-content: left; /* Center the content horizontally */
+    width: 100%; /* Ensure the menu takes the full width */
+    margin-top: auto; /* Push the menu to the bottom */
 }
 
 /* Site footer styles */
