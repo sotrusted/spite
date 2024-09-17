@@ -33,14 +33,17 @@ def cache_posts_data():
     return True
 
 @shared_task
-def cache_page_html(view_name, page_number):
+def cache_page_html(view_name, page_number=None):
     from django.urls import reverse
     from django.test import Client
 
     try:
         # Use Django's test Client to render the page HTML
         client = Client()
-        url = reverse(view_name, kwargs={'page': page_number})
+        if page_number:
+            url = reverse(view_name, kwargs={'page': page_number})
+        else:
+            url = reverse(view_name)
         response = client.get(url)
 
         if response.status_code == 200:

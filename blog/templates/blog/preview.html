@@ -30,7 +30,7 @@
 <div class="image-content">
     <div class="image-container">
         <a href="{% url 'post-detail' post.id %}">
-            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
         </a>
     </div>  
 </div>
