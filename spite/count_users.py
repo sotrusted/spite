@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from django.utils import timezone
 
 def get_ip_from_log(log):
     '''
@@ -34,7 +35,8 @@ def extract_datetime_from_log(log):
     else:
         return None
 
-def count_ips(logfile, date=None):
+current_timezone = timezone.get_current_timezone() 
+def count_ips(logfile, past_time=None):
     unique_ips = set()
 
     try:
@@ -42,7 +44,10 @@ def count_ips(logfile, date=None):
             logs = f.readlines()
             for log in logs:
                 log_datetime = extract_datetime_from_log(log)
-                if date is None or (log_datetime is not None and log_datetime.date() >= date):
+            
+                if past_time is None or \
+                    (log_datetime is not None and \
+                        timezone.make_aware(log_datetime, current_timezone)  >= past_time):
                     ip = get_ip_from_log(log)
                     if ip:
                         unique_ips.add(ip)
