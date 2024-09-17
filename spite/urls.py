@@ -17,8 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 import spite.views as core_views
+from debug_toolbar.toolbar import debug_toolbar_urls
+from django.conf import settings 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('favicon.ico', core_views.favicon),
-    path('',include('blog.urls'))
-]
+    path('',include('blog.urls')),
+] + debug_toolbar_urls()
+
+if settings.DEBUG: 
+    urlpatterns += path('silk/', include('silk.urls', namespace='silk')),
+    urlpatterns += debug_toolbar_urls()
+

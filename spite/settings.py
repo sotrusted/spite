@@ -1,4 +1,12 @@
 import os
+from celery.schedules import crontab
+import mimetypes
+
+mimetypes.add_type("application/javascript", ".js", True)
+
+DEBUG_TOOLBAR_CONFIG = {
+    "INTERCEPT_REDIRECTS": False,
+}
 """
 Django settings for spite project.
 
@@ -11,6 +19,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import sys
 from pathlib import Path
 import json
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -134,7 +143,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),
+                    os.path.join(BASE_DIR, 'staticfiles/')]
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -175,13 +185,14 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django_error.log'),
+            'filename': os.path.join(BASE_DIR, 'logs/django_debug.log'),
             'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',
+            'stream': sys.stdout,
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -197,7 +208,12 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-    },
+        'spite': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG', 
+            'propogate': True,
+        },
+    }, 
 }
 
 # Maximum size for file uploads (in bytes)
@@ -210,3 +226,61 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 TIME_ZONE = 'America/New_York'  # EST time zone
 USE_TZ = True  # Enable timezone support
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Example using Redis as broker
+
+CELERY_BEAT_SCHEDULE = {
+    'cache-posts-every-15-minutes': {
+        'task': 'your_app.tasks.cache_posts_data',
+        'schedule': crontab(minute='*/15'),
+    },
+    'cache-page-html-every-15-minutes': {
+        'task': 'your_app.tasks.cache_page_html',
+        'schedule': crontab(minute='*/15'),
+        'args': ('your_view_name', 1),  # Cache page 1 initially, extend for more pages if needed
+    },
+}
+
+if DEBUG:
+    INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'silk.middleware.SilkyMiddleware',
+        ] + MIDDLEWARE
+
+    INSTALLED_APPS += [
+        'debug_toolbar',
+        'silk',
+        ]
+
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
+
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK" : lambda request: True,
+    }
+

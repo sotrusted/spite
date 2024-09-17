@@ -1,4 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+import logging
 from django.core.paginator import Paginator
 import os
 from django.http import JsonResponse
@@ -12,6 +15,7 @@ from datetime import datetime
 import subprocess
 # Create your views here.
 
+logger = logging.getLogger('spite')
 
 def write_ip(ip, *args, **kwargs):
     with open('iplog', 'a+') as log:
@@ -47,10 +51,23 @@ def log_ip(view_func):
     return wrapper
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+CACHE_KEY = 'home_cache'
+
 @log_ip
+@cache_page(60 * 15, key_prefix=CACHE_KEY)
 def home(request):
+    logger.debug("IP Address for debug-toolbar: " + get_client_ip(request))
     return render(request, 'blog/home.html')
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class PostCreateView(CreateView):
     model = Post
     fields = ['title', 'city', 'description', 'contact', 'image']
@@ -81,20 +98,21 @@ class PostCreateView(CreateView):
             form.author = request.user
             messages.success(request, "successfully posted")
 
-            
-            venv_activate = '/home/sargent/spite/.spite/bin/activate'
-
-            try: 
-                subprocess.run(f'source {venv_activate} && python backup_database.py', shell=True, check=True, executable='/bin/bash')
-                print('Post uploaded, migrations run, and backup created successfully.')
-
-            except subprocess.CalledProcessError as e:
-                print('Post uploaded and migrations run, but backup failed: {str(e)}')   
-
             return redirect('home')
-
         return render(request, self.template_name, {self.form_context_name: form})
 
+''' 
+venv_activate = '/home/sargent/spite/.spite/bin/activate'
+
+try: 
+    subprocess.run(f'source {venv_activate} && python backup_database.py', shell=True, check=True, executable='/bin/bash')
+    print('Post uploaded, migrations run, and backup created successfully.')
+
+except subprocess.CalledProcessError as e:
+    print('Post uploaded and migrations run, but backup failed: {str(e)}')   
+'''
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class PostReplyView(PostCreateView):
     template_name = 'blog/post_reply.html'
     form_context_name = 'replyForm'
@@ -116,7 +134,7 @@ class PostReplyView(PostCreateView):
 
 
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
