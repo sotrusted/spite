@@ -1,23 +1,38 @@
 import pickle
+from blog.models import Post
+import logging
+from spite.count_users import count_ips
+from django.core.paginator import Paginator
+from django.conf import settings
 import zlib
 from django.core.cache import cache
-from .tasks import cache_posts_data
+from spite.tasks import cache_posts_data
 from datetime import datetime, timedelta, timezone
 import os
 
-def posts_context(request):
+logger = logging.getLogger('spite')
+def load_posts(request):
     # Try to get posts from the cache
     compressed_posts_data = cache.get('posts_data')
     if not compressed_posts_data:
         # If no cached data, trigger Celery task to cache posts data
+        logger.info("Cache is empty, fetching posts from the database.")
         cache_posts_data.delay()
-        posts_data = {'posts': [], 'pinned_posts': []}  # Empty data as a fallback
+
+        # Directly fetch posts from the database as a fallback
+
+        pinned_posts = Post.objects.filter(is_pinned=True).order_by('-date_posted')
+        posts = Post.objects.filter(is_pinned=False).order_by('-date_posted')
+
+        logger.info(f"Fetched {pinned_posts.count()} pinned posts and {posts.count()} unpinned posts from the database.")
+        posts_data = {'posts': posts, 'pinned_posts': pinned_posts}  # Fallback data
     else:
         # Load the cached posts data
+        logger.info("Loaded posts from cache.")
         posts_data = pickle.loads(zlib.decompress(compressed_posts_data))
 
     paginator = Paginator(posts_data['posts'], 20)  # Number to load initially
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page') or 1 
     page_obj = paginator.get_page(page_number)
 
     # Get or calculate user count data
