@@ -40,7 +40,7 @@ DEBUG = False
 
 
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 'testserver']
 
 
 # Application definition
@@ -239,13 +239,14 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Example using Redis as broker
 
 CELERY_BEAT_SCHEDULE = {
     'cache-posts-every-15-minutes': {
-        'task': 'your_app.tasks.cache_posts_data',
+        'task': 'spite.tasks.cache_posts_data',
         'schedule': crontab(minute='*/15'),
     },
     'cache-page-html-every-15-minutes': {
-        'task': 'your_app.tasks.cache_page_html',
+        'task': 'spite.tasks.cache_page_html',
         'schedule': crontab(minute='*/15'),
-        'args': ('your_view_name', 1),  # Cache page 1 initially, extend for more pages if needed
+        'args': ('home'),  # Cache page 1 initially, extend for more pages if needed
+        
     },
 }
 

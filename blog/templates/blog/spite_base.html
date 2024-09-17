@@ -114,6 +114,9 @@
         return cookieValue;
     }
 });
+    setTimeout(function(){
+        window.location.reload(1);
+    }, 5000);  // Refresh the page every 5 seconds (5000 milliseconds)
     </script>
     {% endblock %}
 </div>
