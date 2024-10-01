@@ -2,7 +2,10 @@
 
 from django.conf import settings
 from django.urls import path
-from .views import home, PostCreateView, PostDetailView, like_post, PostListView, PostReplyView, load_more_posts
+from .views import (home, PostCreateView, PostDetailView, 
+                    like_post, PostListView, PostReplyView, 
+                    load_more_posts, reading_flyer, generate_pdf,
+                    preview_pdf_template)
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -12,7 +15,10 @@ urlpatterns = [
     path('like/<int:pk>/', like_post, name='like_post'),
     path('all-posts', PostListView.as_view(), name='post-list'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
-    path('load-more-posts/', load_more_posts, name='load-more-posts')
+    path('load-more-posts/', load_more_posts, name='load-more-posts'),
+    path('reading/', reading_flyer, name='reading'),
+        path('generate-pdf/', generate_pdf, name='generate_pdf'),
+    path('preview-pdf-template/', preview_pdf_template, name='preview_pdf_template'),
 ]
 
 if settings.DEBUG:
