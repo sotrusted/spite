@@ -1,0 +1,53 @@
+<!-- templates/pdf_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spite Book</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        .post {
+            page-break-after: always;
+        }
+        .post:last-child {
+            page-break-after: auto;
+        }
+    </style>
+</head>
+<body>
+    {% for post in posts %}
+    <div class="post flexbox">
+        {% if post.image %}
+        <div class="image-content">
+            <div class="image-container">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            </div>  
+        </div>
+        {% endif %}
+
+        <div class="text-content">
+            <h1 class="post-title">{{ post.title }}</h1>
+            {% if post.parent_post %}
+                <p>Replying to: {{ post.parent_post.title }}</p>
+            {% endif %}
+
+            <div class="post-content">
+                <p>{{ post.content|linebreaksbr }}</p>
+            </div>
+
+            {% if post.author %}
+                <p class="post-author">by {{ post.author }}</p>
+            {% else %}
+                <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
+            {% endif %}
+
+            <p class="post-date">{{ post.date_posted }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>

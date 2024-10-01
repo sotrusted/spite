@@ -1,4 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 import logging
@@ -13,6 +15,7 @@ from .forms import PostForm, ReplyForm
 import functools
 from datetime import datetime 
 import subprocess
+from weasyprint import HTML
 # Create your views here.
 
 logger = logging.getLogger('spite')
@@ -163,12 +166,12 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'  # Specify your template name
     context_object_name = 'posts'  # Name of the context variable to use in the template
-    ordering = ['-date_posted']  # Order posts by date posted in descending order
+    ordering = ['date_posted']  # Order posts by date posted in descending order
 
 
-def load_more_posts(requests):
-    post_list = Posts.objects.all().order_by('-date_posted')
-    paginator - Paginator(post_list, 100)
+def load_more_posts(request):
+    post_list = Post.objects.all().order_by('-date_posted')
+    paginator = Paginator(post_list, 100)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -178,3 +181,27 @@ def load_more_posts(requests):
         'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, 'blog/post_list_partial.html', context)
+
+
+def reading_flyer(request):
+    return render(request, 'blog/flyer.html')
+
+def generate_pdf(request):
+    # Render HTML template
+    html_string = render_to_string('blog/pdf_template.html')
+
+    # Convert the HTML to a PDF
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+
+    # Create a response object and set the appropriate headers
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="spite_book.pdf"'
+
+    return response
+
+
+def preview_pdf_template(request):
+
+    # Render the posts into an HTML template
+    return render(request, 'blog/pdf_template.html')

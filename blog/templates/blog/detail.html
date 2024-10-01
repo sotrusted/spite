@@ -29,6 +29,9 @@
             <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
         {% endif %}
 
+
+        <p class="post-date">{{post.date_posted }}</p>
+
     </div>
     <div class="menu">
 	    {% if not post.is_pinned %}
