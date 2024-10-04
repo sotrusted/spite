@@ -2,7 +2,7 @@
 {% load static %}
 
 <div class="feed">
-
+    {% if home %}
     <h2 class="section-header">spite issue of the week</h2>
     <div class="pinned-posts">
         {% if pinned_posts %}
@@ -15,6 +15,12 @@
         <p class="oops">This section seems to be empty.</p>
         {% endif %}
     </div>
+    {% endif %}
+
+    <form method="get" action="{% url 'search_results' %}">
+        {% csrf_token %}
+        {{ search_form|crispy }}
+    </form>
 
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">

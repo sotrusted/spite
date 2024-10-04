@@ -68,3 +68,12 @@ class ReplyForm(PostForm):
         label='Response to post'
         ) 
 
+
+class PostSearchForm(forms.Form):
+    query = forms.CharField(label='Search', max_length=100)
+
+    def __init__(self, *args, **kwargs):
+        super(PostSearchForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'get'
+        self.helper.add_input(Submit('submit', 'Search'))

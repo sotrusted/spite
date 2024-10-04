@@ -36,7 +36,7 @@ with open('config.json') as f:
 SECRET_KEY = config['SECRET_KEY'] 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 
@@ -285,3 +285,5 @@ if DEBUG:
         "SHOW_TOOLBAR_CALLBACK" : lambda request: True,
     }
 
+
+CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr']

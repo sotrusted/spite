@@ -17,6 +17,31 @@
     <p>Readings 8PM</p>
         <a class="email" href="mailto:editor@spite.fr">Featuring</a>
         <a href="#"></a><br>
+        <a href="#">Priya Banerjee -</a>
+        <a href="#">Annabel Boardman</a><br>
+        <a href="#">Izzy Dent -</a>
+        <a href="#">Catie Fronczak</a><br>
+        <a href="#">Cassidy Grady - </a>
+        <a href="#">T. Sargent Moore</a><br>
+        <a href="#">Marcel Monroy -</a>
+        <a href="#">Zebediah Newby</a><br>
+        <a href="#">Peter Vack</a><br>
+        <a class="email" href="mailto:editor@spite.fr">reading the writing of Spite Magazine</a>
+    </div>
+    {% block  spite %}
+    <div class="spite" style="background-color: darkgray; color: indigo;">
+
+    </div>
+    {% endblock %}
+    
+    <div class="header">
+        <a href="{% url 'home' %}">
+            <img class="logo" src="{% static 'media/spite-reading-2.png' %}" alt="Spite Logo">
+        </a>
+    <p>October 13th - 185 E. Broadway </p>
+    <p>Readings 8PM</p>
+        <a class="email" href="mailto:editor@spite.fr">Featuring</a>
+        <a href="#"></a><br>
         <a href="#">Priya Banerjee /</a>
         <a href="#">Annabel Boardman /</a>
         <a href="#">Izzy Dent</a><br>
@@ -27,4 +52,5 @@
         <a href="#">Peter Vack</a><br>
         <a class="email" href="mailto:editor@spite.fr">reading the writing of Spite Magazine</a>
     </div>
+    
 {% endblock %}
