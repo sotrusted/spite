@@ -2,6 +2,9 @@
 
 {% load static %}
 
+{% block content %}
+{% endblock %}
+
 {% block feed %}
-    {% include 'blog/feed.html' with home=false posts=posts}
+    {% include 'blog/feed.html' with home=False posts=posts %}
 {% endblock %}
