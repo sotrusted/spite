@@ -12,6 +12,5 @@ def clear_cache_on_post_save(sender, instance, **kwargs):
     logger.debug(f"Post {instance.id} saved. Clearing cache")
     
     #Cache posts 
-    cache.delete('posts_data')
+    cache.clear()
 
-    cache_posts_data.delay()

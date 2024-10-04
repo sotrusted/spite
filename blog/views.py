@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
@@ -70,7 +71,6 @@ def home(request):
     logger.debug("IP Address for debug-toolbar: " + get_client_ip(request))
     return render(request, 'blog/home.html')
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class PostCreateView(CreateView):
     model = Post
     fields = ['title', 'city', 'description', 'contact', 'image']
@@ -205,3 +205,19 @@ def preview_pdf_template(request):
 
     # Render the posts into an HTML template
     return render(request, 'blog/pdf_template.html')
+
+def search_results(request):
+    query = request.GET.get('query')
+    if query:
+        posts = Post.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+    else:
+        posts = Post.objects.none()
+    
+    context = {
+        'posts': posts,
+        'query': query,
+    }
+
+    return render(request, 'blog/search_results.html', context)
