@@ -209,6 +209,7 @@ def preview_pdf_template(request):
 def search_results(request):
     query = request.GET.get('query')
     if query:
+        logger.debug(f'Search query: {query}')
         posts = Post.objects.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )

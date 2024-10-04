@@ -1,20 +1,21 @@
 <!-- templates/feed.html -->
 {% load static %}
+{% load crispy_forms_tags %}
 
 <div class="feed">
     {% if home %}
-    <h2 class="section-header">spite issue of the week</h2>
-    <div class="pinned-posts">
-        {% if pinned_posts %}
-        {% for post in pinned_posts %}
-        <div class="detail" id="post-detail-{{post.id}}">
-            {% include 'blog/detail.html' with post=post %}
+        <h2 class="section-header">spite issue of the week</h2>
+        <div class="pinned-posts">
+            {% if pinned_posts %}
+            {% for post in pinned_posts %}
+            <div class="detail" id="post-detail-{{post.id}}">
+                {% include 'blog/detail.html' with post=post %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="oops">This section seems to be empty.</p>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <p class="oops">This section seems to be empty.</p>
-        {% endif %}
-    </div>
     {% endif %}
 
     <form method="get" action="{% url 'search_results' %}">
