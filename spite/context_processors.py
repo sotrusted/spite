@@ -9,6 +9,7 @@ from django.core.cache import cache
 from spite.tasks import cache_posts_data
 from datetime import datetime, timedelta, timezone
 import os
+from blog.forms import PostSearchForm
 
 logger = logging.getLogger('spite')
 def load_posts(request):
@@ -62,6 +63,7 @@ def load_posts(request):
         'daily_user_count': user_count_data['daily_user_count'],
         'active_sessions_count': user_count_data['active_sessions_count'],
         'is_paginated': page_obj.has_other_pages(),
+        'search_form': PostSearchForm(), 
     }
 
 def days_since_launch():

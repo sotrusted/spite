@@ -1,0 +1,7 @@
+{% extends 'blog/spite_base.html' %}
+
+{% load static %}
+
+{% block feed %}
+    {% include 'blog/feed.html' with home=false posts=posts}
+{% endblock %}
