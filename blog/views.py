@@ -211,7 +211,7 @@ def search_results(request):
     if query:
         logger.debug(f'Search query: {query}')
         posts = Post.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
+            Q(title__icontains=query) | Q(content__icontains=query)
         )
     else:
         posts = Post.objects.none()
