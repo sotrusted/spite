@@ -65,7 +65,6 @@ def get_client_ip(request):
 
 CACHE_KEY = 'home_cache'
 
-@log_ip
 @cache_page(60 * 15, key_prefix=CACHE_KEY)
 def home(request):
     logger.debug("IP Address for debug-toolbar: " + get_client_ip(request))
@@ -85,7 +84,7 @@ class PostCreateView(CreateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        log_ip1(request, 'get-post')
+        # log_ip1(request, 'get-post')
         context = {
             self.form_context_name : self.form(),
         }
@@ -94,7 +93,7 @@ class PostCreateView(CreateView):
     
     def post(self, request, *args, **kwargs):
 
-        log_ip1(request, 'post-post')
+        # log_ip1(request, 'post-post')
         form = self.form(request.POST, request.FILES)
         if form.is_valid():
             form.save()
@@ -149,7 +148,7 @@ class PostDetailView(DetailView):
 
 
 @csrf_exempt
-@log_ip
+# @log_ip
 def like_post(request, post_id):
     if request.method == 'POST':
         try:
