@@ -30,7 +30,10 @@ def extract_datetime_from_log(log):
     datetime_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
     re_match = re.search(datetime_pattern, log)
     if re_match:
-        log_datetime = datetime.strptime(re_match.group(), "%Y-%m-%d %H:%M:%S")
+        try:
+            log_datetime = datetime.strptime(re_match.group(), "%Y-%m-%d %H:%M:%S")
+        except ValueError as e:
+            pass
         return log_datetime
     else:
         return None
