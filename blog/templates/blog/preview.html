@@ -24,6 +24,13 @@
         <p class="post-author">by {{ post.author }}</p>
     {% endif %}
     <p class="post-date">{{post.date_posted }}</p>
+    {% if post.city or post.contact %}
+        <p class="post-info">
+            {% if post.city %}{{ post.city }}{% endif %}
+            {% if post.city and post.contact %} / {% endif %}
+            {% if post.contact %}{{ post.contact }}{% endif %}
+        </p>
+    {% endif %}
 </div>
 
 {% if post.image %}

@@ -1,4 +1,5 @@
 import pickle
+import lz4.frame as lz4
 import zlib
 from celery import shared_task
 from django.core.cache import cache
@@ -21,7 +22,14 @@ def cache_posts_data():
 
         # Compress and cache the posts data
         posts_data = {'posts': posts, 'pinned_posts': pinned_posts}
-        compressed_posts_data = zlib.compress(pickle.dumps(posts_data))
+
+        # compressed_posts_data = zlib.compress(pickle.dumps(posts_data))
+        # Serialize with pickle
+        pickled_data = pickle.dumps(posts_data)
+
+        # Compress the pickled data with LZ4
+        compressed_posts_data = lz4.compress(pickled_data)
+
 
         # Cache the compressed data
         cache.set('posts_data', compressed_posts_data, 60 * 15)

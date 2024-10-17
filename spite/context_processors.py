@@ -1,3 +1,4 @@
+import lz4.frame as lz4
 import pickle
 from blog.models import Post
 import logging
@@ -12,6 +13,7 @@ import os
 from blog.forms import PostSearchForm
 
 logger = logging.getLogger('spite')
+
 def load_posts(request):
     # Try to get posts from the cache
     compressed_posts_data = cache.get('posts_data')
@@ -32,18 +34,24 @@ def load_posts(request):
         logger.info("Loaded posts from cache.")
         posts_data = pickle.loads(zlib.decompress(compressed_posts_data))
 
-    paginator = Paginator(posts_data['posts'], 20)  # Number to load initially
-    page_number = request.GET.get('page') or 1 
+        # Decompress with LZ4
+        decompressed_data = lz4.decompress(compressed_posts_data)
+
+        # Deserialize with pickle
+        posts_data = pickle.loads(decompressed_data)
+
+    paginator = Paginator(posts, 20)  # Number to load initially
+    page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
     # Get or calculate user count data
     user_count_data = cache.get('user_count_data')
     if not user_count_data:
-        iplog = os.path.join(settings.BASE_DIR, 'iplog')
+        iplog = os.path.join(settings.BASE_DIR, 'logs/django_access.log')
         current_time = datetime.now(timezone.utc)
 
         user_count, daily_user_count, active_sessions_count = \
-            [count_ips(iplog, past_time=time) for time in \
+            [count_ips(iplog, start_time=time) for time in \
              [None, current_time - timedelta(hours=24), current_time - timedelta(hours=1)]]
 
         user_count_data = {
