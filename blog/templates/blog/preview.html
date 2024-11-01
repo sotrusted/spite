@@ -22,6 +22,8 @@
     <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Expand</a>
     {% if post.author %}
         <p class="post-author">by {{ post.author }}</p>
+    {% elif post.display_name %}
+        <p class="post-author">by {{ post.display_name }}</p>
     {% endif %}
     <p class="post-date">{{post.date_posted }}</p>
     {% if post.city or post.contact %}

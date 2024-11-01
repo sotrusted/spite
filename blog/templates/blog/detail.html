@@ -25,6 +25,8 @@
 
         {% if post.author %}
             <p class="post-author">by {{ post.author }}</p>
+        {% elif post.display_name %}
+            <p class="post-author">by {{ post.display_name }}</p>
         {% else %}
             <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
         {% endif %}

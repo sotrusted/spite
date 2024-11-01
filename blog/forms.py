@@ -38,7 +38,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'city', 'content', 'image', \
-                  'contact')
+                  'contact', 'display_name')
 
 
     def __init__(self, *args, **kwargs):
@@ -48,15 +48,11 @@ class PostForm(forms.ModelForm):
         
         self.helper.layout = Layout(
             Div(
-                Row(
-                    Column('title', css_class='form-group col-md-6 mb-0'),
-                    Column('city', css_class='form-group col-md-3 mb-0'),
-                    css_class='form-row'
-                ),
-                Row('content', css_class='form-group col-md-9 mb-0'),
-                Row('image', css_class='form-group col-md-9 mb-0'),
-                Row('contact', css_class='form-group col-md-9 mb-0'
-                ),
+                Row('title', css_class='form-group col-md-12 mb-0'),
+                Row('content', css_class='form-group col-md-12 mb-0'),
+                Row('image', css_class='form-group col-md-12 mb-0'),
+                Row('display_name', css_class='form-group col-md-12 mb-0'),
+                # Row('contact', css_class='form-group col-md-9 mb-0'
                 css_class='form-group mb-0'
             ),
             Submit('submit', 'Submit'),
@@ -77,3 +73,11 @@ class PostSearchForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'get'
         self.helper.add_input(Submit('submit', 'Search'))
+
+'''
+                Row(
+                    Column('title', css_class='form-group col-md-6 mb-0'),
+                    Column('city', css_class='form-group col-md-3 mb-0'),
+                    css_class='form-row'
+                ),
+                '''
