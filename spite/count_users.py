@@ -92,7 +92,6 @@ def count_ips(logfile, start_time=None):
         for logline in loglines:
             try:
                 if logline.count('[') != 2 or logline.count(']') != 2:
-                    logger.error(f"Malformed log line detected: {logline.strip()}")
                     continue
                 # Parse the logline using apache-log-parser
                 log_data = parser(logline)

@@ -274,7 +274,6 @@ CELERY_BEAT_SCHEDULE = {
         
     },
 }
-
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
     MIDDLEWARE = [
@@ -286,7 +285,6 @@ if DEBUG:
         'debug_toolbar',
         'silk',
         ]
-
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.versions.VersionsPanel',
         'debug_toolbar.panels.timer.TimerPanel',
