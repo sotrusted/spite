@@ -23,6 +23,8 @@ class Post(models.Model):
     date_posted = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
     parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
+    
+    display_name = models.CharField(max_length=100, verbose_name='Display Name', null=True, blank=True, default='')
 
     is_pinned = models.BooleanField(default=False)
 

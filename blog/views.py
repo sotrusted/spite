@@ -221,3 +221,8 @@ def search_results(request):
     }
 
     return render(request, 'blog/search_results.html', context)
+
+
+def store_page(request):
+
+    return render(request, 'blog/shop.html')
