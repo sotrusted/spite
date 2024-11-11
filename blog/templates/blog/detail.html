@@ -1,23 +1,31 @@
 <div class="post flexbox">
 
-    {% if post.image %}
+    {% if post.media_file or post.image %}
     <div class="image-content">
         <div class="image-container">
-            <a href="{% url 'post-detail' post.id %}">
+            {% if post.media_file and post.is_video %}
+                <video controls muted autoplay playsinline>
+                    <source src="{{ post.media_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% elif post.media_file and post.is_image %}
+                <img src="{{ post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
+            {% elif post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
-            </a>
-        </div>  
+            {% endif %}
+        </div>
     </div>
     {% endif %}
+
 
     <div class="text-content">
 
         <h1 class="post-title">
             {{ post.title }}
         </h1>
-	{% if post.parent_post %}
+        {% if post.parent_post %}
     	    <p>Replying to: <a href="{% url 'post-detail' post.parent_post.id %}">{{ post.parent_post.title }}</a></p>
-	{% endif %}
+        {% endif %}
 
         <div class="post-content">
             <p>{{ post.content|linebreaksbr }}</p>
