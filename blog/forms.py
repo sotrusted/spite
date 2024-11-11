@@ -37,8 +37,8 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'city', 'content', 'image', \
-                  'contact', 'display_name')
+        fields = ('title', 'content', 'media_file',\
+                  'display_name')
 
 
     def __init__(self, *args, **kwargs):
@@ -50,7 +50,7 @@ class PostForm(forms.ModelForm):
             Div(
                 Row('title', css_class='form-group col-md-12 mb-0'),
                 Row('content', css_class='form-group col-md-12 mb-0'),
-                Row('image', css_class='form-group col-md-12 mb-0'),
+                Row('media_file', css_class='form-group col-md-12 mb-0'),
                 Row('display_name', css_class='form-group col-md-12 mb-0'),
                 # Row('contact', css_class='form-group col-md-9 mb-0'
                 css_class='form-group mb-0'
