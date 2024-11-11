@@ -242,12 +242,14 @@ LOGGING = {
 }
 
 # Maximum size for file uploads (in bytes)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
 # Maximum size for request data (in bytes)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+# FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
 TIME_ZONE = 'America/New_York'  # EST time zone
 USE_TZ = True  # Enable timezone support
