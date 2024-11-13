@@ -220,16 +220,41 @@ body {
     }
 }
 
+/* Form styles */
+form {
+    width: 100% !important;
+    max-width: none !important;
+}
+
 /* Form container styles */
 .form-container {
     display: flex;
     margin: 0 auto;
-    max-width: 560px;
+    max-width: 720px;
     padding: 15px;
     border: 2px solid #000;
     font-weight: bold;
     background-color: antiquewhite;
 }
+.form-container .form-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0; /* Remove unnecessary padding */
+}
+
+/* Adjust the textarea to fill the width */
+.form-container textarea {
+    width: 100%;           /* Ensure it spans the width */
+    max-width: 100%;       /* Prevent extra constraints */
+    box-sizing: border-box; /* Adjust for padding/borders */
+    margin: 0;             /* Avoid extra spacing */
+    display: block;        /* Avoid inline weirdness */
+}
+
+#div_id_content.form-group {
+    width: 100% !important;
+}
+
 
 /* Feed styles */
 .feed {
@@ -241,7 +266,6 @@ body {
     width: 100%;
     height: auto;
 }
-
 .feed > div {
     width: 100%;
 }
@@ -320,8 +344,6 @@ body {
 .preview .image-container video {
     max-height: 300px;
     max-width: 100%;
-    object-fit: contain;
-    box-sizing: border-box;
     height: auto;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
 }
@@ -360,12 +382,11 @@ body {
 
 .detail .image-container img, 
 .detail .image-container video {
-	max-height: 500px;
-    object-fit: contain;
-    box-sizing: border-box;
 	max-width: 100%;
 	height: auto;
+	max-height: 500px;
 	display: block; 
+    object-fit: contain;
 }
 
 .detail .img {
