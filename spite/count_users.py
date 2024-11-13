@@ -88,7 +88,6 @@ def count_ips(logfile, start_time=None):
         logtext = process.stdout.read()
         loglines = logtext.splitlines()
 
-
         for logline in loglines:
             try:
                 if logline.count('[') != 2 or logline.count(']') != 2:
