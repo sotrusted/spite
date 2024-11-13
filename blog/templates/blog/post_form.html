@@ -4,7 +4,7 @@
 {% endblock %}
 {% block form %}
     <div class="form-container">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" onsubmit="disableSubmitButton()">
             {% csrf_token %}
             {% crispy postForm postForm.helper %}
             {% if form.errors %}
@@ -24,3 +24,10 @@
 {% block feed %}
 {% endblock %}
 
+<script>
+    function disableSubmitButton() {
+        var submitButton = document.getElementById('submit-id-submit');
+        submitButton.disabled = true;
+        submitButton.value = 'Posting...';  // Change the button text
+    }
+</script>
