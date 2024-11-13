@@ -49,7 +49,10 @@ class PostForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 Row('title', css_class='form-group col-md-12 mb-0'),
-                Row('content', css_class='form-group col-md-12 mb-0'),
+                Row(
+                    Field('content', css_class='w-100'),  # Full-width content field
+                    css_class='form-group col-md-12 mb-0'
+                ),
                 Row('media_file', css_class='form-group col-md-12 mb-0'),
                 Row('display_name', css_class='form-group col-md-12 mb-0'),
                 # Row('contact', css_class='form-group col-md-9 mb-0'
