@@ -21,13 +21,17 @@
         </form>
     </div>
 {% endblock %}
+
 {% block feed %}
 {% endblock %}
 
+{% block page_scripts %}
 <script>
     function disableSubmitButton() {
         var submitButton = document.getElementById('submit-id-submit');
+        console.log(submitButton.value);
         submitButton.disabled = true;
         submitButton.value = 'Posting...';  // Change the button text
     }
 </script>
+{% endblock %}

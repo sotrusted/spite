@@ -62,7 +62,7 @@ def cache_page_html(view_name, page_number=None):
                 cache.set(f'{view_name}_html_page_{page_number}', response.content, 60 * 15)
                 logger.info(f"Cached HTML for {view_name} page {page_number} successfully.")
             else:
-                logger.warning(f"Failed to cache HTML for {view_name} page {pavge_number}. Status code: {response.status_code}")
+                logger.warning(f"Failed to cache HTML for {view_name} page {page_number}. Status code: {response.status_code}")
 
     except Exception as e:
         logger.error(f"Error caching HTML for {view_name} page {page_number}: {e}")
