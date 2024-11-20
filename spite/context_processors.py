@@ -1,6 +1,6 @@
 import lz4.frame as lz4
 import pickle
-from blog.models import Post
+from blog.models import Post, Comment
 import logging
 from spite.count_users import count_ips
 from django.core.paginator import Paginator
@@ -10,7 +10,7 @@ from django.core.cache import cache
 from spite.tasks import cache_posts_data
 from datetime import datetime, timedelta, timezone
 import os
-from blog.forms import PostSearchForm
+from blog.forms import PostSearchForm, CommentForm
 
 logger = logging.getLogger('spite')
 
@@ -62,6 +62,13 @@ def load_posts(request):
 
         cache.set('user_count_data', user_count_data, 60 * 1)
 
+    # Add comments context
+    for post in page_obj.object_list:
+        comments = Comment.objects.filter(post=post).order_by('-created_on')
+        # Attach comments and total count directly to the post object
+        post.comments_total = comments.count()
+        post.recent_comments = comments[:5]  # Attach the recent 5 comments directly to the post
+
     return {
         'days_since_launch': days_since_launch(),
         'posts': page_obj,
@@ -72,6 +79,7 @@ def load_posts(request):
         'active_sessions_count': user_count_data['active_sessions_count'],
         'is_paginated': page_obj.has_other_pages(),
         'search_form': PostSearchForm(), 
+        'comment_form': CommentForm(),
     }
 
 def days_since_launch():

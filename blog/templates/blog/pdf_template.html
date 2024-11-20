@@ -5,47 +5,122 @@
 {% block stylesheets %}
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     <style>
+        
         @page {
-            size: A4;
-            margin: 1cm;
+            size: 6in 9in;
+            margin: 0.5in;
+          }
+      
+        body {
+            font-family: 'Crimson Text', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
         }
-        .post {
-            page-break-after: always;
+      
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
         }
-        .post:last-child {
-            page-break-after: auto;
+      
+        .item.detail {
+            display: inline-block;
+            width:100%;
+            page-break-inside: avoid; /* Prevent splitting posts across pages */
+            page-break-before: auto;  /* Allow a post to poststart at the top of a page when necessary */
+            page-break-after: auto;   /* Allow ending before starting a new one */
+            margin: 20px 0;           /* Add spacing between posts */
+         }
+      
+        .post-title {
+            font-size: 18pt;
+            font-weight: bold;
+         }
+      
+        .post-content {
+            position: relative;
+            display: inline-block;
+            width:100%;
+            margin-top: 10px;
+            text-align: justify;
+            page-break-inside: avoid; /* Ensure paragraphs/images stay together */
+         }
+
+        p {
+            page-break-inside: avoid;
         }
+
+        .image-container {
+            page-break-inside: avoid; /* Prevent images from breaking across pages */
+        }
+      
+        img {
+            position:relative;
+            display: inline-block;
+            page-break-inside: avoid; /* Prevent images from breaking across pages */
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media print {
+            body {
+                font-family: 'Crimson Text', serif;
+                font-size: 12pt;
+                line-height: 1.5;
+                color: #000;
+            }
+        
+            .navbar, .footer, .spite-bar {
+                display: none; /* Hide navigation bars, footers, or any other UI elements */
+            }
+        
+            .container {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+
+            p {
+                page-break-inside: avoid;
+            }
+        
+            .item {
+                position: relative;
+                display: inline-block;
+                page-break-inside: avoid; /* Prevent splitting posts across pages */
+                margin-bottom: 20px;
+            }
+        
+            .post-content {
+                position: relative;
+                display: inline-block;
+                page-break-inside: avoid;
+            }
+        
+            img {
+                position: relative;
+                display: inline-block;
+                max-width: 100%; /* Ensure images scale correctly */
+                height: auto;
+                page-break-inside: avoid;
+            }
+        
+            /* Remove any unwanted backgrounds or colors */
+            body, .container, .posts {
+                color: black;
+            }
+        }
+
     </style>
 {% endblock %}
-{% block content %}
+{% block feed %}
+<div class="posts" id="post-list">
     {% for post in posts %}
-    <div class="post flexbox">
-        {% if post.image %}
-        <div class="image-content">
-            <div class="image-container">
-                <img src="{{ post.image.url }}" alt="{{ post.title }}">
-            </div>  
-        </div>
-        {% endif %}
-
-        <div class="text-content">
-            <h1 class="post-title">{{ post.title }}</h1>
-            {% if post.parent_post %}
-                <p>Replying to: {{ post.parent_post.title }}</p>
-            {% endif %}
-
-            <div class="post-content">
-                <p>{{ post.content|linebreaksbr }}</p>
-            </div>
-
-            {% if post.author %}
-                <p class="post-author">by {{ post.author }}</p>
-            {% else %}
-                <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
-            {% endif %}
-
-            <p class="post-date">{{ post.date_posted }}</p>
-        </div>
+    <div class="item detail" id="post-detail-{{ post.id }}">
+        {% include 'blog/detail.html' with post=post export=True %} 
     </div>
     {% endfor %}
+</div>
 {% endblock %}

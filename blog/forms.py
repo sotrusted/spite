@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from .models import Post
+from blog.models import Post, Comment
 from crispy_forms.layout import Layout, Submit, Div, Field, HTML, Row, Column
 
 class PostForm(forms.ModelForm):
@@ -84,3 +84,22 @@ class PostSearchForm(forms.Form):
                     css_class='form-row'
                 ),
                 '''
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['name', 'content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your comment here...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_class = 'comment-form'
+        self.helper.layout = Layout(
+            Field('name', placeholder='Your name (optional)', css_class='form-control'),
+            Field('content', css_class='form-control'),
+            Submit('submit', 'Submit', css_class='btn btn-primary'),
+        )

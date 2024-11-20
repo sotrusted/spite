@@ -104,7 +104,6 @@ def count_ips(logfile, start_time=None):
 
                 # Convert the log time to a datetime object
                 log_time = datetime.strptime(log_time_str, '%d/%b/%Y:%H:%M:%S %z')
-                logger.info(log_time)
                 
                 # Check if the log time is after the provided start_time
                 if start_time is None or log_time >= start_time:
