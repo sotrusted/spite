@@ -71,11 +71,11 @@
             if (detailDiv.style.display === 'none') {
                 detailDiv.style.display = 'flex';
                 previewDiv.style.display = 'none';
-		toggleButton.textContent = 'Collapse';
+                toggleButton.textContent = 'Collapse';
             } else {
                 detailDiv.style.display = 'none';
                 previewDiv.style.display = 'flex';
-		toggleButton.textContent = 'Expand';
+                toggleButton.textContent = 'Expand';
             }
         }
     document.addEventListener('DOMContentLoaded', function() {
@@ -118,6 +118,14 @@
         }
         return cookieValue;
     }
+    document.getElementById('toggle-comments').addEventListener('click', function() {
+        var container = document.getElementById('comments-container');
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    });
 });
     </script>
     {% endblock %}
