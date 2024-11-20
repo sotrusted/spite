@@ -243,7 +243,7 @@ def add_comment(request, post_id):
 
         # Initialize the form with POST data
         comment_form = CommentForm(request.POST)
-        comment_form = CommentForm(request.POST)
+
         if comment_form.is_valid():
             logger.info("Comment form is valid. Saving comment...")
 
