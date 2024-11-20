@@ -31,4 +31,4 @@ postgresql.log
 # Ignore any connection credentials or environment files
 .env
 *.env
-
+config.json
