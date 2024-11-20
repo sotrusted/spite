@@ -46,7 +46,7 @@ with open('config.json') as f:
 SECRET_KEY = config['SECRET_KEY'] 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 
@@ -276,6 +276,13 @@ CELERY_BEAT_SCHEDULE = {
         
     },
 }
+
+CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr']
+
+
+PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
+PUSHOVER_API_TOKEN = 'apuwdk74tzqpfv35b1sc76vgs1z2g8'
+
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
     MIDDLEWARE = [
@@ -311,8 +318,3 @@ if DEBUG:
     }
 
 
-CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr']
-
-
-PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
-PUSHOVER_API_TOKEN = 'apuwdk74tzqpfv35b1sc76vgs1z2g8'
