@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView, ListView
 from .models import Post
 from django.contrib import messages
-from .forms import PostForm, ReplyForm
+from .forms import PostForm, ReplyForm, CommentForm
 import functools
 from datetime import datetime 
 import subprocess
@@ -67,7 +67,7 @@ CACHE_KEY = 'home_cache'
 
 @cache_page(60 * 15, key_prefix=CACHE_KEY)
 def home(request):
-    logger.debug("IP Address for debug-toolbar: " + get_client_ip(request))
+    logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
     return render(request, 'blog/home.html')
 
 class PostCreateView(CreateView):
@@ -208,7 +208,7 @@ def preview_pdf_template(request):
 def search_results(request):
     query = request.GET.get('query')
     if query:
-        logger.debug(f'Search query: {query}')
+        logger.info(f'Search query: {query}')
         posts = Post.objects.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
         )
@@ -226,3 +226,39 @@ def search_results(request):
 def store_page(request):
 
     return render(request, 'blog/shop.html')
+
+def add_comment(request, post_id):
+    logger.info(f"Received a request to add a comment to post ID {post_id}.")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"CSRF token in POST data: {request.POST.get('csrfmiddlewaretoken', 'Not found')}")
+
+    post = get_object_or_404(Post, id=post_id)
+    logger.info(f"Post found: {post.title}")
+
+    if request.method == 'POST':
+        logger.info("Processing POST request.")
+        
+        # Log the raw POST data
+        logger.info(f"POST data: {request.POST}")
+
+        # Initialize the form with POST data
+        comment_form = CommentForm(request.POST)
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            logger.info("Comment form is valid. Saving comment...")
+
+            # Save the comment
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+
+            # Log success and redirect
+            logger.info("Comment saved successfully.")
+            return redirect('home')  # Redirect to homepage after submission
+        else:
+            # Log the form errors
+            logger.error(f"Comment form errors: {comment_form.errors}")
+    else:
+        logger.info("Request method is not POST. Redirecting to home.")    
+
+    return redirect('home')

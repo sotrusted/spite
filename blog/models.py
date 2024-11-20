@@ -75,3 +75,13 @@ def get_image_filename(instance, filename):
     title = instance.personal.title
     slug = slugify(title)
     return "uploads/%s-%s" % (slug, filename)
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=True)  # Optional name field
+    content = models.TextField()
+    created_on = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Comment by {self.name or "Anonymous"} on {self.post}'

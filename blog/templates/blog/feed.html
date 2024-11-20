@@ -7,13 +7,13 @@
         <h2 class="section-header">spite issue of the week</h2>
         <div class="pinned-posts">
             {% if pinned_posts %}
-            {% for post in pinned_posts %}
-            <div class="detail" id="post-detail-{{post.id}}">
-                {% include 'blog/detail.html' with post=post %}
-            </div>
-            {% endfor %}
+                {% for post in pinned_posts %}
+                    <div class="detail" id="post-detail-{{post.id}}">
+                        {% include 'blog/detail.html' with post=post %}
+                    </div>
+                {% endfor %}
             {% else %}
-            <p class="oops">This section seems to be empty.</p>
+                <p class="oops">This section seems to be empty.</p>
             {% endif %}
         </div>
     {% endif %}
@@ -26,50 +26,96 @@
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
         {% if posts %}
-        {% for post in posts %}
-        <div class="item preview" id="post-preview-{{post.id}}">
+            {% for post in posts %}
+            <div class="item">
+                <div class="preview" id="post-preview-{{post.id}}">
+                    {% include 'blog/preview.html' with post=post %}
+                </div>
+                <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
+                    {% include 'blog/detail.html' with post=post nested=True %}
+                </div>
 
-            {% include 'blog/preview.html' with post=post %}
+                <div class="menu">
+                    <a href="{% url 'post-reply' post.id %}">Reply</a>
+                </div>
+                <!-- Unique Comment Section for Each Post -->
+                <div id="comment-section-{{ post.id }}">
+                    <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
+                        Comments ({{ post.comments_total|default:0 }})
+                    </button>
+                    <div id="comments-container-{{ post.id }}" class="comments-container" style="display: none;">
+                        <div id="comments-list-{{ post.id }}">
+                            {% for comment in post.recent_comments %}
+                                <div class="comment">
+                                    <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
+                                    <p><em>{{ comment.created_on }}</em></p>
+                                </div>
+                            {% empty %}
+                                <p>No comments yet.</p>
+                            {% endfor %}
+                        </div>
 
-	    <div class="menu">
-		    <a href="{% url 'post-reply' post.id %}">Reply</a>
-	    </div>
-		    
+                        <!-- Comment Form -->
+                        <div id="comment-form-{{ post.id }}">
+                            <h3>Leave a Comment</h3>
+                            <form method="post" action="{% url 'add_comment' post.id %}">
+                                {% csrf_token %}
+                                {{ comment_form|crispy }}
+                                <button type="submit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
 
-        </div>
 
-        <div class="item detail" id="post-detail-{{ post.id }}" style="display: none;">
-            {% include 'blog/detail.html' with post=post nested=True %}
-        </div>
+
+                
+            </div>
+
         {% endfor %}
         {% else %}
-        <p class="oops">No one seems to have posted yet! Click below to post!</p>
+            <p class="oops">No one seems to have posted yet! Click below to post!</p>
         {% endif %}
     </div>
+
     <div class="cta">
         <div class="post-button">
             <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
         </div>
     </div>
 
-	<div class="pagination">
-		<span class="step-links">
-		    {% if posts.has_previous %}
-			<a href="?page=1">&laquo; first</a>
-			<a href="?page={{ posts.previous_page_number }}">previous</a>
-		    {% endif %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if posts.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ posts.previous_page_number }}">previous</a>
+            {% endif %}
 
-		    <span class="current">
-			Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
-		    </span>
+            <span class="current">
+                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+            </span>
 
-		    {% if posts.has_next %}
-			<a href="?page={{ posts.next_page_number }}">next</a>
-			<a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
-		    {% endif %}
-		</span>
-	</div>
+            {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}">next</a>
+                <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
 </div>
-<script src="{% static 'js/load_more.js' %}" defer></script>
 
+<script src="{% static 'js/load_more.js' %}" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click listeners for each toggle button
+        document.querySelectorAll('.toggle-comments').forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.dataset.postId;
+                const commentsContainer = document.getElementById(`comments-container-${postId}`);
+                
+                // Toggle visibility of the comments container
+                commentsContainer.style.display = commentsContainer.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    });
+</script>

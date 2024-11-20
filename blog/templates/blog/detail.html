@@ -1,4 +1,7 @@
+{% load crispy_forms_tags %}
 <div class="post flexbox">
+
+        
 
     {% if post.media_file or post.image %}
     <div class="image-content">
@@ -42,10 +45,13 @@
 
         <p class="post-date">{{post.date_posted }}</p>
 
+        
     </div>
+    {% if not export %}
     <div class="menu">
 	    {% if not post.is_pinned %}
 	    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Collapse</a>
 	    {% endif %}
     </div> 
+    {% endif %}
 </div>
