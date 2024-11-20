@@ -130,8 +130,10 @@ class PostReplyView(PostCreateView):
         return redirect('post-detail', pk=parent_post.pk)
 
     def get_context_data(self, **kwargs):
+        logger.info(f"Replying to post {self.kwargs['pk']}")
         context = super().get_context_data(**kwargs)
         context['parent_post'] = get_object_or_404(Post, pk=self.kwargs['pk'])
+        logger.info(f"")
         return context
 
 
