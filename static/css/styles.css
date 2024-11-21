@@ -502,4 +502,9 @@ main {
 
 .comment-form .form-control {
     border-radius: 5px;
+    max-width: 600px; /* Maximum width for all fields within #comment-form */
+}
+
+#comment-form #id_name {
+    max-width: 300px; /* Narrower width for the Name field */
 }
