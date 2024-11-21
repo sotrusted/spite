@@ -43,21 +43,20 @@
                     <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
                         Comments ({{ post.comments_total|default:0 }})
                     </button>
-                    <div id="comments-container-{{ post.id }}" class="comments-container" style="display: block;">
+                    <div id="comments-container-{{ post.id }}" 
+                        data-has-comments="{{ post.has_comments }}" 
+                        class="comments-container" style="display: none;">
                         <div id="comments-list-{{ post.id }}">
                             {% for comment in post.recent_comments %}
                                 <div class="comment">
                                     <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
                                     <p><em>{{ comment.created_on }}</em></p>
                                 </div>
-                            {% empty %}
-                                <p>No comments yet.</p>
                             {% endfor %}
                         </div>
 
                         <!-- Comment Form -->
                         <div id="comment-form-{{ post.id }}">
-                            <h3>Leave a Comment</h3>
                             <form method="post" action="{% url 'add_comment' post.id %}">
                                 {% csrf_token %}
                                 {{ comment_form|crispy }}
@@ -106,16 +105,4 @@
 
 <script src="{% static 'js/load_more.js' %}" defer></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add click listeners for each toggle button
-        document.querySelectorAll('.toggle-comments').forEach(button => {
-            button.addEventListener('click', function() {
-                const postId = this.dataset.postId;
-                const commentsContainer = document.getElementById(`comments-container-${postId}`);
-                
-                // Toggle visibility of the comments container
-                commentsContainer.style.display = commentsContainer.style.display === 'none' ? 'block' : 'none';
-            });
-        });
-    });
 </script>

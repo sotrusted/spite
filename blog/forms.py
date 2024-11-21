@@ -99,7 +99,23 @@ class CommentForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.form_class = 'comment-form'
         self.helper.layout = Layout(
-            Field('name', placeholder='Your name (optional)', css_class='form-control'),
-            Field('content', css_class='form-control'),
+            Div(
+                Row('name', placeholder='Your name (optional)', css_class='form-group col-md-4 mb-0'),
+                Row('content', css_class='form-group col-md-8 mb-0'),
+            ),
             Submit('submit', 'Submit', css_class='btn btn-primary'),
+        )
+        self.helper.layout = Layout(
+            Div(
+                Field('name', css_class='form-control', wrapper_class='col-6'),
+                css_class='row justify-content-center',  # Aligns form fields
+            ),
+            Div(
+                Field('content', css_class='form-control', wrapper_class='col-12'),
+                css_class='row justify-content-center',
+            ),
+            Div(
+                Submit('submit', 'Submit', css_class='btn btn-primary'),
+                css_class='row justify-content-center mt-2',
+            )
         )

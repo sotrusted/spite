@@ -66,3 +66,7 @@
 {% block feed %}
     {% include 'blog/feed.html' with home=True posts=posts%}
 {% endblock %}
+
+{% block page_scripts %}
+    <script src="{% static 'js/load_more.js' %}" defer></script>
+{% endblock %}

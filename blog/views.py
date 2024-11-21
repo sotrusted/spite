@@ -213,7 +213,7 @@ def search_results(request):
         logger.info(f'Search query: {query}')
         posts = Post.objects.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
-        )
+        ).order_by('-date_posted')
     else:
         posts = Post.objects.none()
     
