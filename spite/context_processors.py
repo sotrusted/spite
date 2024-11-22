@@ -68,6 +68,8 @@ def load_posts(request):
         # Attach comments and total count directly to the post object
         post.comments_total = comments.count()
         post.recent_comments = comments[:5]  # Attach the recent 5 comments directly to the post
+    
+    highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
 
     return {
         'days_since_launch': days_since_launch(),
@@ -80,6 +82,7 @@ def load_posts(request):
         'is_paginated': page_obj.has_other_pages(),
         'search_form': PostSearchForm(), 
         'comment_form': CommentForm(),
+        'highlight_comments': highlight_comments,
     }
 
 def days_since_launch():
