@@ -35,7 +35,8 @@ class Post(models.Model):
     #media fields
     image = models.ImageField(blank=True, null=True, verbose_name=f'image', upload_to='images/')
     media_file = models.FileField(upload_to='media/', blank=True, null=True, \
-                                  validators=[validate_media_file, validate_video_file_size])  # New field
+                                verbose_name = 'Image or video (<10 MB)', \
+                                validators=[validate_media_file, validate_video_file_size])  # New field
 
     #meta
     date_posted = models.DateTimeField(auto_now_add=True)
