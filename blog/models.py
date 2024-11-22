@@ -69,6 +69,9 @@ class Post(models.Model):
         """Check if the media_file is a video."""
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
+    
+    def get_recent_comments(self):
+        return Comment.objects.filter(post=self).order_by('-created_on')
 
 
 def get_image_filename(instance, filename):

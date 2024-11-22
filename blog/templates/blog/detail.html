@@ -45,6 +45,33 @@
 
         <p class="post-date">{{post.date_posted }}</p>
 
+        {% if not home %}
+        <div id="comment-section-{{ post.id }}">
+            <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
+                Comments ({{ post.comments_total|default:0 }})
+            </button>
+            <div id="comments-container-{{ post.id }}" 
+                data-has-comments="{{ post.has_comments }}" 
+                class="comments-container" style="display: block;">
+                <div id="comments-list-{{ post.id }}">
+                    {% for comment in post.get_recent_comments %}
+                        <div class="comment">
+                            <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
+                            <p><em>{{ comment.created_on }}</em></p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Comment Form -->
+                <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add_comment' post.id %}">
+                    {% csrf_token %}
+                    {{ comment_form|crispy }}
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
         
     </div>
     {% if not export %}
