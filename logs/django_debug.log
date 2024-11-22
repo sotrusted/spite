@@ -15997,3 +15997,729 @@ INFO 2024-11-22 16:36:41,840 signals {'info': 'no active devices to send to', 's
 INFO 2024-11-22 16:36:42,278 views IP Address for debug-toolbar: 75.214.37.203
 INFO 2024-11-22 16:36:42,285 context_processors Cache is empty, fetching posts from the database.
 INFO 2024-11-22 16:36:42,735 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:37:27,522 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:37:27,580 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:38:06,848 views IP Address for debug-toolbar: 98.113.65.254
+INFO 2024-11-22 16:38:06,861 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:38:07,285 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:39:12,150 views IP Address for debug-toolbar: 66.249.72.3
+INFO 2024-11-22 16:39:12,157 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:39:12,425 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:39:28,357 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:39:28,529 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:39:59,102 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:39:59,264 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:40:38,839 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:40:38,957 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:40:41,782 views IP Address for debug-toolbar: 98.113.65.254
+INFO 2024-11-22 16:40:41,797 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:40:42,177 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:41:06,696 views IP Address for debug-toolbar: 66.249.72.2
+INFO 2024-11-22 16:41:06,699 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:41:06,953 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:41:10,932 views IP Address for debug-toolbar: 66.249.72.2
+INFO 2024-11-22 16:41:10,935 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:41:11,080 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+WARNING 2024-11-22 16:42:20,860 log Forbidden (CSRF token from POST incorrect.): /add-comment/14929/
+WARNING 2024-11-22 16:42:20,860 log Forbidden (CSRF token from POST incorrect.): /add-comment/14929/
+INFO 2024-11-22 16:42:53,800 views IP Address for debug-toolbar: 98.113.65.254
+INFO 2024-11-22 16:42:53,805 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:42:54,008 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:43:48,563 views IP Address for debug-toolbar: 66.249.72.3
+INFO 2024-11-22 16:43:48,567 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:43:48,705 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:44:44,429 clearcache Cache clearing process started.
+INFO 2024-11-22 16:44:44,458 clearcache Cache cleared successfully.
+ERROR 2024-11-22 16:44:45,832 log Internal Server Error: /post/3473/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 147, in get_context_data
+    comments = Comment.objects.filter(post=post).order_by('-created_on')
+NameError: name 'post' is not defined
+INFO 2024-11-22 16:45:01,687 views IP Address for debug-toolbar: 67.244.64.72
+INFO 2024-11-22 16:45:02,442 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:45:02,988 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:45:47,431 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:45:47,691 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+ERROR 2024-11-22 16:45:48,166 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 147, in get_context_data
+    post = context['post']
+NameError: name 'post' is not defined
+INFO 2024-11-22 16:46:09,582 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:46:09,789 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:46:14,949 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:46:15,157 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:47:00,654 views IP Address for debug-toolbar: 66.249.72.3
+INFO 2024-11-22 16:47:00,665 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:47:01,167 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:47:23,472 views IP Address for debug-toolbar: 24.202.67.199
+INFO 2024-11-22 16:47:23,478 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:47:23,711 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+ERROR 2024-11-22 16:47:48,850 log Internal Server Error: /post/14923/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 147, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+NameError: name 'post' is not defined
+INFO 2024-11-22 16:47:59,152 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:47:59,348 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+INFO 2024-11-22 16:48:13,695 clearcache Cache clearing process started.
+INFO 2024-11-22 16:48:13,706 clearcache Cache cleared successfully.
+ERROR 2024-11-22 16:48:19,235 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    context['post']['recent_comments'] = comments
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:48:21,375 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    context['post']['recent_comments'] = comments
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:48:46,396 log Internal Server Error: /post/6100/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    context['post']['recent_comments'] = comments
+TypeError: 'Post' object does not support item assignment
+INFO 2024-11-22 16:49:28,620 views IP Address for debug-toolbar: 52.167.144.172
+INFO 2024-11-22 16:49:29,037 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:49:29,404 context_processors Fetched 1 pinned posts and 14751 unpinned posts from the database.
+ERROR 2024-11-22 16:49:35,532 log Internal Server Error: /post/11543/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    context['post']['recent_comments'] = comments
+TypeError: 'Post' object does not support item assignment
+INFO 2024-11-22 16:49:56,956 signals Post 14930 saved. Clearing cache
+INFO 2024-11-22 16:49:56,961 signals Cache cleared
+INFO 2024-11-22 16:49:57,136 signals {'info': 'no active devices to send to', 'status': 1, 'request': 'fa29721a-9be1-4c55-a2d8-6856984890b8'}
+INFO 2024-11-22 16:49:57,354 views IP Address for debug-toolbar: 173.177.138.72
+INFO 2024-11-22 16:49:57,359 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:49:57,531 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.
+ERROR 2024-11-22 16:51:19,315 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:51:20,128 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:51:21,026 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:51:22,050 log Internal Server Error: /post/14929/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:51:55,703 log Internal Server Error: /post/9768/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:44,365 log Internal Server Error: /post/14914/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:44,614 log Internal Server Error: /post/14917/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:44,747 log Internal Server Error: /post/14918/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:49,470 log Internal Server Error: /post/14919/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:49,756 log Internal Server Error: /post/14922/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:50,020 log Internal Server Error: /post/14920/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:50,812 log Internal Server Error: /post/14928/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:51,404 log Internal Server Error: /post/14923/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:52:56,796 log Internal Server Error: /post/14910/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:07,004 log Internal Server Error: /post/14919/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:07,354 log Internal Server Error: /post/14922/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:08,985 log Internal Server Error: /post/14920/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:09,936 log Internal Server Error: /post/14923/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:17,244 log Internal Server Error: /post/14928/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:17,695 log Internal Server Error: /post/14910/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:37,686 log Internal Server Error: /post/14919/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:38,078 log Internal Server Error: /post/14920/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:38,824 log Internal Server Error: /post/14922/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+ERROR 2024-11-22 16:53:59,715 log Internal Server Error: /post/5722/
+Traceback (most recent call last):
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/home/sargent/spite/.spite/lib/python3.10/site-packages/django/views/generic/detail.py", line 109, in get
+    context = self.get_context_data(object=self.object)
+  File "/home/sargent/spite/blog/views.py", line 149, in get_context_data
+    post = get_object_or_404(Post, pk=self.kwargs['pk'])
+TypeError: 'Post' object does not support item assignment
+INFO 2024-11-22 16:54:54,207 clearcache Cache clearing process started.
+INFO 2024-11-22 16:54:54,221 clearcache Cache cleared successfully.
+INFO 2024-11-22 16:54:56,723 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:54:56,747 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:54:57,001 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.
+INFO 2024-11-22 16:54:57,053 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.
+INFO 2024-11-22 16:55:02,133 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:55:02,632 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.
+INFO 2024-11-22 16:55:15,734 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:55:15,793 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.
+INFO 2024-11-22 16:55:33,770 clearcache Cache clearing process started.
+INFO 2024-11-22 16:55:33,777 clearcache Cache cleared successfully.
+INFO 2024-11-22 16:55:36,114 context_processors Cache is empty, fetching posts from the database.
+INFO 2024-11-22 16:55:36,238 context_processors Fetched 1 pinned posts and 14752 unpinned posts from the database.

@@ -6,18 +6,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 import logging
 from django.core.paginator import Paginator
-import os
+# import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView, ListView
-from .models import Post
+from blog.models import Post, Comment
 from django.contrib import messages
-from .forms import PostForm, ReplyForm, CommentForm
+from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
 from datetime import datetime 
-import subprocess
-from weasyprint import HTML
-# Create your views here.
+# import subprocess
+# from weasyprint import HTML
 
 logger = logging.getLogger('spite')
 
@@ -143,6 +142,7 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
