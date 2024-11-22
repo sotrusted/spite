@@ -181,8 +181,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SECURE_SSL_REDIRECT = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -234,6 +235,10 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'DEBUG', 
             'propogate': True,
+        },
+        'django.security.csrf': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
         },
     }, 
 }
