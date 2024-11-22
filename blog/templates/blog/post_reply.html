@@ -3,10 +3,8 @@
 {% block content %}
 {% endblock %}
 {% block form %}
-
-
     <div class="form-container">
-	{% include 'blog/quote.html' with post=parent_post%}
+        {% include 'blog/quote.html' with post=parent_post%}
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% crispy replyForm replyForm.helper %}
