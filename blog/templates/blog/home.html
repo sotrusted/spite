@@ -1,4 +1,5 @@
 {% extends 'blog/spite_base.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 {% load custom_filters %} 
 {% block content %}
@@ -52,17 +53,19 @@
 		<p>My only choice is to create my own online publication. I have playfully dubbed it <em>Spite</em>.</p>
 		<p><em>Anyone can write for Spite.</em></p>
     </div>
-    <div class="cta">
-        <p>Tired of biting your tongue? </p>
-        <div class="post-button">
-            <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
-        </div>
-    </div>
     <div class="shop">
         {% include 'blog/products.html' %}
     </div>
 </div>
 {% endblock %}
+
+{% block form %}
+    <div class="form-container">
+        <p>Tired of biting your tongue? </p>
+        {% include 'blog/post_form_stub.html' %}
+    </div>
+{% endblock %}
+
 {% block feed %}
     {% include 'blog/feed.html' with home=True posts=posts%}
 {% endblock %}

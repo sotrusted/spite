@@ -50,7 +50,7 @@ class Post(models.Model):
     # deprecated
     city = models.CharField(max_length=100, blank=True, null=True, verbose_name='city or neighborhood')
     contact = models.TextField(blank=True, null=True, verbose_name='contact info')
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
