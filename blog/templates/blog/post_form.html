@@ -4,21 +4,7 @@
 {% endblock %}
 {% block form %}
     <div class="form-container">
-        <form method="post" enctype="multipart/form-data" onsubmit="disableSubmitButton()">
-            {% csrf_token %}
-            {% crispy postForm postForm.helper %}
-            {% if form.errors %}
-            <div class="alert alert-danger">
-                <ul>
-                    {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        </form>
+        {% include 'blog/post_form_stub.html' %}
     </div>
 {% endblock %}
 

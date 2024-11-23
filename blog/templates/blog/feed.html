@@ -4,36 +4,38 @@
 
 <div class="feed">
     {% if home %}
+        {% if pinned_posts %}
         <h2 class="section-header">spite issue of the week</h2>
         <div class="pinned-posts">
-            {% if pinned_posts %}
                 {% for post in pinned_posts %}
                     <div class="detail" id="post-detail-{{post.id}}">
                         {% include 'blog/detail.html' with post=post %}
                     </div>
                 {% endfor %}
-            {% else %}
-                <p class="oops">This section seems to be empty.</p>
-            {% endif %}
         </div>
-        <div class="comment-highlight">
+        {% endif %}
 
+        {% if highlight_comments %}
+        <div class="comment-highlight">
             <h2 class="section-header">recent comments</h2>
             {% for comment in highlight_comments %}
                 <div class="comment">
-                    <p>Posted on: <a href="{% url 'post-detail' comment.post.id %}">{{ comment.post.title }}</a></p>
                     <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
                     <p><em>{{ comment.created_on }}</em></p>
+                    <p>Posted on: <a href="{% url 'post-detail' comment.post.id %}">{{ comment.post.title }}</a></p>
                 </div>
-
             {% endfor %}
         </div>
+        {% endif %}
+
     {% endif %}
 
+    {% if search_form %}
     <form method="get" action="{% url 'search_results' %}">
         {% csrf_token %}
         {{ search_form|crispy }}
     </form>
+    {% endif %}
 
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
