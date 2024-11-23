@@ -63,11 +63,17 @@ class Post(models.Model):
     
     def is_image(self):
         """Check if the media_file is an image."""
+        if self.image: 
+            return True
+        if not self.media_file: 
+            return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else self.image.name)
         return mime_type and mime_type.startswith('image/')
 
     def is_video(self):
         """Check if the media_file is a video."""
+        if self.image:
+            return False
         if not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)

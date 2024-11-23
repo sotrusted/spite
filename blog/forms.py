@@ -26,13 +26,7 @@ class PostForm(forms.ModelForm):
   #      required=False
    # )
 
-    image = forms.ImageField(required=False, label='')
 
-    contact = forms.CharField(
-        max_length=50, 
-        label='contact info', 
-        required=False
-        )
     
 
     class Meta:

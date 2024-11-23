@@ -41,7 +41,7 @@
     <div class="posts" id="post-list">
         {% if posts %}
             {% for post in posts %}
-            <div class="item">
+            <div id="post-{{post.id}}" class="item">
                 <div class="preview" id="post-preview-{{post.id}}">
                     {% include 'blog/preview.html' with post=post %}
                 </div>
