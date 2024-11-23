@@ -35,7 +35,7 @@ class Post(models.Model):
     #media fields
     image = models.ImageField(blank=True, null=True, verbose_name=f'image', upload_to='images/')
     media_file = models.FileField(upload_to='media/', blank=True, null=True, \
-                                verbose_name = 'Image or video (<10 MB)', \
+                                max_length=255, verbose_name = 'Image or video (<50 MB)', \
                                 validators=[validate_media_file, validate_video_file_size])  # New field
 
     #meta
@@ -68,6 +68,8 @@ class Post(models.Model):
 
     def is_video(self):
         """Check if the media_file is a video."""
+        if not self.media_file: 
+            return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
     

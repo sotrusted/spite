@@ -19,7 +19,11 @@
     </div>
 
     
-    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Expand</a>
+    <div class="menu">
+        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Expand</a>
+        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
+        <span id="copy-message" style="display: none;">Link copied!</span>
+    </div>
     {% if post.author %}
         <p class="post-author">by {{ post.author }}</p>
     {% elif post.display_name %}
@@ -40,7 +44,7 @@
     <div class="image-container">
         <a href="{% url 'post-detail' post.id %}">
             {% if post.media_file and post.is_video %}
-                <video autoplay muted loop playsinline>
+                <video controls autoplay muted loop playsinline>
                     <source src="{{ post.media_file.url }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
