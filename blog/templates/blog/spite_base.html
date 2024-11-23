@@ -64,6 +64,22 @@
 
     {% block scripts %}
     <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
     // Function to toggle content between detail and preview
     function toggleContent(postId) {
         var detailDiv = document.getElementById('post-detail-' + postId);
@@ -196,22 +212,8 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         // Function to get CSRF token from cookies
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
         attachEventListeners();
+        attachCopyLinks();
 
         const postForm = document.getElementById('post-form');
 
@@ -263,7 +265,10 @@
                                         <div class="post-content">
                                             ${data.post.content ? `<p>${data.post.content}</p>` : ''}
                                         </div>
-                                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
+                                        <div class="menu">
+                                            <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
+                                            <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
+                                        </div>
                                         ${data.post.author ? `<p class="post-author">by ${data.post.author}</p>` : ''}
                                         <p class="post-date">${data.post.date_posted}</p>
                                         ${data.post.city || data.post.contact ? `
@@ -308,6 +313,10 @@
                                         ${data.post.author ? `<p class="post-author">by ${data.post.author}</p>` : `<p class="post-author">by Anonymous ${data.post.anon_uuid}</p>`}
                                         <p class="post-date">${data.post.date_posted}</p>
                                     </div>
+                                    <div class="menu">
+                                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
+                                        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
+                                    </div>
                                 </div>
                             </div>
                             <div id="comment-section-${postId}">
@@ -328,6 +337,7 @@
                         `;
                         postList.prepend(newPost); // Add the new post to the top of the list
                         attachEventListeners();
+                        attachCopyLinks();
 
                         // Scroll slightly above the newly added post
                         const newPostPosition = newPost.getBoundingClientRect().top + window.scrollY;

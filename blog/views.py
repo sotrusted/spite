@@ -343,7 +343,7 @@ def add_comment(request, post_id):
                     'comment': {
                         'name': comment.name,
                         'content': comment.content,
-                        'created_on': comment.created_on.strftime('%b. %d, %Y, %I:%M %p'),
+                        'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
                     }
                 })
 
