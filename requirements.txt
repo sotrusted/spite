@@ -55,7 +55,7 @@ pylibmc==1.6.3
 pyphen==0.16.0
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
-redis==4.5.3
+redis==5.2.0
 reportlab==4.2.0
 requests==2.32.3
 six==1.16.0
