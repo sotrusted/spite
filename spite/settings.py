@@ -47,7 +47,7 @@ DEBUG = False
 
 
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 'testserver']
+ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 'testserver', '192-3-30-202-host.colocrossing.com']
 
 
 # Application definition
@@ -55,6 +55,7 @@ ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'loca
 
 
 INSTALLED_APPS = [
+    'daphne', 
     'axes',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -69,6 +70,8 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'filer',
     'crispy_bootstrap4',
+    'channels',
+    'corsheaders',
 ]
 
 
@@ -104,6 +107,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'spite.wsgi.application'
+ASGI_APPLICATION = "spite.asgi.application"
 
 
 # Database
@@ -285,6 +289,15 @@ CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr']
 
 PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
 PUSHOVER_API_TOKEN = 'apuwdk74tzqpfv35b1sc76vgs1z2g8'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
