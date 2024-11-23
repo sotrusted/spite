@@ -1,4 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.utils.timezone import localtime
+from django.urls import reverse_lazy
+from django.core.cache import cache
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -82,6 +85,7 @@ class PostCreateView(CreateView):
         context[self.form_context_name] = self.form()
         return context
 
+    '''
     def get(self, request, *args, **kwargs):
         # log_ip1(request, 'get-post')
         context = {
@@ -89,7 +93,6 @@ class PostCreateView(CreateView):
         }
         
         return render(request, self.template_name, context)
-    
     def post(self, request, *args, **kwargs):
 
         # log_ip1(request, 'post-post')
@@ -101,6 +104,34 @@ class PostCreateView(CreateView):
 
             return redirect('home')
         return render(request, self.template_name, {self.form_context_name: form})
+    '''
+    
+    def form_valid(self, form):
+        logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
+        post = form.save()
+        # Return JSON response for AJAX requests
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 
+                                'post': {
+                                    'id': post.id,
+                                    'title': post.title,
+                                    'content': post.content,
+                                    'date_posted': localtime(post.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                                    'anon_uuid': post.anon_uuid,
+                                    'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
+                                    'city': post.city,
+                                    'contact': post.contact,
+                                    'media_file': post.media_file.url if post.media_file else None,
+                                    'image': post.image.url if post.image else None,
+                                }})
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        logger.error("Form errors: %s", form.errors)  # Log the form errors
+        # Return JSON response for AJAX requests
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
 
 ''' 
 venv_activate = '/home/sargent/spite/.spite/bin/activate'
@@ -229,19 +260,26 @@ def store_page(request):
 
     return render(request, 'blog/shop.html')
 
+'''
 def add_comment(request, post_id):
     logger.info(f"Received a request to add a comment to post ID {post_id}.")
     logger.info(f"Request method: {request.method}")
-    logger.info(f"CSRF token in POST data: {request.POST.get('csrfmiddlewaretoken', 'Not found')}")
+
+    # Log CSRF-related data
+    csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
+    csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
+    logger.info(f"CSRF token in POST data: {csrf_token_post}")
+    logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
 
     post = get_object_or_404(Post, id=post_id)
     logger.info(f"Post found: {post.title}")
 
     if request.method == 'POST':
         logger.info("Processing POST request.")
-        
-        # Log the raw POST data
+
+        # Log raw POST data and headers
         logger.info(f"POST data: {request.POST}")
+        logger.info(f"Request headers: {request.headers}")
 
         # Initialize the form with POST data
         comment_form = CommentForm(request.POST)
@@ -258,9 +296,46 @@ def add_comment(request, post_id):
             logger.info("Comment saved successfully.")
             return redirect('home')  # Redirect to homepage after submission
         else:
-            # Log the form errors
+            # Log form errors for debugging
             logger.error(f"Comment form errors: {comment_form.errors}")
+            return HttpResponseForbidden("Invalid form data.")
     else:
-        logger.info("Request method is not POST. Redirecting to home.")    
+        logger.info("Request method is not POST. Redirecting to home.")
 
+    return redirect('home')
+'''
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+
+            # Return JSON response for AJAX requests
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'comment': {
+                        'name': comment.name,
+                        'content': comment.content,
+                        'created_on': comment.created_on.strftime('%b. %d, %Y, %I:%M %p'),
+                    }
+                })
+
+            # Non-AJAX fallback
+            return redirect('post-detail', pk=post.id)
+
+    return JsonResponse({'success': False}, status=400)
+
+def custom_csrf_failure(request, reason=""):
+    logger.error(f"CSRF failure occurred. Reason: {reason}. Path: {request.path}")
+
+    # Clear the cache
+    cache.clear()
+    logger.info("Cache cleared.")
+
+    # Redirect to the homepage
     return redirect('home')

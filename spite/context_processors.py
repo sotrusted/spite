@@ -10,7 +10,7 @@ from django.core.cache import cache
 from spite.tasks import cache_posts_data
 from datetime import datetime, timedelta, timezone
 import os
-from blog.forms import PostSearchForm, CommentForm
+from blog.forms import PostSearchForm, CommentForm, PostForm
 
 logger = logging.getLogger('spite')
 
@@ -82,6 +82,7 @@ def load_posts(request):
         'is_paginated': page_obj.has_other_pages(),
         'search_form': PostSearchForm(), 
         'comment_form': CommentForm(),
+        'postForm': PostForm(),
         'highlight_comments': highlight_comments,
     }
 

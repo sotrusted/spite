@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+<form id="post-form" method="post" action="{% url 'post-create' %}" enctype="multipart/form-data" onsubmit="disableSubmitButton()" %}">
+    {% csrf_token %}
+    {% crispy postForm postForm.helper %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</form>
+<div id="post-success" style="display: none; color: green;">Post created successfully!</div>
+<div id="post-error" style="display: none; color: red;">Failed to create the post!</div>
