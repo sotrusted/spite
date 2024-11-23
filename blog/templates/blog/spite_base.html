@@ -79,6 +79,34 @@
             toggleButton.textContent = 'Expand';
         }
     }
+    function attachCopyLinks() {
+        document.querySelectorAll('a[id^="copy-link-"]').forEach(a => {
+            a.addEventListener('click', function () {
+                // Extract the post ID from the link's ID attribute
+                const postId = this.id.replace('copy-link-', ''); // e.g., 'copy-link-123' -> '123'
+
+                // Construct the URL dynamically
+                const link = `https://spite.fr/post/${postId}`;
+
+                // Copy the link to the clipboard
+                navigator.clipboard.writeText(link).then(() => {
+                    // Optional: Show a confirmation message
+                    const message = document.createElement('span');
+                    message.textContent = 'Link copied!';
+                    message.style.color = 'green';
+                    this.parentElement.appendChild(message);
+
+                    // Remove the message after 2 seconds
+                    setTimeout(() => {
+                        message.remove();
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy link:', err);
+                    alert('Failed to copy the link. Please try again.');
+                });
+            })
+        })
+    }
     // Attach submit event to all comment forms
     function attachEventListeners() {
         document.querySelectorAll('form[id^="comment-form-"]').forEach(form => {
@@ -94,6 +122,7 @@
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
                     },
                     body: formData,
                 })
@@ -158,6 +187,11 @@
         submitButton.disabled = true;
         submitButton.value = 'Posting...';  // Change the button text
     }
+    function enableSubmitButton() {
+        var submitButton = document.getElementById('submit-id-submit');
+        submitButton.disabled = false;
+        submitButton.value = 'Post';  // Change the button text
+    }
 
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -205,6 +239,8 @@
                 .then(data => {
                     if (data.success) {
                         postForm.reset(); // Clear the form
+                        enableSubmitButton();
+
                         document.getElementById('post-success').style.display = 'block';
                         document.getElementById('post-error').style.display = 'none';
     
@@ -241,10 +277,10 @@
                                             <a href="/post/${postId}/">
                                                 ${data.post.media_file && data.post.is_video ? `
                                                     <video autoplay muted loop playsinline>
-                                                        <source src="${data.post.media_file}" type="video/mp4">
+                                                        <source src="${data.post.media_file.url}" type="video/mp4">
                                                     </video>` : ''}
-                                                ${data.post.media_file && data.post.is_image ? `<img src="${data.post.media_file}" alt="${data.post.title}" loading="lazy">` : ''}
-                                                ${data.post.image ? `<img src="${data.post.image}" alt="${data.post.title}" loading="lazy">` : ''}
+                                                ${data.post.media_file && data.post.is_image ? `<img src="${data.post.media_file.url}" alt="${data.post.title}" loading="lazy">` : ''}
+                                                ${data.post.image ? `<img src="${data.post.image.url}" alt="${data.post.title}" loading="lazy">` : ''}
                                             </a>
                                         </div>
                                     </div>` : ''}
@@ -310,6 +346,7 @@
                     console.error('Error:', error);
                     document.getElementById('post-error').style.display = 'block';
                     document.getElementById('post-success').style.display = 'none';
+                    enableSubmitButton();
                 });
             });
     });

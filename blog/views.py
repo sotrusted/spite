@@ -74,7 +74,7 @@ def home(request):
 
 class PostCreateView(CreateView):
     model = Post
-    fields = ['title', 'city', 'description', 'contact', 'image']
+    fields = ['title', 'city', 'content', 'contact', 'image', 'media_file']
 
     template_name = 'blog/post_form.html'
     form_context_name = 'postForm'
@@ -95,6 +95,7 @@ class PostCreateView(CreateView):
         return render(request, self.template_name, context)
     def post(self, request, *args, **kwargs):
 
+
         # log_ip1(request, 'post-post')
         form = self.form(request.POST, request.FILES)
         if form.is_valid():
@@ -105,10 +106,22 @@ class PostCreateView(CreateView):
             return redirect('home')
         return render(request, self.template_name, {self.form_context_name: form})
     '''
+    def post(self, request, *args, **kwargs):
+        logger.info("Request POST data: %s", request.POST)  # Log POST data
+        logger.info("Request FILES data: %s", request.FILES)
+        # Log CSRF-related data
+        csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
+        csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
+        logger.info(f"CSRF token in POST data: {csrf_token_post}")
+        logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
+        return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
+        logger.info(f"Form data: {form.cleaned_data}")
         post = form.save()
+        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, media file: {post.media_file}")
+        post = get_object_or_404(Post, pk=post.id)
         # Return JSON response for AJAX requests
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 
@@ -121,8 +134,12 @@ class PostCreateView(CreateView):
                                     'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
                                     'city': post.city,
                                     'contact': post.contact,
-                                    'media_file': post.media_file.url if post.media_file else None,
+                                    'media_file': {
+                                        'url': post.media_file.url,
+                                    } if post.media_file else None,
                                     'image': post.image.url if post.image else None,
+                                    'is_image': post.is_image(), 
+                                    'is_video': post.is_video(),
                                 }})
         return super().form_valid(form)
 
@@ -165,6 +182,11 @@ class PostReplyView(PostCreateView):
         context['parent_post'] = get_object_or_404(Post, pk=self.kwargs['pk'])
         logger.info(f"")
         return context
+
+    def post(self, request, *args, **kwargs):
+        logger.info("Request POST data: %s", request.POST)  # Log POST data
+        logger.info("Request FILES data: %s", request.FILES)
+        return super().post(request, *args, **kwargs)
 
 
 
