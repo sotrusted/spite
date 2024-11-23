@@ -402,6 +402,19 @@ form {
     margin-top: auto; /* Push the menu to the bottom */
 }
 
+.menu a {
+    margin-right: 20px;
+}
+
+.copy-link {
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s ease;
+}
+
+.copy-link:hover {
+    background-color: #0084ff; /* Darker color on hover */
+}
+
 /* Site footer styles */
 .site-footer {
     background-color: #000;
