@@ -33,6 +33,12 @@ body {
     -webkit-backface-visibility: hidden;
 }
 
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
 /* Container styles */
 .container {
     max-width: 80%;
@@ -301,6 +307,11 @@ form {
     padding-left: 20px;
     overflow: hidden;
     border-bottom: 2px solid #000;
+}
+
+.highlight {
+    background-color: yellow;
+    transition: background-color 1s ease-out;
 }
 
 .post .post-title {

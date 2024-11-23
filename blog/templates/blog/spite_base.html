@@ -23,7 +23,13 @@
 
     {% block spitebar %}
     <div class="spite-bar">
-        <p class="spite-counter">SPITE COUNTER: {{spite}}</p>
+        <p id="spite-counter" class="spite-counter">SPITE COUNTER: {{spite}}</p>
+    </div>
+    {% endblock %}
+
+    {% block notifications %}
+    <div id="new-post-notification" style="display: none; position: fixed; top: 100px; background-color: green; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; animation: flash 1s infinite; z-index: 1001;">
+        New post! (<span id="new-post-title"></span>)
     </div>
     {% endblock %}
 
@@ -48,7 +54,7 @@
         <div class="spite">
             <p>Every time you post, the SPITE COUNTER goes up!</p>
             <br>
-	    <p class="spite-counter">{{spite}} spite -- {{active_sessions_count}} users active now -- {{daily_user_count}} users active today -- {{user_count}} alltime users</p>
+	    <p id="spite-counter" class="spite-counter">{{spite}} spite -- {{active_sessions_count}} users active now -- {{daily_user_count}} users active today -- {{user_count}} alltime users</p>
         </div>
     {% endblock %}
 
@@ -215,152 +221,12 @@
         attachEventListeners();
         attachCopyLinks();
 
-        const postForm = document.getElementById('post-form');
-
-        postForm.addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent the default form submission
-    
-            const formData = new FormData(this); // Collect form data
-            const url = this.action; // Get the form's action URL
-    
-            // Perform AJAX request
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest', // Mark it as an AJAX request
-                    'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
-                },
-                body: formData,
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        postForm.reset(); // Clear the form
-                        enableSubmitButton();
-
-                        document.getElementById('post-success').style.display = 'block';
-                        document.getElementById('post-error').style.display = 'none';
-    
-                        // Dynamically construct the new post HTML
-                        const postList = document.getElementById('post-list');
-                        const newPost = document.createElement('div');
-                        newPost.classList.add('item');
-                        const postId = data.post.id;
-    
-                        newPost.innerHTML = `
-                            <div class="preview" id="post-preview-${postId}">
-                                <div class="post flexbox">
-                                    <div class="text-content">
-                                        <h2 class="post-title">
-                                            <a href="/post/${postId}/">
-                                                ${data.post.title}
-                                            </a>
-                                        </h2>
-                                        ${data.post.parent_post ? `<p>Replying to: <a href="/post/${data.post.parent_post.id}/">${data.post.parent_post.title}</a></p>` : ''}
-                                        <div class="post-content">
-                                            ${data.post.content ? `<p>${data.post.content}</p>` : ''}
-                                        </div>
-                                        <div class="menu">
-                                            <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
-                                            <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-                                        </div>
-                                        ${data.post.author ? `<p class="post-author">by ${data.post.author}</p>` : ''}
-                                        <p class="post-date">${data.post.date_posted}</p>
-                                        ${data.post.city || data.post.contact ? `
-                                            <p class="post-info">
-                                                ${data.post.city ? data.post.city : ''}${data.post.city && data.post.contact ? ' / ' : ''}${data.post.contact ? data.post.contact : ''}
-                                            </p>` : ''}
-                                    </div>
-                                    ${data.post.media_file || data.post.image ? `
-                                    <div class="image-content">
-                                        <div class="image-container">
-                                            <a href="/post/${postId}/">
-                                                ${data.post.media_file && data.post.is_video ? `
-                                                    <video autoplay muted loop playsinline>
-                                                        <source src="${data.post.media_file.url}" type="video/mp4">
-                                                    </video>` : ''}
-                                                ${data.post.media_file && data.post.is_image ? `<img src="${data.post.media_file.url}" alt="${data.post.title}" loading="lazy">` : ''}
-                                                ${data.post.image ? `<img src="${data.post.image.url}" alt="${data.post.title}" loading="lazy">` : ''}
-                                            </a>
-                                        </div>
-                                    </div>` : ''}
-                                </div>
-                            </div>
-                            <div class="detail" id="post-detail-${postId}" style="display: none;">
-                                <div class="post flexbox">
-                                    ${data.post.media_file || data.post.image ? `
-                                    <div class="image-content">
-                                        <div class="image-container">
-                                            ${data.post.media_file && data.post.is_video ? `
-                                                <video controls muted autoplay playsinline>
-                                                    <source src="${data.post.media_file}" type="video/mp4">
-                                                </video>` : ''}
-                                            ${data.post.media_file && data.post.is_image ? `<img src="${data.post.media_file}" alt="${data.post.title}" loading="lazy">` : ''}
-                                            ${data.post.image ? `<img src="${data.post.image}" alt="${data.post.title}" loading="lazy">` : ''}
-                                        </div>
-                                    </div>` : ''}
-                                    <div class="text-content">
-                                        <h1 class="post-title">${data.post.title}</h1>
-                                        ${data.post.parent_post ? `<p>Replying to: <a href="/post/${data.post.parent_post.id}/">${data.post.parent_post.title}</a></p>` : ''}
-                                        <div class="post-content">
-                                            <p>${data.post.content}</p>
-                                        </div>
-                                        ${data.post.author ? `<p class="post-author">by ${data.post.author}</p>` : `<p class="post-author">by Anonymous ${data.post.anon_uuid}</p>`}
-                                        <p class="post-date">${data.post.date_posted}</p>
-                                    </div>
-                                    <div class="menu">
-                                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
-                                        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="comment-section-${postId}">
-                                <button id="toggle-comments-${postId}" class="toggle-comments" data-post-id="${postId}">
-                                    Comments (0)
-                                </button>
-                                <div id="comments-container-${postId}" class="comments-container" style="display: none;">
-                                    <div id="comments-list-${postId}">
-                                        <p>No comments yet.</p>
-                                    </div>
-                                    <form id="comment-form-${postId}" method="post" action="/add-comment/${postId}/">
-                                        <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
-                                        <textarea name="content" class="form-control" placeholder="Write your comment here..." required></textarea>
-                                        <button type="submit">Submit</button>
-                                    </form>
-                                </div>
-                            </div>
-                        `;
-                        postList.prepend(newPost); // Add the new post to the top of the list
-                        attachEventListeners();
-                        attachCopyLinks();
-
-                        // Scroll slightly above the newly added post
-                        const newPostPosition = newPost.getBoundingClientRect().top + window.scrollY;
-                        const offset = 100; // Adjust this value for desired spacing
-                        window.scrollTo({
-                            top: newPostPosition - offset,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        // Display error message
-                        document.getElementById('post-error').style.display = 'block';
-                        document.getElementById('post-success').style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('post-error').style.display = 'block';
-                    document.getElementById('post-success').style.display = 'none';
-                    enableSubmitButton();
-                });
-            });
     });
+    
     </script>
+    <script src="{% static 'js/utility_functions.js' %}" defer></script>
+    <script src="{% static 'js/ajax_posts.js' %}" defer></script>
+    <script src="{% static 'js/websocket_updates.js' %}" defer></script>
     {% endblock %}
 
     {% block page_scripts %} 

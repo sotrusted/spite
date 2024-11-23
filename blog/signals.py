@@ -1,11 +1,17 @@
 from django.db.models.signals import post_save
+from asgiref.sync import async_to_sync
+from django.contrib.sessions.models import Session
 from spite.tasks import cache_posts_data
 from django.dispatch import receiver
 import logging 
 from django.core.cache import cache
+from django.utils.timezone import localtime
 from .models import Post, Comment
 from django.conf import settings 
 import requests
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 
 logger = logging.getLogger('spite')
 
@@ -56,3 +62,31 @@ def refresh_recent_comments(sender, instance, created, **kwargs):
         post.recent_comments = comments[:5]  # Update recent_comments attribute
         # Optionally log for debugging
         print(f"Updated recent comments for Post ID {post.id}")
+
+@receiver(post_save, sender=Post)
+def broadcast_new_post(sender, instance, created, **kwargs):
+    if created:  # Only broadcast new posts
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "posts",  # Group name for clients subscribed to post updates
+            {
+                "type": "post_message",
+                "message": {
+                    "id": instance.id,
+                    "title": instance.title,
+                    "content": instance.content,
+                    'date_posted': localtime(instance.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                    "anon_uuid": str(instance.anon_uuid),
+                    "parent_post": {
+                        "id": instance.parent_post.id,
+                        "title": instance.parent_post.title,
+                    } if instance.parent_post else None,
+                    "city": instance.city,
+                    "contact": instance.contact,
+                    "media_file": instance.media_file.url if instance.media_file else None,
+                    "image": instance.image.url if instance.image else None,
+                    "is_image": instance.is_image(),
+                    "is_video": instance.is_video(),
+                },
+            },
+        )
