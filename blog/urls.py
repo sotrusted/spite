@@ -6,7 +6,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     like_post, PostListView, PostReplyView, 
                     load_more_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
-                    store_page, add_comment)
+                    store_page, add_comment, get_csrf_token)
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -23,6 +23,7 @@ urlpatterns = [
     path('search/', search_results, name='search_results'),
     path('shop/', store_page, name='shop'),
     path('add-comment/<int:post_id>/', add_comment, name='add_comment'),
+    path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
 ]
 
 if settings.DEBUG:

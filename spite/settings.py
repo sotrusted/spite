@@ -185,9 +185,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SECURE_SSL_REDIRECT = True
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
 CSRF_FAILURE_VIEW = 'blog.views.custom_csrf_failure'
 
 SECURE_HSTS_SECONDS = 3600
@@ -196,6 +196,7 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
+AUTHENTICATION_BACKENDS = ['axes.backends.AxesStandaloneBackend']
 
 
 LOGGING = {
@@ -248,13 +249,16 @@ LOGGING = {
     }, 
 }
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # 2 weeks (default)
+
 # Maximum size for file uploads (in bytes)
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
 # Maximum size for request data (in bytes)
 
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
 # FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 

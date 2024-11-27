@@ -1,3 +1,159 @@
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function refreshCSRFToken() {
+    const response = await fetch('/get-csrf-token/');
+    const data = await response.json();
+    document.querySelector('[name=csrfmiddlewaretoken]').value = data.csrfToken;
+}
+
+// Function to toggle content between detail and preview
+function toggleContent(postId) {
+    var detailDiv = document.getElementById('post-detail-' + postId);
+    var previewDiv = document.getElementById('post-preview-' + postId);
+    var toggleButton = document.getElementById('toggle-link-' + postId); 
+    if (detailDiv.style.display === 'none') {
+        detailDiv.style.display = 'flex';
+        previewDiv.style.display = 'none';
+        toggleButton.textContent = 'Collapse';
+    } else {
+        detailDiv.style.display = 'none';
+        previewDiv.style.display = 'flex';
+        toggleButton.textContent = 'Expand';
+    }
+}
+
+//Function to attach event listeners to copy links
+function attachCopyLinks() {
+    document.querySelectorAll('a[id^="copy-link-"]').forEach(a => {
+        a.addEventListener('click', function () {
+            // Extract the post ID from the link's ID attribute
+            const postId = this.id.replace('copy-link-', ''); // e.g., 'copy-link-123' -> '123'
+
+            // Construct the URL dynamically
+            const link = `https://spite.fr/post/${postId}`;
+
+            // Copy the link to the clipboard
+            navigator.clipboard.writeText(link).then(() => {
+                // Optional: Show a confirmation message
+                const message = document.createElement('span');
+                message.textContent = 'Link copied!';
+                message.style.color = 'green';
+                this.parentElement.appendChild(message);
+
+                // Remove the message after 2 seconds
+                setTimeout(() => {
+                    message.remove();
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy link:', err);
+                alert('Failed to copy the link. Please try again.');
+            });
+        })
+    })
+}
+
+// Attach submit event to all comment forms
+function attachEventListeners() {
+    document.querySelectorAll('form[id^="comment-form-"]').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(this);
+            const postId = this.id.split('-').pop(); // Extract post ID from form ID
+            const url = this.action; // Form action URL
+
+            // Perform AJAX request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear the form
+                    this.reset();
+
+                    // Append the new comment to the comment list
+                    const commentList = document.getElementById(`comments-list-${postId}`);
+                    const newComment = document.createElement('div');
+                    newComment.classList.add('comment');
+                    newComment.innerHTML = `
+                        <strong>${data.comment.name || 'Anonymous'}</strong>: ${data.comment.content}
+                        <p><em>${data.comment.created_on}</em></p>
+                    `;
+                    commentList.appendChild(newComment);
+
+                    // Make sure the comments container is visible
+                    const commentsContainer = document.getElementById(`comments-container-${postId}`);
+                    commentsContainer.style.display = 'block';
+                } else {
+                    alert('Failed to add comment. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while adding the comment.');
+            });
+        });
+    });
+
+
+    // Automatically expand comments if data-has-comments is true
+    console.log("Expanding comments...");
+    document.querySelectorAll('.comments-container').forEach(container => {
+        const hasComments = container.dataset.hasComments === 'true';
+        console.log(hasComments);
+
+        if (hasComments) {
+            container.style.display = 'block';
+            console.log('Expanded');
+        }
+    });
+
+    // Add click listeners for toggling comments
+    document.querySelectorAll('.toggle-comments').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const commentsContainer = document.getElementById(`comments-container-${postId}`);
+            if (commentsContainer) {
+                commentsContainer.style.display = 
+                    commentsContainer.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    });
+}; 
+
+
+function disableSubmitButton() {
+    var submitButton = document.getElementById('submit-id-submit');
+    console.log(submitButton.value);
+    submitButton.disabled = true;
+    submitButton.value = 'Posting...';  // Change the button text
+}
+function enableSubmitButton() {
+    var submitButton = document.getElementById('submit-id-submit');
+    submitButton.disabled = false;
+    submitButton.value = 'Post';  // Change the button text
+}
+
+
 function updateSpiteCounter() {
     const counterElement = document.getElementById("spite-counter");
     const currentCount = parseInt(counterElement.textContent.split(":")[1].trim());
@@ -98,7 +254,7 @@ function addPostToPage(post) {
                     <div class="post-content">
                         <p>${post.content}</p>
                     </div>
-                    ${post.author ? `<p class="post-author">by ${post.author}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
+                    ${post.display_name ? `<p class="post-author">by ${post.display_name}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
                     <p class="post-date">${post.date_posted}</p>
                 </div>
                 <div class="menu">
@@ -132,3 +288,6 @@ function addPostToPage(post) {
     attachCopyLinks();
     return newPost;
 }
+
+
+
