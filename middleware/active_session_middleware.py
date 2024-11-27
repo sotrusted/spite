@@ -1,5 +1,5 @@
 # middleware/active_session_middleware.py
-
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.utils.deprecation import MiddlewareMixin

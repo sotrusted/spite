@@ -472,6 +472,10 @@ main {
 @media only screen and (max-width: 480px) {
     body {
         font-size: 1em;
+        overscroll-behavior: none; /* Prevent overscroll effects like bounce */
+        touch-action: pan-y;      /* Restrict gestures to vertical scrolling only */
+        touch-action: manipulation; /* Restrict zoom gestures */
+        -ms-touch-action: manipulation; /* For older IE/Edge support */
     }
     .container {
 	    max-width:100%;
