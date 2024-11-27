@@ -1,4 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views.decorators.cache import never_cache
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 from django.utils.timezone import localtime
 from django.urls import reverse_lazy
 from django.core.cache import cache
@@ -140,7 +143,6 @@ except subprocess.CalledProcessError as e:
     print('Post uploaded and migrations run, but backup failed: {str(e)}')   
 '''
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class PostReplyView(PostCreateView):
     template_name = 'blog/post_reply.html'
     form_context_name = 'replyForm'
@@ -296,3 +298,6 @@ def custom_csrf_failure(request, reason=""):
 
     # Redirect to the homepage
     return redirect('home')
+
+def get_csrf_token(request):
+    return JsonResponse({'csrfToken': get_token(request)})
