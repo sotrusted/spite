@@ -8,6 +8,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     preview_pdf_template, search_results,
                     store_page, add_comment, get_csrf_token)
 from django.conf.urls.static import static
+from graphene_django.views import GraphQLView
+from spite.schema import schema 
 
 urlpatterns = [
     path('', home, name='home'),
@@ -24,6 +26,7 @@ urlpatterns = [
     path('shop/', store_page, name='shop'),
     path('add-comment/<int:post_id>/', add_comment, name='add_comment'),
     path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
+    path("graphql/", GraphQLView.as_view(graphiql=True, schema=schema)),
 ]
 
 if settings.DEBUG:

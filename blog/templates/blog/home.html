@@ -7,9 +7,9 @@
 
 	<div class="cta">
         <p>Tired of biting your tongue? </p>
-        <div class="post-button">
-        <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
-        </div>
+        <button class="post-button" id="post-button">
+        <p> --&lt Write for Spite! &gt-- </p>
+        </button>
     </div>
 
     <div class="flexbox">
@@ -55,13 +55,35 @@
     </div>
     <div class="shop">
         {% include 'blog/products.html' %}
+    </div>  
+
+    {% if highlight_comments %}
+    <div class="comment-highlight">
+        <h2 class="section-header">recent comments</h2>
+        {% for comment in highlight_comments %}
+            <div class="comment">
+                <strong>
+                    {{ comment.name|default:"Anonymous" }}
+                </strong>: {{ comment.content }}
+                <p><em>{{ comment.created_on }}</em></p>
+                <p>Posted on: 
+                    <a href="{% url 'post-detail' comment.post.id %}">
+                        {{ comment.post.title }}
+                    </a>
+                </p>
+            </div>
+        {% endfor %}
     </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block highlight %}
 {% endblock %}
 
 {% block form %}
     <div class="form-container">
-        <p>Tired of biting your tongue? </p>
+        <p>Tired of biting your tongue? </p><br>
         {% include 'blog/post_form_stub.html' %}
     </div>
 {% endblock %}
