@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.timezone import now
 from django.template.defaultfilters import slugify
 from django.db import models
 from django.contrib.auth.models import User
@@ -97,3 +98,12 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.name or "Anonymous"} on {self.post}'
+
+class SearchQueryLog(models.Model):
+    query = models.CharField(max_length=255)
+    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    timestamp = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"{self.query} - {self.timestamp}"
