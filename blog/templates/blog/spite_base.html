@@ -15,6 +15,13 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no">">
+
+    {% block meta %}
+        <meta property="og:title" content="SPITE Magazine">
+        <meta property="og:description" content="Anyone can write for spite">
+        <meta property="og:image" content="https://spite.fr/static/media/anon.jpg">
+    {% endblock %}
+
     {% block title %}
         <title>SPITE MAGAZINE</title>
     {% endblock %}
@@ -32,35 +39,37 @@
 <div class="container">
 
     {% block spitebar %}
-    <div class="spite-bar">
-        <p id="spite-counter" class="spite-counter">SPITE COUNTER: {{spite}}</p>
-    </div>
+        <div class="spite-bar">
+            <p id="spite-counter" class="spite-counter">
+                SPITE COUNTER: {{spite}}
+            </p>
+        </div>
     {% endblock %}
 
     {% block notifications %}
-    <div id="new-post-notification" style="display: none; position: fixed; top: 100px; background-color: green; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; animation: flash 1s infinite; z-index: 1001;">
-        New post! (<span id="new-post-title"></span>)
-    </div>
-    <audio id="notification-sound" src="{% static 'sounds/sword-sound.mp3' %}" hidden></audio>
+        <div id="new-post-notification">
+            New post! (<span id="new-post-title"></span>)
+        </div>
+        <audio id="notification-sound" src="{% static 'sounds/sword-sound.mp3' %}" hidden></audio>
     {% endblock %}
 
     {% block header %}
-    <div class="header">
-        <a href="{% url 'home' %}">
-            <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
-        </a>
-	<p>In Spite of it all since {{days_since_launch}} days ago</p>
-        <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
-    </div>
+        <div class="header">
+            <a href="{% url 'home' %}">
+                <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
+            </a>
+        <p>In Spite of it all since {{days_since_launch}} days ago</p>
+            <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
+        </div>
     {% endblock %}
 
 
     {% block content %}
     {% endblock %}
 
-    {% block form %}
+    {% block highlight %}
     {% endblock %}
-    
+
     {% block spite %}
         <div class="spite">
             <p>Every time you post, the SPITE COUNTER goes up!</p>
@@ -69,6 +78,9 @@
         </div>
     {% endblock %}
 
+    {% block form %}
+    {% endblock %}
+    
     {% block feed %}
     {% endblock %}
 
@@ -86,10 +98,12 @@
         // Function to get CSRF token from cookies
 
 
-        refreshCsrfToken();
+
+        refreshCSRFToken();
         attachEventListeners();
         attachCopyLinks();
 
+        scrollToElementById('post-form');
     });
     </script>
 

@@ -138,6 +138,9 @@ function attachEventListeners() {
             }
         });
     });
+
+
+    setWriteLinksScrollers();
 }; 
 
 
@@ -159,6 +162,7 @@ function updateSpiteCounter() {
     const currentCount = parseInt(counterElement.textContent.split(":")[1].trim());
     counterElement.textContent = `SPITE COUNTER: ${currentCount + 1}`;
 }
+
 
 // Function to show the notification
 function showNewPostNotification(message) {
@@ -184,6 +188,23 @@ function showNewPostNotification(message) {
     setTimeout(() => {
         notificationButton.style.display = "none";
     }, 10000); // Hide after 10 seconds
+}
+
+function scrollToElementById(id) {
+    const targetElement = document.getElementById(id);
+    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+    const offset = 100; // Adjust this value for desired spacing
+    window.scrollTo({
+        top: targetPosition - offset,
+    });
+}
+
+function setWriteLinksScrollers() {
+    document.querySelectorAll('.post-button').forEach(button => {
+        button.addEventListener('click', function () {
+            scrollToElementById('post-form');
+        });
+    });
 }
 
 
@@ -289,5 +310,10 @@ function addPostToPage(post) {
     return newPost;
 }
 
+// Attach to window object to make it globally accessible
+window.refreshCSRFToken = refreshCSRFToken;
+window.attachCopyLinks = attachCopyLinks;
+window.attachEventListeners = attachEventListeners;
+window.scrollToElementById = scrollToElementById;
 
 

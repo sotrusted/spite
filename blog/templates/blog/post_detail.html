@@ -2,14 +2,20 @@
 
 {% load static %}
 
-{% block content %}
-
-<div class="detail mb-3">
-<a class="back" href="{% url 'home' %}">Back to Spite</a>
-
-{% include 'blog/detail.html' with post=post nested=False %}
-
-</div>
+{% block meta %}
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:description" content="{{ post.content }}">
+    {% if post.media_file.url %}
+        <meta property="og:image" content="https://spite.fr/{{ post.media_file.url }}"> 
+    {% endif %}
 {% endblock %}
+
+{% block content %}
+    <div class="detail mb-3">
+        <a class="back" href="{% url 'home' %}">Back to Spite</a>
+        {% include 'blog/detail.html' with post=post nested=False %}
+    </div>
+{% endblock %}
+
 {% block feed %}
 {% endblock %}

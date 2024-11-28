@@ -67,7 +67,7 @@ def load_posts(request):
         comments = Comment.objects.filter(post=post).order_by('-created_on')
         # Attach comments and total count directly to the post object
         post.comments_total = comments.count()
-        post.recent_comments = comments[:5]  # Attach the recent 5 comments directly to the post
+        post.recent_comments = comments
     
     highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
 

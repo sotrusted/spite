@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.cache import never_cache
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
-from django.utils.timezone import localtime
+from django.utils.timezone import localtime, now
 from django.urls import reverse_lazy
 from django.core.cache import cache
 from django.db.models import Q
@@ -16,7 +16,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DetailView, ListView
-from blog.models import Post, Comment
+from blog.models import Post, Comment, SearchQueryLog
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
@@ -117,7 +117,7 @@ class PostCreateView(CreateView):
                                     'city': post.city,
                                     'contact': post.contact,
                                     'media_file': {
-                                        'url': post.media_file.url,
+                                        'url': post.media_file.url if post.media_file.url else None,
                                     } if post.media_file else None,
                                     'image': post.image.url if post.image else None,
                                     'is_image': post.is_image(), 
@@ -231,7 +231,7 @@ def generate_pdf(request):
 
     # Create a response object and set the appropriate headers
     response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="spite_book.pdf"'
+    response['Content-Disposition'] = 'inline filename="spite_book.pdf"'
 
     return response
 
@@ -245,6 +245,12 @@ def search_results(request):
     query = request.GET.get('query')
     if query:
         logger.info(f'Search query: {query}')
+        SearchQueryLog.objects.create(
+            query=query,
+            user=request.user if request.user.is_authenticated else None,
+            ip_address=get_client_ip(request),
+            timestamp=now()
+        )
         posts = Post.objects.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
         ).order_by('-date_posted')

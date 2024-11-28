@@ -5,8 +5,6 @@ const postForm = document.getElementById('post-form');
 postForm.addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent the default form submission
 
-    refreshCSRFToken();
-
     const formData = new FormData(this); // Collect form data
     const url = this.action; // Get the form's action URL
 

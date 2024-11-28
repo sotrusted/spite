@@ -15,19 +15,6 @@
         </div>
         {% endif %}
 
-        {% if highlight_comments %}
-        <div class="comment-highlight">
-            <h2 class="section-header">recent comments</h2>
-            {% for comment in highlight_comments %}
-                <div class="comment">
-                    <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
-                    <p><em>{{ comment.created_on }}</em></p>
-                    <p>Posted on: <a href="{% url 'post-detail' comment.post.id %}">{{ comment.post.title }}</a></p>
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
     {% endif %}
 
     {% if search_form %}
