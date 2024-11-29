@@ -141,6 +141,14 @@ function attachEventListeners() {
 
 
     setWriteLinksScrollers();
+
+    document.querySelectorAll('#feed-scroller').forEach(a => {
+       a.addEventListener('click', function() {
+            scrollToElementById('feed');
+       };
+    });
+
+
 }; 
 
 
@@ -263,10 +271,10 @@ function addPostToPage(post) {
                     <div class="image-container">
                         ${post.media_file && post.is_video ? `
                             <video controls muted autoplay playsinline>
-                                <source src="${post.media_file}" type="video/mp4">
+                                <source src="${post.media_file.url}" type="video/mp4">
                             </video>` : ''}
-                        ${post.media_file && post.is_image ? `<img src="${post.media_file}" alt="${post.title}" loading="lazy">` : ''}
-                        ${post.image ? `<img src="${post.image}" alt="${post.title}" loading="lazy">` : ''}
+                        ${post.media_file && post.is_image ? `<img src="${post.media_file.url}" alt="${post.title}" loading="lazy">` : ''}
+                        ${post.image ? `<img src="${post.image.url}" alt="${post.title}" loading="lazy">` : ''}
                     </div>
                 </div>` : ''}
                 <div class="text-content">

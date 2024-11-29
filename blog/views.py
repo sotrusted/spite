@@ -14,7 +14,7 @@ import logging
 from django.core.paginator import Paginator
 # import os
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from blog.models import Post, Comment, SearchQueryLog
 from django.contrib import messages
@@ -71,6 +71,7 @@ def get_client_ip(request):
 CACHE_KEY = 'home_cache'
 
 @cache_page(60 * 15, key_prefix=CACHE_KEY)
+@csrf_protect
 def home(request):
     logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
     return render(request, 'blog/home.html')
