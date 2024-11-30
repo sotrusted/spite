@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'graphene_django',
+    'pwa',
 ]
 
 
@@ -311,6 +312,26 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+PWA_APP_NAME = 'SPITE MAGAZINE'
+PWA_APP_DESCRIPTION = 'Anyone can write for spite'
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#faebd7'
+PWA_APP_SCOPE = '/'
+PWA_APP_START_URL = '/'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/images/icon-192x192.png',
+        'sizes': '192x192'
+    },
+    {
+        'src': '/static/images/icon-512x512.png',
+        'sizes': '512x512'
+    }
+]
+PWA_APP_OFFLINE_PAGE = '/offline/'  # URL for offline fallback page
 
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']

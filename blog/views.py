@@ -308,3 +308,6 @@ def custom_csrf_failure(request, reason=""):
 
 def get_csrf_token(request):
     return JsonResponse({'csrfToken': get_token(request)})
+
+def offline_view(request):
+    return render(request, 'blog/offline.html')

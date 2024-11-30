@@ -6,7 +6,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     like_post, PostListView, PostReplyView, 
                     load_more_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
-                    store_page, add_comment, get_csrf_token)
+                    store_page, add_comment, get_csrf_token, 
+                    offline_view,)
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
 from spite.schema import schema 
@@ -27,6 +28,7 @@ urlpatterns = [
     path('add-comment/<int:post_id>/', add_comment, name='add_comment'),
     path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
     path("graphql/", GraphQLView.as_view(graphiql=True, schema=schema)),
+    path('offline/', offline_view, name='offline')
 ]
 
 if settings.DEBUG:

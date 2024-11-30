@@ -5,7 +5,7 @@
 {% block meta %}
     <meta property="og:title" content="{{ post.title }}">
     <meta property="og:description" content="{{ post.content }}">
-    {% if post.media_file.url %}
+    {% if post.media_file %}
         <meta property="og:image" content="https://spite.fr/{{ post.media_file.url }}"> 
     {% endif %}
 {% endblock %}
