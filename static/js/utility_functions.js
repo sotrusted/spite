@@ -145,7 +145,7 @@ function attachEventListeners() {
     document.querySelectorAll('#feed-scroller').forEach(a => {
        a.addEventListener('click', function() {
             scrollToElementById('feed');
-       };
+       });
     });
 
 

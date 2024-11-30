@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('favicon.ico', core_views.favicon),
     path('',include('blog.urls')),
+    path('', include('pwa.urls')),
 ] + debug_toolbar_urls()
 
 if settings.DEBUG: 
