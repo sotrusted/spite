@@ -11,6 +11,13 @@ from .views import (home, PostCreateView, PostDetailView,
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
 from spite.schema import schema 
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap, PostSitemap
+
+sitemaps = {
+    'posts': PostSitemap,
+    'static': StaticViewSitemap,
+}
 
 urlpatterns = [
     path('', home, name='home'),
@@ -28,8 +35,9 @@ urlpatterns = [
     path('add-comment/<int:post_id>/', add_comment, name='add_comment'),
     path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
     path("graphql/", GraphQLView.as_view(graphiql=True, schema=schema)),
-    path('offline/', offline_view, name='offline')
+    path('offline/', offline_view, name='offline'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('sitemap.xml.gz', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
 ]
-
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
