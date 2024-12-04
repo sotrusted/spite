@@ -33,7 +33,6 @@
         <div class="post-content">
             <p>{{ post.content|linebreaksbr }}</p>
         </div>
-
         {% if post.author %}
             <p class="post-author">by {{ post.author }}</p>
         {% elif post.display_name %}
@@ -45,6 +44,7 @@
 
         <p class="post-date">{{post.date_posted }}</p>
 
+   
         {% if not home %}
         <div id="comment-section-{{ post.id }}">
             <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
@@ -76,11 +76,10 @@
     </div>
     {% if not export %}
     <div class="menu">
-	    {% if not post.is_pinned %}
-	    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Collapse</a>
+        
+        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}" onclick="toggleContent({{ post.id }})">Collapse</a>
         <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
         <span id="copy-message" style="display: none;">Link copied!</span>
-	    {% endif %}
     </div> 
     {% endif %}
 </div>

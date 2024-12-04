@@ -1,4 +1,5 @@
 {% load static %}
+{% load pwa %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +17,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no">">
 
+    <meta name="theme-color" content="#000000">
     {% block meta %}
         <meta property="og:title" content="SPITE Magazine">
         <meta property="og:description" content="Anyone can write for spite">
@@ -29,10 +31,12 @@
         <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+        <link rel="manifest" href="{% static 'manifest.json' %}">
     {% endblock %}
     {% block stylesheets %}
         <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     {% endblock %}
+    {% progressive_web_app_meta %}
 </head>
 <body>
 
@@ -40,7 +44,7 @@
 
     {% block spitebar %}
         <div class="spite-bar">
-            <a id="feedScroller">
+            <a id="feed-scroller">
                 <p id="spite-counter" class="spite-counter">
                     SPITE COUNTER: {{spite}}
                 </p>
@@ -94,6 +98,19 @@
 
 
     {% block scripts %}
+    <!-- Register the service worker -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('/serviceworker.js')
+            .then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+    }
+    </script>
     <script src="{% static 'js/utility_functions.js' %}" defer></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
