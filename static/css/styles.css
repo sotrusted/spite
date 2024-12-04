@@ -15,10 +15,14 @@ body {
     font-size: clamp(1rem, 4vw, 2rem);
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
     min-height: 100vh;
     padding-top: 50px;
     hyphens: auto;
+    width: 100vw;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow: visible;
 }
 
 .spite-bar {
@@ -488,9 +492,10 @@ main {
     body {
         font-size: 1em;
         overscroll-behavior: none; /* Prevent overscroll effects like bounce */
-        touch-action: pan-y;      /* Restrict gestures to vertical scrolling only */
-        touch-action: manipulation; /* Restrict zoom gestures */
         -ms-touch-action: manipulation; /* For older IE/Edge support */
+    }
+    h2 {
+        font-size: 1.5rem;
     }
     .container {
 	    max-width:100%;
