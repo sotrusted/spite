@@ -244,9 +244,14 @@ body {
 }
 
 .spite-counter {
-    animation: fire 2s infinite alternate;
     text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #ff4500; /* Static fire effect */
     color: #ff4500;
+    display: inline-block; /* Ensures size fits content */
+    background-color: #000;
+    width: 100vw;
+}
+.spite-text {
+    animation: fire 2s infinite alternate;
 }
 
 @keyframes flicker {
