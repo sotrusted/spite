@@ -1,5 +1,6 @@
 import os
 import environ
+import time
 
 # Initialize environment variables
 env = environ.Env(
@@ -175,7 +176,7 @@ PASSWORD_HASHERS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
@@ -196,12 +197,16 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder',
 ]
 
+# Use a timestamp for dynamic versioning
+STATIC_VERSION = str(int(time.time()))
+
 COMPRESS_ENABLED = True  # Enable compression
 COMPRESS_OFFLINE = True  # Enable offline compression for production
 
 COMPRESS_OFFLINE_CONTEXT = {
     'STATIC_URL': os.path.join(BASE_DIR, 'static'),
     'MEDIA_URL': os.path.join(BASE_DIR, 'media'),
+    'STATIC_VERSION': STATIC_VERSION,
 }
 
 

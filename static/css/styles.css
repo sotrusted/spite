@@ -23,6 +23,7 @@ body {
     word-wrap: break-word;
     overflow-wrap: break-word;
     overflow: visible;
+    overflow-x: hidden;
     font-display: swap;
 }
 
