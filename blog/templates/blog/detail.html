@@ -16,6 +16,7 @@
             {% elif post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
             {% endif %}
+            <p class="post-date">{{post.date_posted }}</p>
         </div>
     </div>
     {% endif %}
@@ -42,7 +43,6 @@
         {% endif %}
 
 
-        <p class="post-date">{{post.date_posted }}</p>
 
    
         {% if not home %}

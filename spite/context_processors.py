@@ -96,6 +96,7 @@ def load_posts(request):
         'comment_form': CommentForm(),
         'postForm': PostForm(),
         'highlight_comments': highlight_comments,
+        'STATIC_VERSION': getattr(settings, 'STATIC_VERSION', '1.0'),
     }
 
 def days_since_launch():
