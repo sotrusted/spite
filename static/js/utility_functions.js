@@ -229,6 +229,9 @@ function addPostToPage(post) {
         <div class="preview" id="post-preview-${postId}">
             <div class="post flexbox">
                 <div class="text-content">
+                    <div class="new-post-badge">
+                        new
+                    </div>
                     <h2 class="post-title">
                         <a href="/post/${postId}/">
                             ${post.title}

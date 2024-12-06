@@ -1,11 +1,12 @@
 {% load static %}
 {% load pwa %}
+{% load compress %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GP22W6QCYV"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GP22W6QCYV" defer></script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -30,11 +31,13 @@
     {% block links %}
         <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}"/>
         <link rel="manifest" href="{% static 'manifest.json' %}">
     {% endblock %}
-    {% block stylesheets %}
+    {% block stylesheets %}        
+        {% compress css %}
         <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+        {% endcompress %}
     {% endblock %}
     {% progressive_web_app_meta %}
 </head>
@@ -62,7 +65,7 @@
     {% block header %}
         <div class="header">
             <a href="{% url 'home' %}">
-                <img class="logo" src="{% static 'media/spite-logo.png' %}" alt="Spite Logo">
+                <img class="logo" src="{% static 'media/spite-logo.webp' %}" alt="Spite Magazine" loading="lazy">
             </a>
         <p>In Spite of it all since {{days_since_launch}} days ago</p>
             <a class="email" href="mailto:editor@spite.fr">editor@spite.fr</a>
@@ -98,7 +101,7 @@
 
 
     {% block scripts %}
-    <!-- Register the service worker -->
+    <!-- 
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker
@@ -110,24 +113,29 @@
                 console.log('ServiceWorker registration failed: ', err);
             });
     }
+
     </script>
-    <script src="{% static 'js/utility_functions.js' %}" defer></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Function to get CSRF token from cookies
+Register the service worker -->
+
+        {% compress js %}
+            <script src="{% static 'js/utility_functions.js' %}" defer></script>
+            <script defer>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Function to get CSRF token from cookies
 
 
 
-        refreshCSRFToken();
-        attachEventListeners();
-        attachCopyLinks();
+                refreshCSRFToken();
+                attachEventListeners();
+                attachCopyLinks();
 
-        scrollToElementById('post-form');
-    });
-    </script>
+                scrollToElementById('post-form');
+            });
+            </script>
 
-    <script src="{% static 'js/ajax_posts.js' %}" defer></script>
-    <script src="{% static 'js/websocket_updates.js' %}" defer></script>
+            <script src="{% static 'js/ajax_posts.js' %}" defer></script>
+            <script src="{% static 'js/websocket_updates.js' %}" defer></script>
+        {% endcompress %}
     {% endblock %}
 
     {% block page_scripts %} 
