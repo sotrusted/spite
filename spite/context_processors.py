@@ -40,6 +40,9 @@ def load_posts(request):
         # Deserialize with pickle
         posts_data = pickle.loads(decompressed_data)
 
+        posts = posts_data['posts']
+        pinned_posts = posts_data['pinned_posts']
+
     paginator = Paginator(posts, 20)  # Number to load initially
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
@@ -63,11 +66,20 @@ def load_posts(request):
         cache.set('user_count_data', user_count_data, 60 * 1)
 
     # Add comments context
+    
     for post in page_obj.object_list:
         comments = Comment.objects.filter(post=post).order_by('-created_on')
         # Attach comments and total count directly to the post object
         post.comments_total = comments.count()
         post.recent_comments = comments
+
+    for post in pinned_posts:
+        query_post = Post.objects.get(id=post.id)
+        comments = Comment.objects.filter(post=query_post).order_by('-created_on')
+        # Attach comments and total count directly to the post object
+        post.comments_total = comments.count()
+        post.recent_comments = comments
+
     
     highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
 
