@@ -46,7 +46,7 @@
 
    
         {% if not home %}
-        <div id="comment-section-{{ post.id }}">
+        <div id="comment-section-{{ post.id }}" class="comment-section">
             <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
                 Comments ({{ post.comments_total|default:0 }})
             </button>

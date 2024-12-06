@@ -3,18 +3,46 @@
 {% load crispy_forms_tags %}
 
 <div class="feed" id="feed">
-    {% if home %}
-        {% if pinned_posts %}
+    {% if home and pinned_posts %}
         <h2 class="section-header">spite issue of the week</h2>
         <div class="pinned-posts">
-                {% for post in pinned_posts %}
-                    <div class="detail" id="post-detail-{{post.id}}">
-                        {% include 'blog/detail.html' with post=post %}
-                    </div>
-                {% endfor %}
-        </div>
-        {% endif %}
+            {% for post in pinned_posts %}
+            <div id="post-{{post.id}}" class="item">
+                <div class="preview" id="post-preview-{{post.id}}">
+                    {% include 'blog/preview.html' with post=post %}
+                </div>
+                <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
+                    {% include 'blog/detail.html' with post=post nested=True %}
+                </div>
 
+                <!-- Unique Comment Section for Each Post -->
+                <div id="comment-section-{{ post.id }}">
+                    <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
+                        Comments ({{ post.comments_total|default:0 }})
+                    </button>
+                    <div id="comments-container-{{ post.id }}" 
+                        data-has-comments="{{ post.has_comments }}" 
+                        class="comments-container" style="display: none;">
+                        <div id="comments-list-{{ post.id }}">
+                            {% for comment in post.recent_comments %}
+                                <div class="comment">
+                                    <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
+                                    <p><em>{{ comment.created_on }}</em></p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Comment Form -->
+                    <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add_comment' post.id %}">
+                        {% csrf_token %}
+                        {{ comment_form|crispy }}
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
     {% if search_form %}

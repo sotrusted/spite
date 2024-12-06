@@ -76,11 +76,14 @@ INSTALLED_APPS = [
     'graphene_django',
     'pwa',
     'meta',
+    'compressor',
 ]
 
 
 MIDDLEWARE = [
-    'axes.middleware.AxesMiddleware',
+    'axes.middleware.AxesMiddleware', 
+    'django_cloudflare.CloudflareMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -183,10 +186,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),
                     ]
-STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATIC_URL = 'https://spite.fr/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_URL = '/media/'
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+COMPRESS_ENABLED = True  # Enable compression
+COMPRESS_OFFLINE = True  # Enable offline compression for production
+
+COMPRESS_OFFLINE_CONTEXT = {
+    'STATIC_URL': os.path.join(BASE_DIR, 'static'),
+    'MEDIA_URL': os.path.join(BASE_DIR, 'media'),
+}
+
+
+MEDIA_URL = 'https://spite.fr/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
