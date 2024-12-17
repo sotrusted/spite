@@ -144,9 +144,11 @@ function attachEventListeners() {
 
     document.querySelectorAll('#feed-scroller').forEach(a => {
        a.addEventListener('click', function() {
-            scrollToElementById('feed');
+            scrollToElementById('recent-posts');
        });
     });
+
+
 
 
 }; 
@@ -202,14 +204,15 @@ function scrollToElementById(id) {
     const targetElement = document.getElementById(id);
     const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
     const offset = 100; // Adjust this value for desired spacing
+    console.log(targetPosition - offset)
     window.scrollTo({
         top: targetPosition - offset,
     });
 }
 
 function setWriteLinksScrollers() {
-    document.querySelectorAll('.post-button').forEach(button => {
-        button.addEventListener('click', function () {
+    document.querySelectorAll('.post-link').forEach(a => {
+        a.addEventListener('click', function () {
             scrollToElementById('post-form');
         });
     });
@@ -245,7 +248,7 @@ function addPostToPage(post) {
                         <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
                         <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
                     </div>
-                    ${post.author ? `<p class="post-author">by ${post.author}</p>` : ''}
+                    ${post.display_name ? `<p class="post-author">by ${post.display_name}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
                     <p class="post-date">${post.date_posted}</p>
                     ${post.city || post.contact ? `
                         <p class="post-info">
