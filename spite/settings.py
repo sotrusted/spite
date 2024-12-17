@@ -80,7 +80,8 @@ INSTALLED_APPS = [
     'compressor',
 ]
 
-
+'''
+old order
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware', 
     'django_cloudflare.CloudflareMiddleware',
@@ -90,6 +91,20 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.active_session_middleware.ActiveSessionMiddleware',
+]
+'''
+MIDDLEWARE = [
+    'django.middleware.gzip.GZipMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django_cloudflare.CloudflareMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middleware.active_session_middleware.ActiveSessionMiddleware',
@@ -200,7 +215,6 @@ STATICFILES_FINDERS = [
 # Use a timestamp for dynamic versioning
 STATIC_VERSION = str(int(time.time()))
 
-COMPRESS_ENABLED = True  # Enable compression
 COMPRESS_OFFLINE = True  # Enable offline compression for production
 
 COMPRESS_OFFLINE_CONTEXT = {
@@ -358,6 +372,10 @@ PWA_APP_ICONS = [
     }
 ]
 PWA_APP_OFFLINE_PAGE = '/offline/'  # URL for offline fallback page
+
+OPENAI_SECRET_KEY = env('OPENAI_SECRET_KEY')
+OPENAI_ORGANIZATION_KEY = env('OPENAI_ORGANIZATION_KEY')
+OPENAI_PROJECT_ID = env('OPENAI_PROJECT_ID')
 
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']

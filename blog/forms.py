@@ -6,33 +6,25 @@ from crispy_forms.layout import Layout, Submit, Div, Field, HTML, Row, Column
 class PostForm(forms.ModelForm):
     title = forms.CharField(
         max_length=100, 
-        label='What\'s your problem'
-        )
-    
-    city = forms.CharField(
-        max_length=100, 
-        label='city',
-        required=False
+        label='What\'s your problem',
         )
     
     content  = forms.CharField(
         widget=forms.Textarea, 
         label='', 
-        required=False
+        required=False,
         )
 
-#    images = MultipleImageField(
- #       label='pics', 
-  #      required=False
-   # )
-
-
+    display_name = forms.CharField(
+        max_length=100,
+        label='Display Name',
+        required=False,
+    )
     
 
     class Meta:
         model = Post
-        fields = ('title', 'content', 'media_file',\
-                  'display_name')
+        fields = ('title', 'content', 'media_file', 'display_name')
 
 
     def __init__(self, *args, **kwargs):
@@ -44,12 +36,11 @@ class PostForm(forms.ModelForm):
             Div(
                 Row('title', css_class='form-group col-md-12 mb-0'),
                 Row(
-                    Field('content', css_class='w-100'),  # Full-width content field
+                    Field('content', css_class='w-100'), # Full-width content field
                     css_class='form-group col-md-12 mb-0'
                 ),
                 Row('media_file', css_class='form-group col-md-12 mb-0'),
                 Row('display_name', css_class='form-group col-md-12 mb-0'),
-                # Row('contact', css_class='form-group col-md-9 mb-0'
                 css_class='form-group mb-0'
             ),
             Submit('submit', 'Submit'),

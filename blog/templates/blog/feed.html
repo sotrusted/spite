@@ -4,7 +4,7 @@
 
 <div class="feed" id="feed">
     {% if home and pinned_posts %}
-        <h2 class="section-header">spite issue of the week</h2>
+        <h2 class="section-header" id="recent-posts">spite issue of the week</h2>
         <div class="pinned-posts">
             {% for post in pinned_posts %}
             <div id="post-{{post.id}}" class="item">
@@ -51,6 +51,11 @@
         {{ search_form|crispy }}
     </form>
     {% endif %}
+
+    <div class="form-container">
+        <p>Tired of biting your tongue? </p><br>
+        {% include 'blog/post_form_stub.html' %}
+    </div>
 
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
@@ -113,6 +118,7 @@
         </div>
     </div>
 
+    {% if home %}
     <div class="pagination">
         <span class="step-links">
             {% if posts.has_previous %}
@@ -130,6 +136,7 @@
             {% endif %}
         </span>
     </div>
+    {% endif %}
 </div>
 
 <script src="{% static 'js/load_more.js' %}" defer></script>
