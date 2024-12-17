@@ -12,6 +12,7 @@ import requests
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
+from spite.tasks import summarize_posts
 
 logger = logging.getLogger('spite')
 
@@ -87,6 +88,13 @@ def broadcast_new_post(sender, instance, created, **kwargs):
                     "image": instance.image.url if instance.image else None,
                     "is_image": instance.is_image(),
                     "is_video": instance.is_video(),
+                    "display_name": instance.display_name,
                 },
             },
         )
+
+@receiver(post_save, sender=Post)
+def trigger_summary(sender, instance, **kwargs):
+    post_count = Post.objects.count()
+    if post_count % 100 == 0:  # Trigger after every 100th post
+        summarize_posts.delay()

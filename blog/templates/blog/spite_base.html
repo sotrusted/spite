@@ -22,7 +22,7 @@
     {% block meta %}
         <meta property="og:title" content="SPITE Magazine">
         <meta property="og:description" content="Anyone can write for spite">
-        <meta property="og:image" content="https://spite.fr/static/media/anon.jpg">
+        <meta property="og:image" content="https://spite.fr/static/media/spite-logo.webp">
     {% endblock %}
 
     {% block title %}
@@ -43,14 +43,18 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="overflow-x: hidden;">
 
     {% block spitebar %}
         <div class="spite-bar">
             <a id="feed-scroller">
                 <p id="spite-counter" class="spite-counter">
                     <span class="spite-text">SPITE COUNTER: {{spite}}</span>
-                </p>
+                 </p>
+            </a>
+            <span>☆</span>
+            <a class="post-link" id="post-link">
+                <p>WRITE</p>
             </a>
         </div>
     {% endblock %}

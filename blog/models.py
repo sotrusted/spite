@@ -1,4 +1,5 @@
 import uuid
+import logging
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -10,6 +11,8 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 import mimetypes
 from django.core.exceptions import ValidationError
+
+logger = logging.getLogger('spite')
 
 def validate_media_file(value):
     """Validate that the file is either an image or a video."""
@@ -55,6 +58,32 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def print_long(self):
+        # Build the main post string
+        posts_string = f'{self.title}-{self.content}-by {self.display_name or "anon"}'
+        logger.info(f"Post String: {posts_string}")
+
+        # Fetch recent comments
+        comments = self.get_recent_comments()
+        logger.info(f"Comments QuerySet for post {self.id}: {comments}")
+
+        try:
+            if comments.exists():  # Check if comments exist
+                # Build a string of all comments
+                comments_string = 'Comments:' 
+                for comment in comments:
+                    comments_string += '\n' + str(comment)
+                logger.info(f"Comments String for post {self.id}: {comments_string}")
+                return posts_string + '\n' + comments_string
+            else:
+                logger.info(f"No comments found for post {self.id}.")
+                return posts_string
+        except Exception as e:
+            logger.error(f"Error in print_long for post {self.id}: {e}")
+            return posts_string
+        
+
     
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk' : self.pk})
@@ -81,7 +110,8 @@ class Post(models.Model):
         return mime_type and mime_type.startswith('video/')
     
     def get_recent_comments(self):
-        return Comment.objects.filter(post=self).order_by('-created_on')
+        comments = Comment.objects.filter(post=self).order_by('-created_on')
+        return comments
 
 
 def get_image_filename(instance, filename):
@@ -97,7 +127,7 @@ class Comment(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'Comment by {self.name or "Anonymous"} on {self.post}'
+        return f'{self.name or "anon"}: \"{self.content}\" on {self.post.title}'
 
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)
@@ -107,3 +137,11 @@ class SearchQueryLog(models.Model):
 
     def __str__(self):
         return f"{self.query} - {self.timestamp}"
+
+
+class Summary(models.Model):
+    start_index = models.IntegerField(blank=True,null=True)  # The first post in the range
+    end_index = models.IntegerField(blank=True,null=True)    # The last post in the range
+    title = models.CharField(max_length=100)
+    summary = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

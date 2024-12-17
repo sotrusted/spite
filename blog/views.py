@@ -21,6 +21,7 @@ from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
 from datetime import datetime 
+from spite.context_processors import get_posts
 # import subprocess
 # from weasyprint import HTML
 
@@ -76,9 +77,14 @@ def home(request):
     logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
     return render(request, 'blog/home.html')
 
+def all_posts(request):
+    _, posts, _ = get_posts()
+    context = {'posts' : posts}
+    return render(request, 'blog/all_posts.html', context=context)
+
 class PostCreateView(CreateView):
     model = Post
-    fields = ['title', 'city', 'content', 'contact', 'image', 'media_file']
+    fields = ['title', 'content', 'media_file', 'display_name']
 
     template_name = 'blog/post_form.html'
     form_context_name = 'postForm'
@@ -103,7 +109,7 @@ class PostCreateView(CreateView):
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
         logger.info(f"Form data: {form.cleaned_data}")
         post = form.save()
-        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, media file: {post.media_file}")
+        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, media file: {post.media_file}, display name {post.display_name}")
         post = get_object_or_404(Post, pk=post.id)
         # Return JSON response for AJAX requests
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -120,6 +126,7 @@ class PostCreateView(CreateView):
                                     'media_file': {
                                         'url': post.media_file.url if post.media_file.url else None,
                                     } if post.media_file else None,
+                                    'display_name': post.display_name,
                                     'image': post.image.url if post.image else None,
                                     'is_image': post.is_image(), 
                                     'is_video': post.is_video(),
@@ -203,6 +210,7 @@ class PostListView(ListView):
     template_name = 'blog/post_list.html'  # Specify your template name
     context_object_name = 'posts'  # Name of the context variable to use in the template
     ordering = ['date_posted']  # Order posts by date posted in descending order
+
 
 
 def load_more_posts(request):

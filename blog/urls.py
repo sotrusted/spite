@@ -7,7 +7,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     load_more_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
                     store_page, add_comment, get_csrf_token, 
-                    offline_view,)
+                    offline_view, all_posts)
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
 from spite.schema import schema 
@@ -25,6 +25,7 @@ urlpatterns = [
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
     path('like/<int:pk>/', like_post, name='like_post'),
     path('all-posts', PostListView.as_view(), name='post-list'),
+    path('catalog', all_posts, name='catalog'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
     path('load-more-posts/', load_more_posts, name='load-more-posts'),
     path('reading/', reading_flyer, name='reading'),

@@ -11,37 +11,12 @@ from spite.tasks import cache_posts_data
 from datetime import datetime, timedelta, timezone
 import os
 from blog.forms import PostSearchForm, CommentForm, PostForm
+from asgiref.sync import sync_to_async
 
 logger = logging.getLogger('spite')
 
 def load_posts(request):
-    # Try to get posts from the cache
-    compressed_posts_data = cache.get('posts_data')
-    if not compressed_posts_data:
-        # If no cached data, trigger Celery task to cache posts data
-        logger.info("Cache is empty, fetching posts from the database.")
-        cache_posts_data.delay()
-
-        # Directly fetch posts from the database as a fallback
-
-        pinned_posts = Post.objects.filter(is_pinned=True).order_by('-date_posted')
-        posts = Post.objects.filter(is_pinned=False).order_by('-date_posted')
-
-        logger.info(f"Fetched {pinned_posts.count()} pinned posts and {posts.count()} unpinned posts from the database.")
-        posts_data = {'posts': posts, 'pinned_posts': pinned_posts}  # Fallback data
-    else:
-        # Load the cached posts data
-        logger.info("Loaded posts from cache.")
-        posts_data = pickle.loads(zlib.decompress(compressed_posts_data))
-
-        # Decompress with LZ4
-        decompressed_data = lz4.decompress(compressed_posts_data)
-
-        # Deserialize with pickle
-        posts_data = pickle.loads(decompressed_data)
-
-        posts = posts_data['posts']
-        pinned_posts = posts_data['pinned_posts']
+    posts_data, posts, pinned_posts = get_posts()
 
     paginator = Paginator(posts, 20)  # Number to load initially
     page_number = request.GET.get('page', 1)
@@ -104,3 +79,34 @@ def days_since_launch():
     current_date = datetime.now()
     days_since = (current_date - site_launch_date).days
     return days_since
+
+def get_posts():
+    # Try to get posts from the cache
+    compressed_posts_data = cache.get('posts_data')
+    if not compressed_posts_data:
+        # If no cached data, trigger Celery task to cache posts data
+        logger.info("Cache is empty, fetching posts from the database.")
+        cache_posts_data.delay()
+
+        # Directly fetch posts from the database as a fallback
+
+        pinned_posts = Post.objects.filter(is_pinned=True).order_by('-date_posted')
+        posts = Post.objects.filter(is_pinned=False).order_by('-date_posted')
+
+        logger.info(f"Fetched {pinned_posts.count()} pinned posts and {posts.count()} unpinned posts from the database.")
+        posts_data = {'posts': posts, 'pinned_posts': pinned_posts}  # Fallback data
+    else:
+        # Load the cached posts data
+        logger.info("Loaded posts from cache.")
+        posts_data = pickle.loads(zlib.decompress(compressed_posts_data))
+
+        # Decompress with LZ4
+        decompressed_data = lz4.decompress(compressed_posts_data)
+
+        # Deserialize with pickle
+        posts_data = pickle.loads(decompressed_data)
+
+        posts = posts_data['posts']
+        pinned_posts = posts_data['pinned_posts']
+    return posts_data, posts, pinned_posts
+

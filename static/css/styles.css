@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+/* Prevent horizontal scrolling on mobile */
+html, body {
+    overflow-x: hidden;
+}
+
 /* Body styles */
 body {
     font-family: 'Crimson Text', serif;
@@ -23,7 +28,6 @@ body {
     word-wrap: break-word;
     overflow-wrap: break-word;
     overflow: visible;
-    overflow-x: hidden;
     font-display: swap;
 }
 
@@ -35,8 +39,21 @@ body {
     color: #000000; /* Adjust the text color as needed */
     text-align: center;
     z-index: 1000; /* Ensure it stays on top of other elements */
+    width: 100vw;
     max-width: 100vw;
     -webkit-backface-visibility: hidden;
+
+    display: flex; /* Enables flexbox layout */
+    justify-content: space-between; /* Distributes items horizontally */
+    background-color: #000;
+}
+
+.spite-bar #feed-scroller {
+    margin: 0 auto;
+}
+
+.spite-bar #post-link {
+    margin-right: 20px;
 }
 
 #new-post-notification {
@@ -248,7 +265,6 @@ body {
     color: #ff4500;
     display: inline-block; /* Ensures size fits content */
     background-color: #000;
-    width: 100vw;
 }
 .spite-text {
     animation: fire 2s infinite alternate;
