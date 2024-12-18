@@ -145,3 +145,6 @@ class Summary(models.Model):
     title = models.CharField(max_length=100)
     summary = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class PageView(models.Model):
+    count = models.PositiveBigIntegerField(default=0)

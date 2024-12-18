@@ -16,7 +16,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
-from blog.models import Post, Comment, SearchQueryLog
+from blog.models import Post, Comment, SearchQueryLog, PageView
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
@@ -75,7 +75,16 @@ CACHE_KEY = 'home_cache'
 @csrf_protect
 def home(request):
     logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
-    return render(request, 'blog/home.html')
+    # Get cached pageview count
+    cached_count = cache.get('pageview_temp_count', 0)
+
+    # Get persistent pageview count from the database
+    persistent_count = PageView.objects.first().count if PageView.objects.exists() else 0
+
+    # Combine counts
+    total_pageviews = cached_count + persistent_count
+
+    return render(request, 'blog/home.html', {'pageview_count': total_pageviews})
 
 def all_posts(request):
     _, posts, _ = get_posts()
