@@ -108,6 +108,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middleware.active_session_middleware.ActiveSessionMiddleware',
+    'middleware.page_view_middleware.PageViewMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
@@ -335,6 +336,10 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='*/15'),
         'args': ('home'),  # Cache page 1 initially, extend for more pages if needed
         
+    },
+    'persist-pageview-count-every-minute': {
+        'task': 'spite.tasks.persist_pageview_count',
+        'schedule': crontab(minute='*/1'),  # Run every minute
     },
 }
 

@@ -8,6 +8,7 @@ from blog.models import Post, Summary
 from .openai import generate_summary
 from django.db.models import Q
 import logging
+from blog.models import PageView
 
 # Get the 'spite' logger
 logger = logging.getLogger('spite')
@@ -130,3 +131,19 @@ def summarize_posts():
         content=summary_text,
         display_name='eTips', 
     )
+
+@shared_task
+def persist_pageview_count():
+    """
+    Sync the pageview count from cache to the database.
+    """
+    # Fetch and reset the temporary pageview count
+    temp_count = cache.get('pageview_temp_count', 0)
+    if temp_count > 0:
+        # Reset cache
+        cache.set('pageview_temp_count', 0)
+
+        # Persist to database
+        pageview, _ = PageView.objects.get_or_create(id=1)
+        pageview.count += temp_count
+        pageview.save()

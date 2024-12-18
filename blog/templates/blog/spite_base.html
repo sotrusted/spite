@@ -84,11 +84,31 @@
     {% endblock %}
 
     {% block spite %}
+    {% if pageview_count %}
         <div class="spite">
             <p>Every time you post, the SPITE COUNTER goes up!</p>
             <br>
-	    <p id="spite-counter" class="spite-counter">{{spite}} spite -- {{active_sessions_count}} users active now -- {{daily_user_count}} users active today -- {{user_count}} alltime users</p>
+            <div style="background-color: black;">
+                <br>
+                <p id="spite-counter" class="spite-counter">
+                    <span class="spite-text">
+                        {{days_since_launch}} DAYS
+                    </span>
+                </p><br>
+                <p id="spite-counter" class="spite-counter">
+                    <span class="spite-text">
+                        {{spite}} POSTS
+                    </span>
+                </p><br>
+                <p id="spite-counter" class="spite-counter">
+                    <span class="spite-text">
+                        {{pageview_count}} PAGE HITS
+                    </span>
+                </p><br>
+
+            </div>
         </div>
+    {% endif %}
     {% endblock %}
 
     {% block form %}
