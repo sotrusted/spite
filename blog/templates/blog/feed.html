@@ -59,8 +59,7 @@
 
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
-        {% if posts %}
-            {% for post in posts %}
+        {% if posts %} {% for post in posts %} {% if post.get_item_type == 'Post' %}
             <div id="post-{{post.id}}" class="item">
                 <div class="preview" id="post-preview-{{post.id}}">
                     {% include 'blog/preview.html' with post=post %}
@@ -73,10 +72,12 @@
                 <div class="menu">
                     <a href="{% url 'post-reply' post.id %}">Reply</a>
                 </div>
--->
+    -->
                 <!-- Unique Comment Section for Each Post -->
                 <div id="comment-section-{{ post.id }}">
-                    <button id="toggle-comments-{{ post.id }}" class="toggle-comments" data-post-id="{{ post.id }}">
+                    <button id="toggle-comments-{{ post.id }}" 
+                            class="toggle-comments" 
+                            data-post-id="{{ post.id }}">
                         Comments ({{ post.comments_total|default:0 }})
                     </button>
                     <div id="comments-container-{{ post.id }}" 
@@ -99,12 +100,29 @@
                         </form>
                     </div>
                 </div>
-
-
-
-
-                
             </div>
+
+        {% elif post.get_item_type == 'Comment' %}
+
+        <div id="comment-{{comment.id}}" class="comment-preview">
+            <h2 class="post-title">
+                Re: 
+                <a href="{% url 'post-detail' post.post.id %}">
+                    {{ post.post.title }}
+                </a>
+            </h2>
+            <div class="post-content">
+                {% if post.content %}
+                    <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+                {% endif %}
+            </div>
+            <p><em>{{ post.created_on }}</em></p>
+        </div>
+        {% endif %}
+
+
+
+            
 
         {% endfor %}
         {% else %}

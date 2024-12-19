@@ -1,13 +1,21 @@
 // websocket_updates.py
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const socket = new WebSocket('wss://spite.fr/ws/posts/');
+
+// define sockets for Post and Comment model
+const postSocket = new WebSocket('wss://spite.fr/ws/posts/');
+const commentSocket = new WebSocket('wss://spite.fr/ws/comments/');
+
 const notificationButton = document.getElementById("new-post-notification");
+const commentNotificationButton = document.getElementById("new-comment-notification");
+
 const notificationTitle = document.getElementById("new-post-title");
+const commentNotificationTitle = document.getElementById("new-comment-post"); 
+
 // Reference the notification sound element
 const notificationSound = document.getElementById("notification-sound");
 
 
-socket.onmessage = function (e) {
+postSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     console.log(data);
     const post = data.message;
@@ -40,5 +48,31 @@ socket.onmessage = function (e) {
         });
     } else {
         console.log(`Post with ID ${post.id} already exists.`);
+    }
+};
+
+commentSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    console.log(data);
+    const post = data.message;
+
+    // Check if the post already exists in the DOM
+    if (!document.getElementById(`comment-${comment.id}`)) {
+        // Post doesn't exist; add it to the page
+
+        // Play the notification sound
+        notificationSound.play();
+
+        // Increment SPITE COUNTER
+        updateSpiteCounter();
+
+        // Display notification
+        showNewCommentNotification(post);
+
+        // Add the post to the DOM
+        addCommentToPage(post);
+
+     } else {
+        console.log(`Comment with ID ${comment.id} already exists.`);
     }
 };
