@@ -27,3 +27,18 @@ class PostConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "message": event["message"]
         }))
+
+
+class CommentConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        # Subscribe to the "comments" group
+        await self.channel_layer.group_add("comments", self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Unsubscribe from the "comments" group
+        await self.channel_layer.group_discard("comments", self.channel_name)
+
+    async def comment_message(self, event):
+        # Send the comment message to the WebSocket
+        await self.send(text_data=json.dumps(event["message"]))

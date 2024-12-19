@@ -200,6 +200,32 @@ function showNewPostNotification(message) {
     }, 10000); // Hide after 10 seconds
 }
 
+
+// Function to show the notification
+function showNewCommentNotification(message) {
+    commentNotificationTitle.textContent = `${message.title.substring(0, 20)}...`;
+    commentNotificationButton.style.display = "block";
+    // Scroll to the post when the button is clicked
+    commentNotificationButton.onclick = function () {
+        const newCommentElement = document.getElementById(`comment-${message.id}`);
+        if (newCommentElement) {
+            // Scroll slightly above the newly added post
+            const newCommentPosition = newCommentElement.getBoundingClientRect().top + window.scrollY;
+            const offset = 100; // Adjust this value for desired spacing
+            window.scrollTo({
+                top: newPostPosition - offset,
+                behavior: 'smooth'
+            });
+            // Hide the notification after clicking
+            commentNotificationButton.style.display = "none";
+        };
+    };
+
+    setTimeout(() => {
+        commentNotificationButton.style.display = "none";
+    }, 10000); // Hide after 10 seconds
+}
+
 function scrollToElementById(id) {
     const targetElement = document.getElementById(id);
     const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
@@ -321,6 +347,38 @@ function addPostToPage(post) {
 
     attachEventListeners();
     attachCopyLinks();
+    return newPost;
+}
+
+function addCommentToPage(post) {
+    const postList = document.getElementById('post-list');
+
+    const newComment = document.createElement('div');
+    newComment.classList.add('item');
+
+    const commentId = comment.id;
+    newComment.id = `comment-${commentId}`;
+
+    newComment.innerHTML = `
+        <div id="comment-${commentId}}" class="comment-preview">
+            <h2 class="${comment.title}">
+                Re: 
+                <a href="/post/${comment.post_id}">
+                    ${comment.post_title}
+                </a>
+            </h2>
+            <div class="post-content">
+                <strong>${comment.name}</strong>: ${comment.content}
+            </div>
+            <p><em>${comment.created_on}</em></p>
+        </div>
+           `;
+    postList.prepend(newComment); // Add the new post to the top of the list
+
+    newPost.classList.add("highlight");
+    setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
+
+    attachEventListeners();
     return newPost;
 }
 

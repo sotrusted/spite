@@ -1,4 +1,5 @@
 import lz4.frame as lz4
+from itertools import chain
 import pickle
 from blog.models import Post, Comment
 import logging
@@ -12,15 +13,21 @@ from datetime import datetime, timedelta, timezone
 import os
 from blog.forms import PostSearchForm, CommentForm, PostForm
 from asgiref.sync import sync_to_async
+from django.urls import resolve
 
 logger = logging.getLogger('spite')
 
 def load_posts(request):
+    current_route = resolve(request.path_info).url_name
+    if current_route == 'post-detail':
+        return {
+            'days_since_launch': days_since_launch(),
+            'comment_form': CommentForm(),
+        }
+
+
     posts_data, posts, pinned_posts = get_posts()
 
-    paginator = Paginator(posts, 20)  # Number to load initially
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
 
     # Get or calculate user count data
     user_count_data = cache.get('user_count_data')
@@ -42,12 +49,7 @@ def load_posts(request):
 
     # Add comments context
     
-    for post in page_obj.object_list:
-        comments = Comment.objects.filter(post=post).order_by('-created_on')
-        # Attach comments and total count directly to the post object
-        post.comments_total = comments.count()
-        post.recent_comments = comments
-
+ 
     for post in pinned_posts:
         query_post = Post.objects.get(id=post.id)
         comments = Comment.objects.filter(post=query_post).order_by('-created_on')
@@ -58,20 +60,40 @@ def load_posts(request):
     
     highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
 
+    all_comments = Comment.objects.all().order_by('-created_on')
+
+    # Combine posts and comments into a single feed
+    combined_items = sorted(
+        chain(posts, all_comments),
+        key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+        reverse=True
+    )
+
+    # Paginate the combined feed items
+    paginator = Paginator(combined_items, 20)  # 20 items per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    for post in page_obj.object_list:
+        if post.get_item_type() == 'Post':
+            comments = Comment.objects.filter(post=post).order_by('-created_on')
+            # Attach comments and total count directly to the post object
+            post.comments_total = comments.count()
+            post.recent_comments = comments
+
+
+
     return {
         'days_since_launch': days_since_launch(),
+        'comment_form': CommentForm(),
+        'search_form': PostSearchForm(), 
+        'postForm': PostForm(),
         'posts': page_obj,
         'pinned_posts': posts_data['pinned_posts'],
-        'spite': len(posts_data['posts']),
+        'spite': len(posts_data['posts']) + len(all_comments),
         'user_count': user_count_data['user_count'],
-        'daily_user_count': user_count_data['daily_user_count'],
-        'active_sessions_count': user_count_data['active_sessions_count'],
         'is_paginated': page_obj.has_other_pages(),
-        'search_form': PostSearchForm(), 
-        'comment_form': CommentForm(),
-        'postForm': PostForm(),
         'highlight_comments': highlight_comments,
-        'STATIC_VERSION': getattr(settings, 'STATIC_VERSION', '1.0'),
     }
 
 def days_since_launch():
