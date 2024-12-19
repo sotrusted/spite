@@ -22,6 +22,7 @@ data/
 # Ignore log files
 pg_log/
 postgresql.log
+logs/django_debug.log
 
 # Ignore any temporary files created during development
 *.pid
