@@ -13,6 +13,7 @@ class PostForm(forms.ModelForm):
         widget=forms.Textarea, 
         label='', 
         required=False,
+        max_length=10000,
         )
 
     display_name = forms.CharField(
@@ -81,15 +82,8 @@ class CommentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
+        self.helper.form_method = 'POST'
         self.helper.form_class = 'comment-form'
-        self.helper.layout = Layout(
-            Div(
-                Row('name', placeholder='Your name (optional)', css_class='form-group col-md-4 mb-0'),
-                Row('content', css_class='form-group col-md-8 mb-0'),
-            ),
-            Submit('submit', 'Submit', css_class='btn btn-primary'),
-        )
         self.helper.layout = Layout(
             Div(
                 Field('name', css_class='form-control', wrapper_class='col-6'),

@@ -7,7 +7,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     load_more_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
                     store_page, add_comment, get_csrf_token, 
-                    offline_view, all_posts)
+                    offline_view, all_posts, get_comment_form_html)
+
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
 from spite.schema import schema 
@@ -39,6 +40,7 @@ urlpatterns = [
     path('offline/', offline_view, name='offline'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('sitemap.xml.gz', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
+    path('api/get-comment-form-html/<int:post_id>/', get_comment_form_html, name='get_comment_form_html'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

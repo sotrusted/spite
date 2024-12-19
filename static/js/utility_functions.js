@@ -203,7 +203,7 @@ function showNewPostNotification(message) {
 
 // Function to show the notification
 function showNewCommentNotification(message) {
-    commentNotificationTitle.textContent = `${message.title.substring(0, 20)}...`;
+    commentNotificationTitle.textContent = `${message.post_title.substring(0, 20)}...`;
     commentNotificationButton.style.display = "block";
     // Scroll to the post when the button is clicked
     commentNotificationButton.onclick = function () {
@@ -213,7 +213,7 @@ function showNewCommentNotification(message) {
             const newCommentPosition = newCommentElement.getBoundingClientRect().top + window.scrollY;
             const offset = 100; // Adjust this value for desired spacing
             window.scrollTo({
-                top: newPostPosition - offset,
+                top: newCommentPosition - offset,
                 behavior: 'smooth'
             });
             // Hide the notification after clicking
@@ -250,6 +250,7 @@ function addPostToPage(post) {
 
     const newPost = document.createElement('div');
     newPost.classList.add('item');
+    newPost.classList.add('post');
 
     const postId = post.id;
     newPost.id = `post-${postId}`;
@@ -332,55 +333,130 @@ function addPostToPage(post) {
                 <div id="comments-list-${postId}">
                     <p>No comments yet.</p>
                 </div>
-                <form id="comment-form-${postId}" method="post" action="/add-comment/${postId}/">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
-                    <textarea name="content" class="form-control" placeholder="Write your comment here..." required></textarea>
-                    <button type="submit">Submit</button>
-                </form>
+                <div id="comment-form-container-${postId}">
+                </div>
             </div>
         </div>
     `;
     postList.prepend(newPost); // Add the new post to the top of the list
 
+    loadCommentForm(postId);
+
     newPost.classList.add("highlight");
     setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
+
 
     attachEventListeners();
     attachCopyLinks();
     return newPost;
 }
 
-function addCommentToPage(post) {
+function addCommentToPage(comment) {
     const postList = document.getElementById('post-list');
 
     const newComment = document.createElement('div');
     newComment.classList.add('item');
+    newComment.classList.add('comment');
 
     const commentId = comment.id;
     newComment.id = `comment-${commentId}`;
 
+    comment.name = comment.name || "Anonymous";
+
     newComment.innerHTML = `
-        <div id="comment-${commentId}}" class="comment-preview">
-            <h2 class="${comment.title}">
-                Re: 
-                <a href="/post/${comment.post_id}">
-                    ${comment.post_title}
-                </a>
-            </h2>
-            <div class="post-content">
-                <strong>${comment.name}</strong>: ${comment.content}
-            </div>
-            <p><em>${comment.created_on}</em></p>
+        <h2 class="${comment.title}">
+            Re: 
+            <a href="/post/${comment.post_id}">
+                ${comment.post_title}
+            </a>
+        </h2>
+        <div class="post-content">
+            <strong>${comment.name}</strong>: ${comment.content}
         </div>
-           `;
+        <p><em>${comment.created_on}</em></p>
+    `;
     postList.prepend(newComment); // Add the new post to the top of the list
 
-    newPost.classList.add("highlight");
+    newComment.classList.add("highlight");
     setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
 
     attachEventListeners();
     return newPost;
 }
+
+function loadCommentForm(postId) {
+    const apiUrl = `/api/get-comment-form-html/${postId}/`;
+
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response data:", data); // Log the response
+            if (data.error) {
+                console.error(`Error loading form: ${data.error}`);
+                return;
+            }
+
+            // Inject the form HTML into the target container
+            const formContainer = document.getElementById(`comment-form-container-${postId}`);
+            if (formContainer) {
+                formContainer.innerHTML = data.form;
+
+                // Update the form action dynamically
+                const formElement = formContainer.querySelector('form');
+                if (formElement) {
+                    formElement.setAttribute('action', data.action_url);
+
+                    // Add an event listener to handle submission
+                    formElement.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        submitCommentForm(formElement, postId);
+                    });
+                }
+            } else {
+                console.error(`Comment form container for post ${postId} not found.`);
+            }
+        })
+        .catch(error => console.error('Error fetching the comment form:', error));
+}
+
+function submitCommentForm(formElement, postId) {
+
+    const formData = new FormData(formElement); // Create a FormData object for the form
+
+    fetch(formElement.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken'), // Include CSRF token for Django
+            'X-Requested-With': 'XMLHttpRequest', 
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                console.log("Comment submitted:", data.comment);
+
+                // Optionally add the comment to the page
+                addCommentToPage(data.comment);
+
+                // Reset the form
+                form.reset();
+            } else {
+                console.error("Error submitting comment:", data.errors);
+                displayFormErrors(form, data.errors); // Display validation errors
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
 
 // Attach to window object to make it globally accessible
 window.refreshCSRFToken = refreshCSRFToken;

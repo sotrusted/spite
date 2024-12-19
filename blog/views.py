@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from crispy_forms.templatetags.crispy_forms_filters import as_crispy_form
 from django.views.decorators.cache import never_cache
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from django.utils.timezone import localtime, now
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.core.cache import cache
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -323,8 +324,57 @@ def custom_csrf_failure(request, reason=""):
     # Redirect to the homepage
     return redirect('home')
 
+
 def get_csrf_token(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
+
 def offline_view(request):
     return render(request, 'blog/offline.html')
+
+
+def get_comment_form(request, post_id):
+    """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
+    post = Post.objects.filter(id=post_id).exists()
+
+    if not post:
+        return JsonResponse({'error': 'Post not found'}, status=404)
+
+    form = CommentForm()
+    form_html = as_crispy_form(form)
+
+    return JsonResponse({
+        'form': form_html,
+        'action_url': f'/add-comment/{post_id}/',
+    })
+
+
+def get_comment_form_html(request, post_id):
+    """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
+    try:
+        # Debugging post_id
+        logger.info(f"Received post_id: {post_id}")
+        post = Post.objects.filter(id=post_id).exists()
+
+        if not post:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+
+        form = CommentForm()
+        logger.info(f"Debug: Generated form = {form}")
+        form_html = render_to_string('blog/partials/comment_form.html',
+                                        {'comment_form': form,
+                                        'post_id' : post_id,},
+                                        request=request  # Pass the request to include CSRF token
+                                    )
+
+        action_url = reverse('add_comment', args=[post_id])
+        logger.info(f"Debug: Generated action_url = {action_url}")  # Debugging action_url
+        # Append the button
+        return JsonResponse({
+            'form': form_html,
+            'action_url': action_url, 
+        })
+    except Exception as e:
+        # Log the exception for debugging
+        logger.info(f"Error in get_comment_form_html: {e}")
+        return JsonResponse({'error': str(e)}, status=500)

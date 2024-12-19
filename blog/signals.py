@@ -9,6 +9,7 @@ from django.utils.timezone import localtime
 from .models import Post, Comment
 from django.conf import settings 
 import requests
+from django.core.serializers.json import DjangoJSONEncoder
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
@@ -97,22 +98,28 @@ def broadcast_new_post(sender, instance, created, **kwargs):
 def broadcast_new_comment(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "comments",  # Group name for clients subscribed to comment updates        )
-            {
-                "type": "comment_message",
-                "message": {
-                    "id": instance.id,
-                    "post_id": instance.post.id,
-                    "post_title": instance.post.title,
-                    "content": instance.content,
-                    "name": instance.name,
-                    "created_on": localtime(instance.created_on).strftime('%b. %d, %Y, %I:%M %p'),
-                },
-            },
-        )
+        message = {
+            "id": instance.id,
+            "post_id": instance.post.id,
+            "post_title": instance.post.title, 
+            "content": instance.content,
+            "name": instance.name,
+            "created_on": localtime(instance.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+        }
+        logger.info(message)
 
-receiver(post_save, sender=Post)
+        # Validate JSON
+        try:
+            json.dumps(message, cls=DjangoJSONEncoder)  # Ensure serializability
+            async_to_sync(channel_layer.group_send)(
+                "comments", 
+                {"type": "comment_message", "message": message}
+            )
+        except TypeError as e:
+            print(f"JSON serialization error: {e}")
+
+
+# @receiver(post_save, sender=Post)
 def trigger_summary(sender, instance, **kwargs):
     post_count = Post.objects.count()
     if post_count % 100 == 0:  # Trigger after every 100th post

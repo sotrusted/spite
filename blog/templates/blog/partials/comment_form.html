@@ -1,0 +1,6 @@
+{% load crispy_forms_tags %}
+<form id="comment-form-{{ post_id }}" method="post" action="{% url 'add_comment' post_id %}">
+    {% csrf_token %}
+    {{ comment_form|crispy }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
