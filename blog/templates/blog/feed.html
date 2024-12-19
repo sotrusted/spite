@@ -60,7 +60,7 @@
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
         {% if posts %} {% for post in posts %} {% if post.get_item_type == 'Post' %}
-            <div id="post-{{post.id}}" class="item">
+            <div id="post-{{post.id}}" class="post item">
                 <div class="preview" id="post-preview-{{post.id}}">
                     {% include 'blog/preview.html' with post=post %}
                 </div>
@@ -93,18 +93,14 @@
                         </div>
 
                         <!-- Comment Form -->
-                        <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add_comment' post.id %}">
-                            {% csrf_token %}
-                            {{ comment_form|crispy }}
-                            <button type="submit">Submit</button>
-                        </form>
+                        {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form %}
                     </div>
                 </div>
             </div>
 
         {% elif post.get_item_type == 'Comment' %}
 
-        <div id="comment-{{comment.id}}" class="comment-preview">
+        <div id="comment-{{post.id}}" class="comment item">
             <h2 class="post-title">
                 Re: 
                 <a href="{% url 'post-detail' post.post.id %}">

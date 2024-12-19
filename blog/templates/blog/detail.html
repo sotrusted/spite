@@ -63,12 +63,9 @@
                 </div>
 
                 <!-- Comment Form -->
-                <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add_comment' post.id %}">
-                    {% csrf_token %}
-                    {{ comment_form|crispy }}
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
+                {% include 'blog/partials/comment_form.html' with id=post.id comment_form=comment_form %}
+ 
+             </div>
         </div>
         {% endif %}
 

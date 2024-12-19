@@ -54,7 +54,7 @@ postSocket.onmessage = function (e) {
 commentSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     console.log(data);
-    const post = data.message;
+    const comment = data;
 
     // Check if the post already exists in the DOM
     if (!document.getElementById(`comment-${comment.id}`)) {
@@ -67,10 +67,10 @@ commentSocket.onmessage = function (e) {
         updateSpiteCounter();
 
         // Display notification
-        showNewCommentNotification(post);
+        showNewCommentNotification(comment);
 
         // Add the post to the DOM
-        addCommentToPage(post);
+        addCommentToPage(comment);
 
      } else {
         console.log(`Comment with ID ${comment.id} already exists.`);
