@@ -57,7 +57,7 @@ class Post(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return f'{self.id} - {self.title}'
 
     def print_long(self):
         # Build the main post string
@@ -82,8 +82,10 @@ class Post(models.Model):
         except Exception as e:
             logger.error(f"Error in print_long for post {self.id}: {e}")
             return posts_string
-        
 
+    def get_item_type(self):
+        return "Post"
+        
     
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk' : self.pk})
@@ -128,6 +130,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.name or "anon"}: \"{self.content}\" on {self.post.title}'
+
+    def get_item_type(self):
+        return "Comment"
 
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)
