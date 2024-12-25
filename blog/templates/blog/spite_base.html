@@ -29,8 +29,8 @@
         <title>SPITE MAGAZINE</title>
     {% endblock %}
     {% block links %}
-        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
-        <link rel="preload" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Prata&family=Princess+Sofia&display=swap" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}"/>
         <link rel="manifest" href="{% static 'manifest.json' %}">
     {% endblock %}
@@ -42,6 +42,16 @@
     {% progressive_web_app_meta %}
 </head>
 <body>
+
+{% block submission %}
+<div id="modal-overlay">
+    <div id="list-submission">
+        <label for="user-input">Enter a NAME onto the INTERESTING LIST to continue</label><br>
+        <input type="text" id="user-input" />
+        <button onclick="saveInput()">Submit</button>
+    </div>
+</div>
+{% endblock %}
 
 {% block spitebar %}
     <div class="spite-bar">
@@ -67,11 +77,11 @@
         <div id="new-comment-notification">
             New comment on <span id="new-comment-post"></span>
         </div>
-        <audio id="notification-sound" src="{% static 'sounds/sword-sound.mp3' %}" hidden></audio>
+        <audio id="notification-sound" src="{% static 'sounds/jinglebell-sound.mp3' %}" hidden></audio>
     {% endblock %}
 
     {% block header %}
-        <div class="header">
+        <div class="header" style="margin-top: 20px">
             <a href="{% url 'home' %}">
                 <img class="logo" src="{% static 'media/spite-logo.webp' %}" alt="Spite Magazine" loading="lazy" width="450px">
             </a>
@@ -157,12 +167,14 @@ Register the service worker -->
                 attachEventListeners();
                 attachCopyLinks();
 
-                scrollToElementById('post-form');
+                showModalIfNeeded();
+
             });
             </script>
 
             <script src="{% static 'js/ajax_posts.js' %}" defer></script>
             <script src="{% static 'js/websocket_updates.js' %}" defer></script>
+            <script src="{% static 'js/snowfall.js' %}" defer></script>
         {% endcompress %}
     {% endblock %}
 

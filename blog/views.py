@@ -1,4 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.db.models import Prefetch
+from django.core.files.storage import default_storage
+from django.utils.html import escape
 from crispy_forms.templatetags.crispy_forms_filters import as_crispy_form
 from django.views.decorators.cache import never_cache
 from django.middleware.csrf import get_token
@@ -15,14 +18,17 @@ import logging
 from django.core.paginator import Paginator
 # import os
 from django.http import JsonResponse
+import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
-from blog.models import Post, Comment, SearchQueryLog, PageView
+from django.views import View
+from blog.models import Post, Comment, SearchQueryLog, PageView, List
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
 from datetime import datetime 
 from spite.context_processors import get_posts
+from django.http import StreamingHttpResponse
 # import subprocess
 # from weasyprint import HTML
 
@@ -378,3 +384,184 @@ def get_comment_form_html(request, post_id):
         # Log the exception for debugging
         logger.info(f"Error in get_comment_form_html: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SaveListView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            input_text = data.get('input', '')
+
+            if not input_text:
+                return JsonResponse({'success': False, 'error': 'Input cannot be empty.'}, status=400)
+
+            # Save to the database
+            new_list = List.objects.create(input=input_text,
+                                        ip_address=get_client_ip(request),)
+            return JsonResponse({'success': True, 'id': new_list.id})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+def get_word_cloud(request):
+    entries = List.objects.values_list('input', flat=True)  # Get a list of inputs
+    return JsonResponse({'entries': list(entries)})
+
+
+def download_posts_as_html_stream(request):
+    # Preload comments using Prefetch
+    posts = Post.objects.prefetch_related(
+        Prefetch(
+            'comments',
+            queryset=Comment.objects.order_by('-created_on'),
+            to_attr='recent_comments'  # Preloaded comments are stored here
+        )
+    ).iterator()
+
+    def generate_html_content():
+        yield """
+        <html>
+            <head>
+                <title>Spite Archive</title>
+                <meta charset="UTF-8">
+            </head>
+            <style>
+                body {
+                    font-size: 16px; /* Base font size */
+                    line-height: 1.5; /* Improve readability */
+                    margin: 20px; /* Add some padding */
+                }
+
+                h1 {
+                    font-size: 24px; /* Larger font size for titles */
+                    margin-bottom: 10px;
+                }
+
+                h2 {
+                    font-size: 20px; /* Adjust subtitle size */
+                    margin-bottom: 8px;
+                }
+
+                p {
+                    font-size: 14px; /* Adjust paragraph size */
+                    margin-bottom: 12px;
+                }
+
+                small {
+                    font-size: 12px; /* Smaller text for metadata */
+                }
+
+                img, video {
+                    max-width: 100%; /* Ensure media scales properly */
+                    display: block;
+                    margin: 10px 0;
+                }
+
+                @media print {
+                    body {
+                        -webkit-print-color-adjust: exact; /* Ensure proper color rendering */
+                        width: 100%;
+                    }
+
+                    @page {
+                        size: A4; /* Standard A4 size */
+                        margin: 10mm 15mm; /* Top/bottom, left/right margins */
+                    }
+
+                    html, body {
+                        zoom: 1.2; /* Increase the size of the entire page */
+                    }
+                    body {
+                        font-size: 18px; /* Larger base font for print */
+                    }
+
+                    h1 {
+                        font-size: 28px; /* Emphasize headings in print */
+                    }
+
+                    h2 {
+                        font-size: 22px;
+                    }
+
+                    p {
+                        font-size: 16px;
+                    }
+
+                    small {
+                        font-size: 14px;
+                    }
+
+                    hr {
+                        border: 1px solid #ccc;
+                        margin: 20px 0;
+                    }
+
+                    /* Remove unnecessary elements like links for print */
+                    a {
+                        text-decoration: none;
+                        color: black;
+                    }
+
+                    img, video {
+                        max-width: 100%; /* Ensure images do not exceed the page width */
+                        height: auto;    /* Maintain aspect ratio */
+                        page-break-inside: avoid; /* Prevent breaking images across pages */
+                    }
+                    
+                    /* Optional: Add margins around images */
+                    img {
+                        margin: 10px 0;
+                    }
+                }
+                </style>
+            <body>
+        """
+        yield "<h1 style=\"font-family: cursive;\">Spite Magazine</h1>"
+
+        for post in posts:
+            # Yield post content
+            yield f"<h1>{escape(post.title)}</h1>"
+            author = escape(post.author) if post.author else (escape(post.display_name) if post.display_name else 'Anonymous')
+            yield f"<em>by {author}</em>\n"
+            yield f"<p>{escape(post.content)}</p>"
+
+            # Handle media files lazily
+            media_content = ""
+            try:
+                if post.media_file and post.is_image:
+                    if default_storage.exists(post.media_file.name):
+                        media_content = f'<img src="{post.media_file.url}" alt="{post.title}" style="width: 500px; margin-bottom: 20px;" loading="lazy"><br>'
+
+                elif post.image and post.is_image:
+                    if default_storage.exists(post.image.name):
+                        media_content = f'<img src="{post.image.url}" alt="{post.title}" style="width: 500px; margin-bottom: 20px;" loading="lazy"><br>'
+                elif post.media_file and post.is_video:
+                    # Check if media file exists before generating the URL
+                    if default_storage.exists(post.media_file.name):
+                        media_content = f"""
+                        <video controls style="width: 500px; margin-bottom: 20px;">
+                            <source src="{post.media_file.url}" type="video/mp4" loading="lazy">
+                            Your browser does not support the video tag.
+                        </video><br>
+                        """
+            except Exception as e:
+                media_content = f"<p style='color: red;'>Error loading media: {escape(str(e))}</p>"
+
+            yield media_content
+
+            # Post metadata
+            yield f'<small><a href="/post/{post.id}/">Post #{post.id}</a> -- {post.date_posted}</small>'
+
+            # Yield preloaded comments
+            comments = getattr(post, 'recent_comments', [])
+            if comments:
+                yield "<h2>Comments</h2>"
+                for comment in comments:
+                    commenter = escape(comment.name) if comment.name else 'Anonymous'
+                    yield f"<p><strong>{commenter}</strong>: {escape(comment.content)}</p>"
+
+            yield "<hr>"
+
+        yield "</body></html>"
+
+    return StreamingHttpResponse(generate_html_content(), content_type="text/html")

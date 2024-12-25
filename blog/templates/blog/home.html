@@ -56,6 +56,11 @@
     <div class="shop">
         {% include 'blog/products.html' %}
     </div>  
+    <div id="list-submission">
+        <label for="user-input">Enter a NAME onto the INTERESTING LIST</label><br>
+        <input type="text" id="user-input" />
+        <button onclick="saveInput()">Submit</button>
+    </div>
 
     <!--
     {% if highlight_comments %}

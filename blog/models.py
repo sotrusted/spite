@@ -62,11 +62,11 @@ class Post(models.Model):
     def print_long(self):
         # Build the main post string
         posts_string = f'{self.title}-{self.content}-by {self.display_name or "anon"}'
-        logger.info(f"Post String: {posts_string}")
+        # logger.info(f"Post String: {posts_string}")
 
         # Fetch recent comments
         comments = self.get_recent_comments()
-        logger.info(f"Comments QuerySet for post {self.id}: {comments}")
+        # logger.info(f"Comments QuerySet for post {self.id}: {comments}")
 
         try:
             if comments.exists():  # Check if comments exist
@@ -74,14 +74,15 @@ class Post(models.Model):
                 comments_string = 'Comments:' 
                 for comment in comments:
                     comments_string += '\n' + str(comment)
-                logger.info(f"Comments String for post {self.id}: {comments_string}")
+                # logger.info(f"Comments String for post {self.id}: {comments_string}")
                 return posts_string + '\n' + comments_string
             else:
-                logger.info(f"No comments found for post {self.id}.")
+                # logger.info(f"No comments found for post {self.id}.")
                 return posts_string
         except Exception as e:
-            logger.error(f"Error in print_long for post {self.id}: {e}")
+            # logger.error(f"Error in print_long for post {self.id}: {e}")
             return posts_string
+    
 
     def get_item_type(self):
         return "Post"
@@ -100,6 +101,11 @@ class Post(models.Model):
         if not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else self.image.name)
+
+        # Fallback for .png
+        if not mime_type and (self.image.name.endswith('.png') or self.media_file.name.endswith('.png')):
+            mime_type = 'image/png'
+
         return mime_type and mime_type.startswith('image/')
 
     def is_video(self):
@@ -129,7 +135,7 @@ class Comment(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.name or "anon"}: \"{self.content}\" on {self.post.title}'
+        return f'{self.name or "Anonymous"}: \"{self.content}\" on {self.post.title}'
 
     def get_item_type(self):
         return "Comment"
@@ -153,3 +159,12 @@ class Summary(models.Model):
 
 class PageView(models.Model):
     count = models.PositiveBigIntegerField(default=0)
+
+class List(models.Model):
+    input = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+
+    def __str__(self):
+        return self.input[:50]  # Show first 50 characters
