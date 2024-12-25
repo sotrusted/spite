@@ -1,4 +1,18 @@
-<script src="https://js.stripe.com/v3/buy-button.js" defer></script>
+                
+
+<script>
+  const script = document.createElement("script");
+  script.src = "https://js.stripe.com/v3/buy-button.js";
+  script.onload = function () {
+      console.log("Script loaded and ready");
+      // Your code here
+      scrollToElementById('post-form');
+  };
+  script.onerror = function () {
+    console.error("Failed to load the Stripe script");
+  };
+  document.head.appendChild(script);  
+</script>
 <!--
 <div id="preview-shop" style="display: hidden;">
 

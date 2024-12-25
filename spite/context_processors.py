@@ -24,6 +24,8 @@ def load_posts(request):
             'days_since_launch': days_since_launch(),
             'comment_form': CommentForm(),
         }
+    elif current_route == 'stream-posts':
+        return {}
 
 
     posts_data, posts, pinned_posts = get_posts()

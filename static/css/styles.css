@@ -11,7 +11,8 @@ body {
     font-family: 'Crimson Text', serif;
     margin: 0;
     padding: 0;
-    background-color: #000;
+    /* background-color: #000;*/
+    background-color: #00b7ff;
     color: #000;
     font-size: clamp(1rem, 4vw, 2rem);
     display: flex;
@@ -33,7 +34,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    color: #000000; /* Adjust the text color as needed */
+    color: #000; /* Adjust the text color as needed */
     text-align: center;
     z-index: 1000; /* Ensure it stays on top of other elements */
     width: 100vw;
@@ -103,6 +104,69 @@ body {
     100% { opacity: 1; }
 }
 
+/* Modal overlay styles */
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    backdrop-filter: blur(5px); /* Blurred background effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Input box styles */
+#list-submission {
+    background: red;
+    color: #fff;
+    text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+    animation: flash 1s infinite;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Prevent interaction with the rest of the site */
+body.modal-active {
+    overflow: hidden;
+}
+
+#word-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Space between words */
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto; /* Allow scrolling if too many words */
+    margin-bottom: 20px; /* Space between word cloud and input */
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.word {
+    font-size: calc(10px + 1vw); /* Dynamic font size */
+    color: #333;
+    background: #e3e3e3;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.word:hover {
+    transform: scale(1.2); /* Slight zoom on hover */
+    background: #ddd;
+}
+
 /* Container styles */
 .container {
     max-width: 85%;
@@ -143,6 +207,8 @@ body {
 .content {
     padding: 0 15px;
     background-color: antiquewhite;
+    background-color: #006400;
+    color:  white;
 }
 
 .content p {
@@ -378,7 +444,7 @@ form {
 /* Post styles */
 
 .pinned-posts {
-	border-bottom: 2px solid #000;
+	border-bottom: 1px solid #000;
 	margin-bottom: 20px;
 }
 
@@ -388,9 +454,13 @@ form {
 }
 
 .post.item {
-    border-bottom: 2px solid #000;
-    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
     padding-left: 20px;
+}
+
+.comment.item {
+    border-bottom: 1px dashed #000;
 }
 
 .highlight {
@@ -560,7 +630,10 @@ main {
         -ms-touch-action: manipulation; /* For older IE/Edge support */
     }
     h2 {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
+    }
+    p {
+        font-size 0.9rem;
     }
     .container {
 	    max-width:100%;
@@ -624,4 +697,42 @@ main {
 
 .comment-section {
     margin-top: 5px;
+}
+
+.snowflake {
+    position: fixed;
+    top: -10px;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    z-index: 9999;
+}
+
+.toggle-snow-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+.toggle-snow-btn:hover {
+    background-color: #0056b3;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+    }
 }

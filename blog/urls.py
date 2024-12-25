@@ -7,7 +7,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     load_more_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
                     store_page, add_comment, get_csrf_token, 
-                    offline_view, all_posts, get_comment_form_html)
+                    offline_view, all_posts, get_comment_form_html,
+                    SaveListView, get_word_cloud, download_posts_as_html_stream)
 
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
@@ -41,6 +42,9 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('sitemap.xml.gz', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
     path('api/get-comment-form-html/<int:post_id>/', get_comment_form_html, name='get_comment_form_html'),
+    path('api/save-list/', SaveListView.as_view(), name='save_list'),
+    path('api/word-cloud/', get_word_cloud, name='word_cloud'),
+    path('stream-posts/', download_posts_as_html_stream, name='stream_posts'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

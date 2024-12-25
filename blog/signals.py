@@ -85,7 +85,7 @@ def broadcast_new_post(sender, instance, created, **kwargs):
                     } if instance.parent_post else None,
                     "city": instance.city,
                     "contact": instance.contact,
-                    "media_file": instance.media_file.url if instance.media_file else None,
+                    "media_file": {"url": instance.media_file.url} if instance.media_file else None,
                     "image": instance.image.url if instance.image else None,
                     "is_image": instance.is_image(),
                     "is_video": instance.is_video(),

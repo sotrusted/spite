@@ -13,11 +13,113 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function refreshCSRFToken() {
-    const response = await fetch('/get-csrf-token/');
-    const data = await response.json();
-    document.querySelector('[name=csrfmiddlewaretoken]').value = data.csrfToken;
+// Helper function to set a cookie
+function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
 }
+
+
+// Function to save input and hide the modal
+function saveInput() {
+    // Select all input elements with the class or ID "user-input"
+    const inputs = document.querySelectorAll("#user-input, .user-input"); // Adjust selectors as needed
+
+    let userInput = null;
+
+    // Loop through inputs and find the one with a value
+    inputs.forEach(input => {
+        if (input.value.trim()) {
+            userInput = input.value.trim(); // Get the value
+        }
+    });
+    
+
+    if (!userInput) {
+        alert("Please enter something before proceeding.");
+        return;
+    }
+
+    // Save input via the API
+    fetch('/api/save-list/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ input: userInput }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Input saved:", data);
+                setCookie("input_shown", "true", 365); // Prevent the modal from showing again
+                document.getElementById("modal-overlay").style.display = "none";
+                document.body.classList.remove("modal-active"); // Re-enable scrolling
+                inputs.forEach(input => {
+                    if (input.value.trim()) {
+                        input.value = ''; // Clear only the input that was used
+                    }
+                })
+            } else {
+                console.error("Error saving input:", data.error);
+            }
+        })
+        .catch(error => console.error("API Error:", error));
+}
+
+
+//Function to load word cloud
+function loadWordCloud() {
+    fetch('/api/word-cloud/')
+        .then(response => response.json())
+        .then(data => {
+            const wordCloud = document.getElementById('word-cloud');
+            wordCloud.innerHTML = ''; // Clear existing words
+
+            data.entries.forEach(entry => {
+                const wordElement = document.createElement('span');
+                wordElement.className = 'word';
+                wordElement.textContent = entry;
+                wordCloud.appendChild(wordElement);
+            });
+        })
+        .catch(error => console.error('Error fetching word cloud:', error));
+}
+
+
+// Function to show the modal if the cookie is not set
+function showModalIfNeeded() {
+    const alreadyShown = getCookie("input_shown");
+    console.log("Input shown: " + alreadyShown);
+    if (!alreadyShown) {
+        document.getElementById("modal-overlay").style.display = "flex";
+        document.body.classList.add("modal-active"); // Disable scrolling
+        // loadWordCloud(); // Load word cloud
+    }
+    else {
+        document.getElementById("modal-overlay").style.display = "none";
+        document.body.classList.remove("modal-active");
+    }
+}
+
+
+
+// Function to refresh the csrf token in the DOM 
+async function refreshCSRFToken() {
+    try {
+        const response = await fetch('/get-csrf-token/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        document.querySelector('[name=csrfmiddlewaretoken]').value = data.csrfToken;
+    } catch (error) {
+        console.error("Error refreshing CSRF token:", error);
+    }
+}
+
 
 // Function to toggle content between detail and preview
 function toggleContent(postId) {
@@ -35,7 +137,7 @@ function toggleContent(postId) {
     }
 }
 
-//Function to attach event listeners to copy links
+// Function to attach event listeners to copy links
 function attachCopyLinks() {
     document.querySelectorAll('a[id^="copy-link-"]').forEach(a => {
         a.addEventListener('click', function () {
@@ -463,5 +565,6 @@ window.refreshCSRFToken = refreshCSRFToken;
 window.attachCopyLinks = attachCopyLinks;
 window.attachEventListeners = attachEventListeners;
 window.scrollToElementById = scrollToElementById;
+window.showModalIfNeeded = showModalIfNeeded;
 
 

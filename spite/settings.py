@@ -251,7 +251,7 @@ AUTHENTICATION_BACKENDS = ['axes.backends.AxesStandaloneBackend']
 AXES_FAILURE_LIMIT = 5  # Number of attempts before blocking
 AXES_COOLOFF_TIME = 1  # Time in hours before reset
 AXES_LOCK_OUT_AT_FAILURE = True
-AXES_META_PRECEDENCE_ORDER = ["HTTP_X_FORWARDED_FOR", "REMOTE_ADDR"]
+AXES_CLIENT_IP_METHOD = "axes.utils.get_client_ip"
 AXES_ALLOWED_IPS = ["67.244.64.72"]
 
 

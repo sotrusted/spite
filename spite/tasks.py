@@ -83,39 +83,42 @@ def summarize_posts():
     logger.info('Summarizing posts')
     # Fetch the latest 100 posts that haven't been summarized yet
     count = Post.objects.count()
-    posts = Post.objects.order_by('-id')[:100]
+    posts = Post.objects.order_by('-id')[:50]
 
 
-    logger.info(f'Summarizing 100 posts ending at post number {count}')
+    logger.info(f'Summarizing 50 posts ending at post number {count}')
 
     # Compile post content
     content = 'Posts: '
     for post in posts:
         try:
             content += '\n' + post.print_long()
+            logger.info(len(content))
+            if len(content) > 26000:
+                break
         except Exception as e:
             logger.error(f"Error processing post {post.id}: {e}")
-    content = content[:29500]
 
-    logger.info(f'Content: {content}')
+    # logger.info(f'Content: {content}')
     
     # Fetch previous summaries to add memory
-    previous_summaries = Summary.objects.all().order_by('-id')[:5]  # Limit to the last 5 summaries
+    previous_summaries = Summary.objects.all().order_by('-id')[0]  # Limit to the last 5 summaries
 
     memory = ''
     for summary in previous_summaries:
         memory += ' ' + f'{summary.title}-{summary.summary}' 
 
-    logger.info(f'Memory: {memory}')
+    # logger.info(f'Memory: {memory}')
 
     # Create a prompt for OpenAI
     summary_prompt = (
-        f"Summarize the following forum posts. Include key points and themes. "
+        f"Give a take on the vibe of this online board from the perspective of a weary yet knowledgeable web surfer and 4chan troll trying to get girls to like him by being funny. "
         f"Previous context: {memory}\n\nPosts:\n{content}"
     )
     
     # Generate summary using OpenAI
-    summary_text = generate_summary(summary_prompt)
+    logger.info(f'Prompt length in chars: {len(summary_prompt)}')
+    summary_text = generate_summary(summary_prompt,)
 
 
     title=f'eTips report, post {count}'
