@@ -130,6 +130,14 @@ def get_image_filename(instance, filename):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+
+    parent_comment = models.ForeignKey(
+        'self',  # Self-referential foreign key for replies
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
     name = models.CharField(max_length=100, blank=True)  # Optional name field
     content = models.TextField()
     created_on = models.DateTimeField(default=timezone.now)

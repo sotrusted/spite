@@ -102,18 +102,35 @@
 
         <div id="comment-{{post.id}}" class="comment item">
             <h2 class="post-title">
-                Re: 
-                <a href="{% url 'post-detail' post.post.id %}">
-                    {{ post.post.title }}
-                </a>
+                {% if post.parent_comment %}
+                    Re: <strong>{{ post.parent_comment.name|default:"Anonymous" }}'s comment</strong>: {{ post.parent_comment.content }} on  
+                    <a href="{% url 'post-detail' post.post.id %}">
+                        {{ post.post.title }}
+                    </a>
+                {% else %}
+                    Re: 
+                    <a href="{% url 'post-detail' post.post.id %}">
+                        {{ post.post.title }}
+                    </a>
+                {% endif %}
             </h2>
             <div class="post-content">
                 {% if post.content %}
                     <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
                 {% endif %}
             </div>
-            <p><em>{{ post.created_on }}</em></p>
-        </div>
+            <div class="menu">
+                <p><em>{{ post.created_on }}</em></p>
+                <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="btn toggle-reply">Reply</a>
+            </div>
+            <div id="reply-form-{{post.id}}" class="reply-form" style="display: none;">
+                <form id="comment-form-{{ post.id }}" method="post" action="{% url 'reply_comment' post.id %}">
+                    {% csrf_token %}
+                    {{ comment_form|crispy }}
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+         </div>
         {% endif %}
 
 

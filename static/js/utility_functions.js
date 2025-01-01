@@ -137,6 +137,19 @@ function toggleContent(postId) {
     }
 }
 
+function attachToggleReplyButtons() {
+    document.querySelectorAll('a[id^="toggle-reply-"]').forEach(a => {
+        a.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const commentReplyForm  = document.querySelector(`reply-form-${postId}`);
+            if (commentReplyForm) {
+                commentReplyForm.style.display = 
+                    commentReplyForm === 'none' ? 'block' : 'none';
+            }
+        })
+    })
+}
+
 // Function to attach event listeners to copy links
 function attachCopyLinks() {
     document.querySelectorAll('a[id^="copy-link-"]').forEach(a => {
@@ -251,6 +264,7 @@ function attachEventListeners() {
     });
 
 
+    attachToggleReplyButtons();
 
 
 }; 
@@ -475,7 +489,13 @@ function addCommentToPage(comment) {
         <div class="post-content">
             <strong>${comment.name}</strong>: ${comment.content}
         </div>
-        <p><em>${comment.created_on}</em></p>
+        <div class="menu">
+            <p><em>${comment.created_on}</em></p>
+
+            <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="btn toggle-reply">Reply</a>
+        </div>
+        <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+        </div>
     `;
     postList.prepend(newComment); // Add the new post to the top of the list
 
@@ -566,5 +586,6 @@ window.attachCopyLinks = attachCopyLinks;
 window.attachEventListeners = attachEventListeners;
 window.scrollToElementById = scrollToElementById;
 window.showModalIfNeeded = showModalIfNeeded;
+window.attachToggleReplyButtons = attachToggleReplyButtons;
 
 
