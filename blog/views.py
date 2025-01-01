@@ -294,14 +294,64 @@ def store_page(request):
 
     return render(request, 'blog/shop.html')
 
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+class IncorrectObjectTypeException(Exception):
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "Incorrect object type, must be \'Post\' or \'Comment\'"
+
+
+def reply_comment(request, comment_id):
+    parent_comment = get_object_or_404(Comment, id=comment_id)
+    post = parent_comment.post
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
+
+            if parent_comment:
+                comment.parent_comment = parent_comment
+            
+            comment.save()
+
+            # Return json response for ajax requests
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'comment': {
+                        'name': comment.name,
+                        'content': comment.content,
+                        'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+                    }
+                })
+
+            # Non-AJAX fallback
+            return redirect('post-detail', pk=post.id)
+
+    return JsonResponse({'success': False}, status=400)
+
+
+def add_comment(request, post_id, post_type='Post'):
+    if post_type == 'Post':
+        post = get_object_or_404(Post, id=post_id)
+    elif post_type == 'Comment':
+        parent_comment = get_object_or_404(Comment, id=post_id) 
+        post = parent_comment.post 
+    else:
+        raise IncorrectObjectTypeException()
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+
+            if parent_comment: 
+                comment.parent_comment = parent_comment
+
             comment.save()
 
             # Return JSON response for AJAX requests
@@ -353,6 +403,22 @@ def get_comment_form(request, post_id):
         'form': form_html,
         'action_url': f'/add-comment/{post_id}/',
     })
+
+def get_comment_reply_form(request, comment_id):
+    """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
+    comment = Comment.objects.filter(id=comment_id).exists()
+
+    if not comment:
+        return JsonResponse({'error': 'Comment not found'}, status=404)
+
+    form = CommentForm()
+    form_html = as_crispy_form(form)
+
+    return JsonResponse({
+        'form': form_html,
+        'action_url': f'/add-comment/comment/{comment_id}/',
+    })
+
 
 
 def get_comment_form_html(request, post_id):

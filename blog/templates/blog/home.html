@@ -15,7 +15,7 @@
     <div class="flexbox">
         <div class="text-content">
             <h3>How Spite Started</h3>
-        <div class="text-box">
+            <div class="text-box">
                 <p>In my capacity as a <b>digital visionary</b>, I was recently hired by a <b>notorious alt-lit figure</b> to help create a new <b>online periodical</b>.</p>
             </div>
             <div class="center-box">
@@ -53,9 +53,6 @@
 		<p>My only choice is to create my own online publication. I have playfully dubbed it <em>Spite</em>.</p>
 		<p><em>Anyone can write for Spite.</em></p>
     </div>
-    <div class="shop">
-        {% include 'blog/products.html' %}
-    </div>  
     <div id="list-submission">
         <label for="user-input">Enter a NAME onto the INTERESTING LIST</label><br>
         <input type="text" id="user-input" />
@@ -94,6 +91,12 @@
 
 {% block feed %}
     {% include 'blog/feed.html' with home=True posts=posts%}
+{% endblock %}
+
+{% block tail %}
+<div class="shop">
+    {% include 'blog/products.html' %}
+</div>  
 {% endblock %}
 
 {% block page_scripts %}
