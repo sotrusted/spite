@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 import logging
 from django.core.paginator import Paginator
-# import os
+import os
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -29,8 +29,10 @@ import functools
 from datetime import datetime 
 from spite.context_processors import get_posts
 from django.http import StreamingHttpResponse
-# import subprocess
-# from weasyprint import HTML
+from weasyprint import HTML
+import cv2
+import numpy as np
+from django.conf import settings
 
 logger = logging.getLogger('spite')
 
@@ -638,3 +640,28 @@ def download_posts_as_html_stream(request):
         yield "</body></html>"
 
     return StreamingHttpResponse(generate_html_content(), content_type="text/html")
+
+
+def get_media_features(request):
+    features_path = os.path.join(settings.MEDIA_ROOT, 'features', 'media_features.json')
+    
+    try:
+        logger.info(f"Attempting to read features from: {features_path}")
+        with open(features_path, 'r') as f:
+            features_data = json.load(f)
+        logger.info(f"Successfully loaded {len(features_data)} features")
+        return JsonResponse({'media_features': features_data})
+    except FileNotFoundError:
+        logger.warning(f"Features file not found at {features_path}")
+        return JsonResponse({'error': 'Features not processed yet'}, status=404)
+    except Exception as e:
+        logger.error(f"Error loading media features: {str(e)}", exc_info=True)
+        return JsonResponse({'error': f'Error loading media features: {str(e)}'}, status=500)
+
+
+def media_flow(request):
+    return render(request, 'blog/media_flow.html')
+
+
+def media_flow_standalone(request):
+    return render(request, 'blog/partials/media_flow_standalone.html')
