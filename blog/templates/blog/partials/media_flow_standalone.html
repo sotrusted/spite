@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .media-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+        }
+
+        .media-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .current-media,
+        .next-media {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .current-media img,
+        .next-media img,
+        .current-media video,
+        .next-media video {
+            width: 80vh;
+            height: 80vh;
+            object-fit: cover;
+            background: black;
+        }
+
+        .toggle-flow {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 100, 0, 0.8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <script src="/static/js/media_animation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const animator = new MediaAnimator();
+            animator.initialize();
+        });
+    </script>
+</body>
+</html>

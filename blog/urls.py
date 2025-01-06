@@ -8,7 +8,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     preview_pdf_template, search_results,
                     store_page, add_comment, reply_comment, get_csrf_token, 
                     offline_view, all_posts, get_comment_form_html,
-                    SaveListView, get_word_cloud, download_posts_as_html_stream)
+                    SaveListView, get_word_cloud, download_posts_as_html_stream,
+                    get_media_features, media_flow, media_flow_standalone)
 
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
@@ -46,6 +47,9 @@ urlpatterns = [
     path('api/save-list/', SaveListView.as_view(), name='save_list'),
     path('api/word-cloud/', get_word_cloud, name='word_cloud'),
     path('stream-posts/', download_posts_as_html_stream, name='stream_posts'),
+    path('api/media-features/', get_media_features, name='media-features'),
+    path('media-flow/', media_flow, name='media-flow'),
+    path('media-flow-standalone/', media_flow_standalone, name='media-flow-standalone'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
