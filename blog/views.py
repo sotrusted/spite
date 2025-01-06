@@ -325,6 +325,9 @@ def reply_comment(request, comment_id):
                         'name': comment.name,
                         'content': comment.content,
                         'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+                        'media_file': {
+                            'url': comment.media_file.url if comment.media_file.url else None,
+                        } if comment.media_file else None,
                     }
                 })
 
@@ -337,6 +340,7 @@ def reply_comment(request, comment_id):
 def add_comment(request, post_id, post_type='Post'):
     if post_type == 'Post':
         post = get_object_or_404(Post, id=post_id)
+        parent_comment = None
     elif post_type == 'Comment':
         parent_comment = get_object_or_404(Comment, id=post_id) 
         post = parent_comment.post 
@@ -344,11 +348,14 @@ def add_comment(request, post_id, post_type='Post'):
         raise IncorrectObjectTypeException()
 
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
         if form.is_valid():
             comment = form.save(commit=False)
+            # every comment has a post
+            # if a comment is a child comment its post is the post of its parent 
             comment.post = post
 
+        
             if parent_comment: 
                 comment.parent_comment = parent_comment
 

@@ -1,0 +1,75 @@
+{% load crispy_forms_tags %}
+<div id="comment-{{post.id}}" class="comment item">
+    <div class="post-content">
+        {% if post.media_file %}
+            <div class="image-container">
+                <a href="{% url 'post-detail' post.id %}">
+                    {% if post.media_file and post.is_video %}
+                        <video controls autoplay muted loop playsinline>
+                            <source src="{{ post.media_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% elif post.media_file and post.is_image %}
+                        <img src="{{ post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
+                    {% elif post.post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+                    {% endif %}
+                </a>
+            </div>
+        {% endif %}
+
+        {% if post.content %}
+            <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+        {% endif %}
+    </div>
+
+    <div class="comment-content blockquote" 
+    {% if post.parent_comment %}
+        data-parent-id="{{post.parent_comment.id}}"
+    {% endif %}>
+        {% if post.parent_comment %}
+            <div class="parent-comment">
+                <span class="reply-to">Re: {{ post.parent_comment.content }} -- <strong>{{ post.parent_comment.name|default:"Anonymous" }}</strong></span>
+            </div>
+        {% endif %}
+        <div class="parent-post preview">
+            <div class="text-content">
+                <h2 class="post-title">
+                Re:<a href="{% url 'post-detail' post.post.id %}">
+                    {{ post.post.title }}
+                </a>
+                </h2>
+                <p class="parent-content">{{post.post.content|truncatewords:40}}</p>
+            </div>
+            <div class="image-content">
+                {% if post.post.media_file %}
+                    <div class="image-container">
+                        <a href="{% url 'post-detail' post.post.id %}">
+                            {% if post.post.media_file and post.post.is_video %}
+                                <video controls autoplay muted loop playsinline>
+                                    <source src="{{ post.post.media_file.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% elif post.post.media_file and post.post.is_image %}
+                                <img src="{{ post.post.media_file.url }}" alt="{{ post.post.title }}" loading="lazy">
+                            {% elif post.post.image %}
+                                <img src="{{ post.post.image.url }}" alt="{{ post.post.title }}" loading="lazy">
+                            {% endif %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>  
+    </div>
+    <div class="menu">
+        <p><em>{{ post.created_on }}</em></p>
+        <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="toggle-reply">Reply</a>
+    </div>
+    <div id="reply-form-{{post.id}}" class="reply-form" style="display: none;">
+        <form id="comment-form-{{ post.id }}" method="post" action="{% url 'reply-comment' post.id %}">
+            {% csrf_token %}
+            {{ comment_form|crispy }}
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    </div>

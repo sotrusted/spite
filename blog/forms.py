@@ -74,7 +74,7 @@ class PostSearchForm(forms.Form):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['name', 'content']
+        fields = ['name', 'content', 'media_file']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your comment here...'}),
         }
@@ -86,12 +86,18 @@ class CommentForm(forms.ModelForm):
         self.helper.form_class = 'comment-form'
         self.helper.layout = Layout(
             Div(
-                Field('name', css_class='form-control', wrapper_class='col-6'),
-                css_class='row justify-content-center',  # Aligns form fields
-            ),
-            Div(
-                Field('content', css_class='form-control', wrapper_class='col-12'),
-                css_class='row justify-content-center',
+                Row(
+                    Field('name', css_class='form-control', wrapper_class='col-6'),
+                    css_class='row justify-content-center',  # Aligns form fields
+                ),
+                Row(
+                    Field('content', css_class='form-control', wrapper_class='col-12'),
+                    css_class='row justify-content-center',
+                ),
+                Row(
+                    Field('media_file', css_class='form-control', wrapper_class='col-12'),
+                    css_class='row justify-content-center',
+                ),
             ),
             Div(
                 Submit('submit', 'Submit', css_class='btn btn-primary'),
