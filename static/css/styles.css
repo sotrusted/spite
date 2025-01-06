@@ -12,7 +12,7 @@ body {
     margin: 0;
     padding: 0;
     /* background-color: #000;*/
-    background-color: #00b7ff;
+    background-color: #000;
     color: #000;
     font-size: clamp(1rem, 4vw, 2rem);
     display: flex;
@@ -410,6 +410,7 @@ form {
 /* Feed styles */
 .feed {
     background-color: antiquewhite;
+    border: 1px solid #000;
     padding: 15px;
     margin-bottom: 100px;
     display: flex;
@@ -459,12 +460,16 @@ form {
     padding-left: 20px;
 }
 
+.comment { 
+    background-color: #f0e1cc; 
+}
+
 .comment.item {
-    border-bottom: 1px dashed #000;
+    border-bottom: 1px solid #000;
 }
 
 .highlight {
-    background-color: yellow;
+    background-color: rgb(255, 255, 124);
     transition: background-color 1s ease-out;
 }
 
@@ -490,6 +495,11 @@ form {
 }
 .preview .text-content, .preview .image-content {
 	flex: 1 1 100%;
+}
+
+.parent-post {
+    max-width: 80%;
+    margin-left: 30px;
 }
 
 .preview .text-content {
@@ -571,12 +581,18 @@ form {
     margin-right: 20px;
 }
 
-.copy-link {
+.copy-link,
+.toggle-reply {
     cursor: pointer; /* Pointer cursor */
     transition: background-color 0.3s ease;
 }
 
-.copy-link:hover {
+.toggle-reply {
+    margin-left: 20px;
+}
+
+.copy-link:hover,
+.toggle-reply:hover {
     background-color: #0084ff; /* Darker color on hover */
 }
 
@@ -735,4 +751,25 @@ main {
     to {
         transform: translateY(100vh);
     }
+}
+
+
+/* Quote styling */
+.comment-content blockquote {
+    background-color: #e1d2be; /* Lighter version of your comment background */
+    border-left: 2px solid #006400;
+    padding: 5px 10px;
+    margin: 5px 0;
+    margin-left: 20px;
+    border-left: 1px solid rgba(0, 100, 0, 0.3);
+    padding-left: 10px;
+
+}
+
+
+/* Thread relationship styling */
+.comment[data-parent-id] {
+    margin-left: 20px;
+    border-left: 1px solid rgba(0, 100, 0, 0.3);
+    padding-left: 10px;
 }

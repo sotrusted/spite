@@ -140,11 +140,16 @@ function toggleContent(postId) {
 function attachToggleReplyButtons() {
     document.querySelectorAll('a[id^="toggle-reply-"]').forEach(a => {
         a.addEventListener('click', function() {
-            const postId = this.dataset.postId;
-            const commentReplyForm  = document.querySelector(`reply-form-${postId}`);
+            const postId = this.id.split('-').pop(); // Extract the part after the last '-'
+            console.log(postId);
+            const commentReplyForm  = document.querySelector(`div[id^=reply-form-${postId}]`);
+            console.log(commentReplyForm);
             if (commentReplyForm) {
+                console.log(`Reply form for comment ${postId} toggled`)
                 commentReplyForm.style.display = 
-                    commentReplyForm === 'none' ? 'block' : 'none';
+                    commentReplyForm.style.display === 'none' ? 'block' : 'none';
+            } else {
+                console.error(`Reply form for comment ${postId} not found`)
             }
         })
     })
@@ -492,7 +497,7 @@ function addCommentToPage(comment) {
         <div class="menu">
             <p><em>${comment.created_on}</em></p>
 
-            <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="btn toggle-reply">Reply</a>
+            <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="toggle-reply">Reply</a>
         </div>
         <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
         </div>
@@ -501,6 +506,25 @@ function addCommentToPage(comment) {
 
     newComment.classList.add("highlight");
     setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
+
+    // Add comment to the comments list if it exists
+    const commentsListDiv = document.querySelector(`#comments-list-${comment.post_id}`);
+    if (commentsListDiv) {
+        const commentElement = document.createElement('div');
+        commentElement.className = 'comment';
+        commentElement.innerHTML = `
+            <strong>${comment.name}</strong>: ${comment.content}
+            <p><em>${comment.created_on}</em></p>
+        `;
+        commentsListDiv.appendChild(commentElement);
+
+        // Update comment count in toggle button
+        const toggleButton = document.querySelector(`#toggle-comments-${comment.post_id}`);
+        if (toggleButton) {
+            const currentCount = parseInt(toggleButton.textContent.match(/\d+/)[0]);
+            toggleButton.textContent = `Comments (${currentCount + 1})`;
+        }
+    }
 
     attachEventListeners();
     return newPost;

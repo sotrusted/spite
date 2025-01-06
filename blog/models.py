@@ -141,12 +141,39 @@ class Comment(models.Model):
     name = models.CharField(max_length=100, blank=True)  # Optional name field
     content = models.TextField()
     created_on = models.DateTimeField(default=timezone.now)
+    media_file = models.FileField(upload_to='media/', blank=True, null=True, \
+                            max_length=255, verbose_name = 'Image or video (<50 MB)', \
+                            validators=[validate_media_file, validate_video_file_size])  # New field
 
     def __str__(self):
         return f'{self.name or "Anonymous"}: \"{self.content}\" on {self.post.title}'
 
     def get_item_type(self):
         return "Comment"
+    
+    def is_image(self):
+        """Check if the media_file is an image."""
+        if self.image: 
+            return True
+        if not self.media_file: 
+            return False
+        mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else self.image.name)
+
+        # Fallback for .png
+        if not mime_type and (self.image.name.endswith('.png') or self.media_file.name.endswith('.png')):
+            mime_type = 'image/png'
+
+        return mime_type and mime_type.startswith('image/')
+
+    def is_video(self):
+        """Check if the media_file is a video."""
+        if self.image:
+            return False
+        if not self.media_file: 
+            return False
+        mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
+        return mime_type and mime_type.startswith('video/')
+    
 
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)

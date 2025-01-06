@@ -59,85 +59,14 @@
 
     <h2 class="section-header">recent posts</h2> 
     <div class="posts" id="post-list">
-        {% if posts %} {% for post in posts %} {% if post.get_item_type == 'Post' %}
-            <div id="post-{{post.id}}" class="post item">
-                <div class="preview" id="post-preview-{{post.id}}">
-                    {% include 'blog/preview.html' with post=post %}
-                </div>
-                <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
-                    {% include 'blog/detail.html' with post=post nested=True %}
-                </div>
-
-                <!--
-                <div class="menu">
-                    <a href="{% url 'post-reply' post.id %}">Reply</a>
-                </div>
-    -->
-                <!-- Unique Comment Section for Each Post -->
-                <div id="comment-section-{{ post.id }}">
-                    <button id="toggle-comments-{{ post.id }}" 
-                            class="toggle-comments" 
-                            data-post-id="{{ post.id }}">
-                        Comments ({{ post.comments_total|default:0 }})
-                    </button>
-                    <div id="comments-container-{{ post.id }}" 
-                        data-has-comments="{{ post.has_comments }}" 
-                        class="comments-container" style="display: none;">
-                        <div id="comments-list-{{ post.id }}">
-                            {% for comment in post.recent_comments %}
-                                <div class="comment">
-                                    <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
-                                    <p><em>{{ comment.created_on }}</em></p>
-                                </div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Comment Form -->
-                        {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form %}
-                    </div>
-                </div>
-            </div>
-
-        {% elif post.get_item_type == 'Comment' %}
-
-        <div id="comment-{{post.id}}" class="comment item">
-            <h2 class="post-title">
-                {% if post.parent_comment %}
-                    Re: <strong>{{ post.parent_comment.name|default:"Anonymous" }}'s comment</strong>: {{ post.parent_comment.content }} on  
-                    <a href="{% url 'post-detail' post.post.id %}">
-                        {{ post.post.title }}
-                    </a>
-                {% else %}
-                    Re: 
-                    <a href="{% url 'post-detail' post.post.id %}">
-                        {{ post.post.title }}
-                    </a>
+        {% if posts %} 
+            {% for post in posts %} 
+                {% if post.get_item_type == 'Post' %}
+                    {% include 'blog/partials/post.html' with post=post %}
+                {% elif post.get_item_type == 'Comment' %}
+                    {% include 'blog/partials/comment.html' with comment=post %}
                 {% endif %}
-            </h2>
-            <div class="post-content">
-                {% if post.content %}
-                    <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
-                {% endif %}
-            </div>
-            <div class="menu">
-                <p><em>{{ post.created_on }}</em></p>
-                <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="btn toggle-reply">Reply</a>
-            </div>
-            <div id="reply-form-{{post.id}}" class="reply-form" style="display: none;">
-                <form id="comment-form-{{ post.id }}" method="post" action="{% url 'reply_comment' post.id %}">
-                    {% csrf_token %}
-                    {{ comment_form|crispy }}
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-         </div>
-        {% endif %}
-
-
-
-            
-
-        {% endfor %}
+            {% endfor %}
         {% else %}
             <p class="oops">No one seems to have posted yet! Click below to post!</p>
         {% endif %}
