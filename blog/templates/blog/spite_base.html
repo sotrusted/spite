@@ -40,9 +40,10 @@
         {% endcompress %}
     {% endblock %}
     {% progressive_web_app_meta %}
+    <style>
+    </style>
 </head>
 <body>
-
 {% block submission %}
 <div id="modal-overlay">
     <div id="list-submission">
@@ -185,5 +186,40 @@ Register the service worker -->
 
     {% endblock %}
 </div>
+    <script>
+        window.addEventListener('beforeunload', () => {
+            // Clear the loading cookie on page refresh
+            document.cookie = "loading_complete=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = document.querySelector('.site-loading-splash');
+            
+            // Function to hide splash screen
+            const hideSplash = () => {
+                splash.classList.add('hidden');
+                setTimeout(() => splash.remove(), 500);
+            };
+
+            // Hide splash when page is fully loaded
+            window.addEventListener('load', () => {
+                // Add a small delay to ensure smooth transition
+                setTimeout(hideSplash, 500);
+            });
+
+            // Fallback: Hide splash after 5 seconds even if load event doesn't fire
+            setTimeout(hideSplash, 5000);
+        });
+
+        // Add this to show loading splash when navigating away
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && !link.hasAttribute('data-no-splash')) {
+                const splash = document.querySelector('.site-loading-splash');
+                if (splash) {
+                    splash.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
 </body>
 </html>

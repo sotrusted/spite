@@ -665,3 +665,17 @@ def media_flow(request):
 
 def media_flow_standalone(request):
     return render(request, 'blog/partials/media_flow_standalone.html')
+
+
+def loading_screen(request):
+    logger.info("Loading screen view called")
+    logger.info(f"Query parameters: {request.GET}")
+    logger.info(f"Current cookies: {request.COOKIES}")
+    
+    response = render(request, 'blog/loading.html')
+    
+    # Set the cookie in the response
+    response.set_cookie('loading_complete', 'true', path='/')
+    logger.info("Set loading_complete cookie in response")
+    
+    return response

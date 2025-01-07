@@ -80,22 +80,6 @@ INSTALLED_APPS = [
     'compressor',
 ]
 
-'''
-old order
-MIDDLEWARE = [
-    'axes.middleware.AxesMiddleware', 
-    'django_cloudflare.CloudflareMiddleware',
-    'django.middleware.gzip.GZipMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.active_session_middleware.ActiveSessionMiddleware',
-]
-'''
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -109,6 +93,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middleware.active_session_middleware.ActiveSessionMiddleware',
     'middleware.page_view_middleware.PageViewMiddleware',
+    'middleware.loading_screen_middleware.LoadingScreenMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
@@ -386,6 +371,11 @@ PWA_APP_OFFLINE_PAGE = '/offline/'  # URL for offline fallback page
 OPENAI_SECRET_KEY = env('OPENAI_SECRET_KEY')
 OPENAI_ORGANIZATION_KEY = env('OPENAI_ORGANIZATION_KEY')
 OPENAI_PROJECT_ID = env('OPENAI_PROJECT_ID')
+
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME')
 
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
