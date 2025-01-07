@@ -684,6 +684,17 @@ main {
     .detail .image-content {
 	    width: 100%;
     }
+
+    .comment .post-content {
+        font-size: 1.1em;
+    }
+
+    .comment .blockquote {
+        font-size: 0.9em;
+    }
+    .comment .blockquote .parent-content {
+        color: rgb(28, 36, 28);
+    }
 }
 
 @media only screen and (min-width: 940px) {

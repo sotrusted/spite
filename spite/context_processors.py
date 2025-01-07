@@ -18,15 +18,18 @@ from django.urls import resolve
 logger = logging.getLogger('spite')
 
 def load_posts(request):
+    # Check if we've shown the loading screen
+    is_loading = not request.COOKIES.get('loading_complete', False)
+    
     current_route = resolve(request.path_info).url_name
     if current_route == 'post-detail':
         return {
             'days_since_launch': days_since_launch(),
             'comment_form': CommentForm(),
+            'is_loading': is_loading,
         }
     elif current_route == 'stream-posts':
-        return {}
-
+        return { 'is_loading': is_loading }
 
     posts_data, posts, pinned_posts = get_posts()
 
@@ -96,6 +99,7 @@ def load_posts(request):
         'user_count': user_count_data['user_count'],
         'is_paginated': page_obj.has_other_pages(),
         'highlight_comments': highlight_comments,
+        'is_loading': is_loading,
     }
 
 def days_since_launch():

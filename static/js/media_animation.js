@@ -4,7 +4,7 @@ class MediaAnimator {
         this.currentIndex = 0;
         this.container = document.createElement('div');
         this.container.className = 'media-animation-container';
-        this.transitionDuration = 100; // Reduced to 500ms
+        this.transitionDuration = 500; // Reduced to 500ms
         this.isPlaying = true;
     }
 
@@ -152,11 +152,10 @@ class MediaAnimator {
         if (mediaItem.type === 'video') {
             element.innerHTML = `
                 <video autoplay loop muted playsinline>
-                    <source src="${mediaItem.url}" type="video/mp4">
-                </video>
-            `;
+                    <source src="${mediaItem.local_url || mediaItem.web_url}" type="video/mp4">
+                </video>`;
         } else {
-            element.innerHTML = `<img src="${mediaItem.url}" alt="media">`;
+            element.innerHTML = `<img src="${mediaItem.local_url || mediaItem.web_url}" alt="Media item">`;
         }
     }
 }
