@@ -9,39 +9,54 @@ from .openai import generate_summary
 from django.db.models import Q
 import logging
 from blog.models import PageView
+from spite.utils import cache_large_data
 
 # Get the 'spite' logger
 logger = logging.getLogger('spite')
 
 @shared_task
+@cache_large_data(key='full_posts_data', timeout=60 * 15)  # 15 minutes
 def cache_posts_data():
     try:
-        # Fetch all posts in a single query
-        all_posts = Post.objects.filter(Q(is_pinned=True) | Q(is_pinned=False)).order_by('-date_posted')
+        # Get posts with optimized query
+        base_query = Post.objects.only(
+            'id', 'title', 'content', 'display_name',
+            'date_posted', 'is_pinned', 'media_file', 'image'
+        ).order_by('-date_posted')
 
-        # Separate the pinned and unpinned posts in Python
+        # Process all posts
+        all_posts = list(base_query)
         pinned_posts = [post for post in all_posts if post.is_pinned]
-        posts = [post for post in all_posts if not post.is_pinned]
+        regular_posts = [post for post in all_posts if not post.is_pinned]
 
-        # Compress and cache the posts data
-        posts_data = {'posts': posts, 'pinned_posts': pinned_posts}
+        logger.info(f"Caching {len(all_posts)} posts")
 
-        # compressed_posts_data = zlib.compress(pickle.dumps(posts_data))
-        # Serialize with pickle
-        pickled_data = pickle.dumps(posts_data)
+        # Cache pinned posts
+        compressed_pinned = lz4.compress(pickle.dumps(pinned_posts))
+        cache.set('pinned_posts', compressed_pinned)
 
-        # Compress the pickled data with LZ4
-        compressed_posts_data = lz4.compress(pickled_data)
+        # Split regular posts into chunks of 1000
+        chunk_size = 1000
+        chunks = [regular_posts[i:i + chunk_size] for i in range(0, len(regular_posts), chunk_size)]
+        
+        # Cache each chunk separately
+        for i, chunk in enumerate(chunks):
+            compressed_chunk = lz4.compress(pickle.dumps(chunk))
+            cache.set(f'posts_chunk_{i}', compressed_chunk)
+        
+        # Store the number of chunks
+        cache.set('posts_chunk_count', len(chunks))
 
-
-        # Cache the compressed data
-        cache.set('posts_data', compressed_posts_data, 60 * 15)
-
-        # Log the success
-        logger.info(f"Posts data successfully cached with {len(posts)} unpinned posts and {len(pinned_posts)} pinned posts.")
+        logger.info(f"Successfully cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks of regular posts")
+        
+        return {
+            'pinned_posts': pinned_posts,
+            'regular_posts': regular_posts
+        }
+        
     except Exception as e:
-        logger.error(f"Error caching posts data: {e}")
-    return True
+        logger.error(f"Error caching posts data: {str(e)}", exc_info=True)
+        return None
 
 @shared_task
 def cache_page_html(view_name, page_number=None):
@@ -140,13 +155,23 @@ def persist_pageview_count():
     """
     Sync the pageview count from cache to the database.
     """
-    # Fetch and reset the temporary pageview count
-    temp_count = cache.get('pageview_temp_count', 0)
-    if temp_count > 0:
-        # Reset cache
-        cache.set('pageview_temp_count', 0)
-
-        # Persist to database
-        pageview, _ = PageView.objects.get_or_create(id=1)
-        pageview.count += temp_count
-        pageview.save()
+    try:
+        # Fetch and reset the temporary pageview count
+        temp_count = cache.get('pageview_temp_count', 0)
+        if temp_count > 0:
+            logger.info(f"Persisting {temp_count} pageviews to database")
+            
+            # Get or create the PageView object
+            pageview, created = PageView.objects.get_or_create(id=1)
+            
+            # Update the count
+            pageview.count += temp_count
+            pageview.save()
+            
+            # Reset cache after successful persistence
+            cache.set('pageview_temp_count', 0)
+            
+            logger.info(f"Successfully persisted pageviews. New total: {pageview.count}")
+            
+    except Exception as e:
+        logger.error(f"Error persisting pageview count: {e}")

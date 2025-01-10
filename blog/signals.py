@@ -19,11 +19,19 @@ logger = logging.getLogger('spite')
 
 @receiver(post_save, sender=Post)
 def clear_cache_on_post_save(sender, instance, **kwargs):
-    logger.info(f"Post {instance.id} saved. Clearing cache")
+    logger.info(f"Post {instance.id} saved. Clearing post caches")
     
-    #Cache posts 
-    cache.clear()
-    logger.info(f"Cache cleared")
+    # Clear all post-related caches
+    cache.delete('pinned_posts')
+    cache.delete('posts_data')
+    for i in range(cache.get('posts_chunk_count', 0)):
+        cache.delete(f'posts_chunk_{i}')
+    cache.delete('posts_chunk_count')
+    
+    # Trigger immediate cache rebuild
+    cache_posts_data.delay()
+    
+    logger.info(f"Post caches cleared and rebuild triggered")
 
 
 @receiver(post_save, sender=Comment)

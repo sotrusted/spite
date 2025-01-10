@@ -834,3 +834,27 @@ main {
     cursor: pointer;
     z-index: 1001;
 }
+
+/* Comment image styling */
+.comment .image-container {
+    max-width: 200px;  /* Adjust this value for desired thumbnail size */
+    margin: 10px 0;
+}
+
+.comment .image-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.comment .video-container {
+    max-width: 200px;  /* Match image size for consistency */
+}
+
+.comment .video-container video {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+

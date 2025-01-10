@@ -80,7 +80,25 @@ INSTALLED_APPS = [
     'compressor',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    'https://spite.fr',
+    'https://www.spite.fr',
+    'https://localhost',
+    'https://127.0.0.1',
+    'https://192.3.30.202',
+    'https://69.48.163.194',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'OPTIONS',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django_cloudflare.CloudflareMiddleware',
@@ -130,6 +148,13 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 60,  # Keep connections alive for 60 seconds
+        'OPTIONS': {
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5
+        }
     }
 }
 
@@ -232,7 +257,10 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-AUTHENTICATION_BACKENDS = ['axes.backends.AxesStandaloneBackend']
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Django's default auth
+    'axes.backends.AxesStandaloneBackend',  # Axes for login security
+]
 AXES_FAILURE_LIMIT = 5  # Number of attempts before blocking
 AXES_COOLOFF_TIME = 1  # Time in hours before reset
 AXES_LOCK_OUT_AT_FAILURE = True
@@ -266,6 +294,18 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'javascript_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/javascript.log',
+            'formatter': 'verbose',
+        },
+        'auth_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/auth.log'),
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': {
@@ -286,6 +326,16 @@ LOGGING = {
         'django.security.csrf': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
+        },
+        'javascript': {
+            'handlers': ['javascript_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.contrib.auth': {
+            'handlers': ['auth_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     }, 
 }
@@ -315,21 +365,20 @@ CACHES = {
 }
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Example using Redis as broker
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+BROKER_CONNECTION_RETRY_ON_STARTUP = True  # Add this to fix the warning
 
 CELERY_BEAT_SCHEDULE = {
-    'cache-posts-every-15-minutes': {
+    'cache-posts': {
         'task': 'spite.tasks.cache_posts_data',
-        'schedule': crontab(minute='*/15'),
+        'schedule': 60.0,  # Run every minute
     },
-    'cache-page-html-every-15-minutes': {
-        'task': 'spite.tasks.cache_page_html',
-        'schedule': crontab(minute='*/15'),
-        'args': ('home'),  # Cache page 1 initially, extend for more pages if needed
-        
-    },
-    'persist-pageview-count-every-minute': {
+    'persist-pageviews': {
         'task': 'spite.tasks.persist_pageview_count',
-        'schedule': crontab(minute='*/1'),  # Run every minute
+        'schedule': 60.0,
     },
 }
 

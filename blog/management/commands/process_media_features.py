@@ -65,18 +65,16 @@ class Command(BaseCommand):
                 else:
                     continue
 
-                # Try different path resolutions
-                media_path = file_field.path  # Django's path
-                abs_path = os.path.join(settings.MEDIA_ROOT, file_field.name)  # Constructed path
-                url_path = unquote(file_field.url)  # URL decoded path
+                # Get file name and fix path if needed
+                file_name = file_field.name
+                if 'images/' in file_name:
+                    # Convert old 'images/' path to 'media/'
+                    file_name = file_name.replace('images/', 'media/')
+                    logger.info(f"Converted old images path to: {file_name}")
 
-                paths_to_try = [media_path, abs_path, url_path]
-                
-                logger.info(f"Processing {index}/{total_posts}: Post {post.id}")
-                logger.info(f"Django path: {media_path}")
-                logger.info(f"Absolute path: {abs_path}")
-                logger.info(f"URL path: {url_path}")
-
+                # Try to read the file
+                file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+                logger.info(f"Attempting to read: {file_path}")
 
                 # Try to read image from S3 first, then fallback to local
                 img = None

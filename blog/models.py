@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 import mimetypes
 from django.core.exceptions import ValidationError
+from django.utils.functional import cached_property
 
 logger = logging.getLogger('spite')
 
@@ -32,7 +33,7 @@ class Post(models.Model):
     anon_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     #text fields
-    title = models.CharField(max_length=100, verbose_name='What\'s your problem?')
+    title = models.CharField(max_length=100, verbose_name='What\'s your problem?', db_index=True)
     content = models.TextField(verbose_name='content', default='', null=True, blank=True)
     display_name = models.CharField(max_length=100, verbose_name='Display Name', null=True, blank=True, default='')
 
@@ -43,8 +44,8 @@ class Post(models.Model):
                                 validators=[validate_media_file, validate_video_file_size])  # New field
 
     #meta
-    date_posted = models.DateTimeField(auto_now_add=True)
-    is_pinned = models.BooleanField(default=False)
+    date_posted = models.DateTimeField(auto_now_add=True, db_index=True)
+    is_pinned = models.BooleanField(default=False, db_index=True)
     #meta/not implemented
     like_count = models.PositiveIntegerField(default=0)
     parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
@@ -121,6 +122,22 @@ class Post(models.Model):
         comments = Comment.objects.filter(post=self).order_by('-created_on')
         return comments
 
+    @cached_property
+    def comment_count(self):
+        return self.comments.count()
+
+    @cached_property
+    def has_media(self):
+        return bool(self.media_file or self.image)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['-date_posted']),
+            models.Index(fields=['is_pinned', '-date_posted']),
+            # Add index for media fields if you query by them often
+            models.Index(fields=['media_file', 'image']),
+        ]
+
 
 def get_image_filename(instance, filename):
     title = instance.personal.title
@@ -153,17 +170,28 @@ class Comment(models.Model):
     
     def is_image(self):
         """Check if the media_file is an image."""
-        if self.image: 
+        logger.info(f"Checking is_image for comment {self.id}")
+        logger.info(f"media_file: {self.media_file}")
+        logger.info(f"image: {getattr(self, 'image', None)}")
+        
+        if hasattr(self, 'image') and self.image: 
+            logger.info("Has image field")
             return True
         if not self.media_file: 
+            logger.info("No media file")
             return False
-        mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else self.image.name)
+            
+        mime_type, _ = mimetypes.guess_type(self.media_file.name)
+        logger.info(f"Mime type: {mime_type}")
 
         # Fallback for .png
-        if not mime_type and (self.image.name.endswith('.png') or self.media_file.name.endswith('.png')):
+        if not mime_type and self.media_file.name.endswith('.png'):
+            logger.info("PNG fallback")
             mime_type = 'image/png'
 
-        return mime_type and mime_type.startswith('image/')
+        is_image = mime_type and mime_type.startswith('image/')
+        logger.info(f"Is image: {is_image}")
+        return is_image
 
     def is_video(self):
         """Check if the media_file is a video."""
@@ -203,3 +231,13 @@ class List(models.Model):
 
     def __str__(self):
         return self.input[:50]  # Show first 50 characters
+
+# Cache individual post data
+def get_post_data(post_id):
+    cache_key = f'post_data_{post_id}'
+    data = cache.get(cache_key)
+    if data is None:
+        data = Post.objects.get(id=post_id)
+        cache.set(cache_key, data, 60 * 15)  # 15 minutes
+    return data
+

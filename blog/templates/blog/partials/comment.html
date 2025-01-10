@@ -1,25 +1,21 @@
 {% load crispy_forms_tags %}
 <div id="comment-{{post.id}}" class="comment item">
     <div class="post-content">
-        {% if post.media_file %}
+        <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+        
+        {% if post.media_file or post.image %}
             <div class="image-container">
-                <a href="{% url 'post-detail' post.id %}">
-                    {% if post.media_file and post.is_video %}
-                        <video controls autoplay muted loop playsinline>
-                            <source src="{{ post.media_file.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    {% elif post.media_file and post.is_image %}
-                        <img src="{{ post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
-                    {% elif post.post.image %}
-                        <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
-                    {% endif %}
-                </a>
+                {% if post.media_file and post.is_video %}
+                    <video controls autoplay muted loop playsinline>
+                        <source src="{{ post.media_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% elif post.media_file and post.is_image %}
+                    <img src="{{ post.media_file.url }}" alt="Comment image" loading="lazy">
+                {% elif post.image %}
+                    <img src="{{ post.image.url }}" alt="Comment image" loading="lazy">
+                {% endif %}
             </div>
-        {% endif %}
-
-        {% if post.content %}
-            <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
         {% endif %}
     </div>
 
