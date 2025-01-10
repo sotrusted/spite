@@ -14,12 +14,17 @@ import os
 from blog.forms import PostSearchForm, CommentForm, PostForm
 from asgiref.sync import sync_to_async
 from django.urls import resolve
+from spite.utils import cache_large_data
 
 logger = logging.getLogger('spite')
 
+
 def load_posts(request):
-    # Check if we've shown the loading screen
-    is_loading = not request.COOKIES.get('loading_complete', False)
+    # Check if this is a pagination request
+    is_pagination = 'page' in request.GET
+    
+    # Only consider loading screen for non-pagination requests
+    is_loading = not request.COOKIES.get('loading_complete', False) and not is_pagination
     
     current_route = resolve(request.path_info).url_name
     if current_route == 'post-detail':
@@ -31,31 +36,72 @@ def load_posts(request):
     elif current_route == 'stream-posts':
         return { 'is_loading': is_loading }
 
-    posts_data, posts, pinned_posts = get_posts()
+    def get_optimized_posts():
+        # Remove author-related queries and only select needed fields
+        base_query = Post.objects.prefetch_related('comments')\
+            .only(
+                'id',
+                'title',
+                'content',
+                'display_name',
+                'date_posted',
+                'is_pinned',
+                'media_file',
+                'image'
+            ).defer(
+                'city',
+                'contact',
+                'description'
+            )
 
+        # Single query to get all posts
+        all_posts = base_query.order_by('-date_posted')
+        
+        # Split posts in memory
+        pinned_posts = [post for post in all_posts if post.is_pinned]
+        regular_posts = [post for post in all_posts if not post.is_pinned]
 
-    # Get or calculate user count data
-    user_count_data = cache.get('user_count_data')
-    if not user_count_data:
-        iplog = os.path.join(settings.BASE_DIR, 'logs/django_access.log')
-        current_time = datetime.now(timezone.utc)
-
-        user_count, daily_user_count, active_sessions_count = \
-            [count_ips(iplog, start_time=time) for time in \
-             [None, current_time - timedelta(hours=24), current_time - timedelta(hours=1)]]
-
-        user_count_data = {
-            'user_count': user_count,
-            'daily_user_count': daily_user_count,
-            'active_sessions_count': active_sessions_count
+        return {
+            'posts': regular_posts,
+            'pinned_posts': pinned_posts,
         }
 
-        cache.set('user_count_data', user_count_data, 60 * 1)
+    def get_cached_posts():
+        try:
+            # Get pinned posts
+            compressed_pinned = cache.get('pinned_posts')
+            pinned_posts = []
+            if compressed_pinned:
+                pickled_pinned = lz4.decompress(compressed_pinned)
+                pinned_posts = pickle.loads(pickled_pinned)
+
+            # Get regular posts from chunks
+            regular_posts = []
+            chunk_count = cache.get('posts_chunk_count', 0)
+            
+            for i in range(chunk_count):
+                compressed_chunk = cache.get(f'posts_chunk_{i}')
+                if compressed_chunk:
+                    pickled_chunk = lz4.decompress(compressed_chunk)
+                    chunk = pickle.loads(pickled_chunk)
+                    regular_posts.extend(chunk)
+
+            return {
+                'posts': regular_posts,
+                'pinned_posts': pinned_posts
+            }
+        except Exception as e:
+            logger.error(f"Error loading cached posts: {e}")
+            return get_optimized_posts()  # Fallback to database query
+
+    # Try cache first, fallback to database
+    posts_data = get_cached_posts()
+
 
     # Add comments context
     
  
-    for post in pinned_posts:
+    for post in posts_data['pinned_posts']:
         query_post = Post.objects.get(id=post.id)
         comments = Comment.objects.filter(post=query_post).order_by('-created_on')
         # Attach comments and total count directly to the post object
@@ -69,7 +115,7 @@ def load_posts(request):
 
     # Combine posts and comments into a single feed
     combined_items = sorted(
-        chain(posts, all_comments),
+        chain(posts_data['posts'], all_comments),
         key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
         reverse=True
     )
@@ -96,7 +142,6 @@ def load_posts(request):
         'posts': page_obj,
         'pinned_posts': posts_data['pinned_posts'],
         'spite': len(posts_data['posts']) + len(all_comments),
-        'user_count': user_count_data['user_count'],
         'is_paginated': page_obj.has_other_pages(),
         'highlight_comments': highlight_comments,
         'is_loading': is_loading,
@@ -127,12 +172,6 @@ def get_posts():
         # Load the cached posts data
         logger.info("Loaded posts from cache.")
         posts_data = pickle.loads(zlib.decompress(compressed_posts_data))
-
-        # Decompress with LZ4
-        decompressed_data = lz4.decompress(compressed_posts_data)
-
-        # Deserialize with pickle
-        posts_data = pickle.loads(decompressed_data)
 
         posts = posts_data['posts']
         pinned_posts = posts_data['pinned_posts']

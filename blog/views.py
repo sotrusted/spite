@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from itertools import chain
 from django.db.models import Prefetch
 from django.core.files.storage import default_storage
 from django.utils.html import escape
@@ -33,7 +34,8 @@ from weasyprint import HTML
 import cv2
 import numpy as np
 from django.conf import settings
-
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 logger = logging.getLogger('spite')
 
 def write_ip(ip, *args, **kwargs):
@@ -80,19 +82,13 @@ def get_client_ip(request):
 
 CACHE_KEY = 'home_cache'
 
-@cache_page(60 * 15, key_prefix=CACHE_KEY)
 @csrf_protect
 def home(request):
     logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
-    # Get cached pageview count
-    cached_count = cache.get('pageview_temp_count', 0)
-
-    # Get persistent pageview count from the database
-    persistent_count = PageView.objects.first().count if PageView.objects.exists() else 0
-
-    # Combine counts
-    total_pageviews = cached_count + persistent_count
-
+    
+    # Get the immediate total count
+    total_pageviews = cache.get('current_total_views', 0)
+    
     return render(request, 'blog/home.html', {'pageview_count': total_pageviews})
 
 def all_posts(request):
@@ -269,26 +265,51 @@ def preview_pdf_template(request):
     return render(request, 'blog/pdf_template.html')
 
 def search_results(request):
-    query = request.GET.get('query')
-    if query:
-        logger.info(f'Search query: {query}')
-        SearchQueryLog.objects.create(
-            query=query,
-            user=request.user if request.user.is_authenticated else None,
-            ip_address=get_client_ip(request),
-            timestamp=now()
-        )
-        posts = Post.objects.filter(
-            Q(title__icontains=query) | Q(content__icontains=query)
-        ).order_by('-date_posted')
-    else:
-        posts = Post.objects.none()
+    query = request.GET.get('query', '')
+    logger.info(f"Searching for: {query}")
     
-    context = {
-        'posts': posts,
-        'query': query,
-    }
+    if query:
+        # Search in posts with optimized queries
+        post_results = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(display_name__icontains=query)
+        ).prefetch_related(
+            Prefetch(
+                'comments',
+                queryset=Comment.objects.order_by('-created_on'),
+                to_attr='recent_comments'
+            )
+        ).distinct()
+        
+        # Search in comments with optimized queries
+        comment_results = Comment.objects.filter(
+            Q(content__icontains=query) |
+            Q(name__icontains=query) |
+            Q(post__title__icontains=query)
+        ).select_related('post').distinct()
+        
+        # Combine and sort results
+        combined_items = sorted(
+            chain(post_results, comment_results),
+            key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+            reverse=True
+        )
+        
+        # Paginate combined results
+        paginator = Paginator(list(combined_items), 10)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        
+        context = {
+            'query': query,
+            'posts': page_obj,  # This matches your feed.html template's expectation
+            'search_query': query,  # Keep the original query for the template
+        }
 
+    else:
+        context = {'query': query}
+    
     return render(request, 'blog/search_results.html', context)
 
 
@@ -309,7 +330,7 @@ def reply_comment(request, comment_id):
     post = parent_comment.post
 
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
@@ -328,8 +349,12 @@ def reply_comment(request, comment_id):
                         'content': comment.content,
                         'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
                         'media_file': {
-                            'url': comment.media_file.url if comment.media_file.url else None,
+                            'url': comment.media_file.url if comment.media_file else None,
                         } if comment.media_file else None,
+                        'is_image': comment.is_image(),
+                        'is_video': comment.is_video(),
+                        'post_id': post.id,
+                        'post_title': post.title
                     }
                 })
 
@@ -371,6 +396,9 @@ def add_comment(request, post_id, post_type='Post'):
                         'name': comment.name,
                         'content': comment.content,
                         'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+                        'media_file': {
+                            'url': comment.media_file.url if comment.media_file.url else None,
+                        } if comment.media_file else None,
                     }
                 })
 
@@ -643,7 +671,7 @@ def download_posts_as_html_stream(request):
 
 
 def get_media_features(request):
-    features_path = os.path.join(settings.MEDIA_ROOT, 'features', 'media_features.json')
+    features_path = os.path.join(settings.MEDIA_ROOT, 'features', 'sorted_media_features.json')
     
     try:
         logger.info(f"Attempting to read features from: {features_path}")
@@ -679,3 +707,27 @@ def loading_screen(request):
     logger.info("Set loading_complete cookie in response")
     
     return response
+
+javascript_logger = logging.getLogger('javascript')
+
+@csrf_exempt
+@require_POST
+def log_javascript(request):
+    javascript_logger.info(f"Received JS log request from {request.META.get('REMOTE_ADDR')}")
+    javascript_logger.info(f"Headers: {dict(request.headers)}")
+    
+    try:
+        message = request.POST.get('message', '')
+        level = request.POST.get('level', 'info')
+        
+        if level == 'error':
+            javascript_logger.error(f"JS Log: {message}")
+        elif level == 'warning':
+            javascript_logger.warning(f"JS Log: {message}")
+        else:
+            javascript_logger.info(f"JS Log: {message}")
+            
+        return JsonResponse({'status': 'logged'})
+    except Exception as e:
+        javascript_logger.error(f"Error in log_javascript view: {str(e)}", exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)

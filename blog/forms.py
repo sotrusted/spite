@@ -63,14 +63,6 @@ class PostSearchForm(forms.Form):
         self.helper.form_method = 'get'
         self.helper.add_input(Submit('submit', 'Search'))
 
-'''
-                Row(
-                    Column('title', css_class='form-group col-md-6 mb-0'),
-                    Column('city', css_class='form-group col-md-3 mb-0'),
-                    css_class='form-row'
-                ),
-                '''
-
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

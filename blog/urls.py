@@ -10,7 +10,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     offline_view, all_posts, get_comment_form_html,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
-                    loading_screen)
+                    loading_screen, log_javascript)
+
 
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
@@ -52,6 +53,7 @@ urlpatterns = [
     path('media-flow/', media_flow, name='media-flow'),
     path('media-flow-standalone/', media_flow_standalone, name='media-flow-standalone'),
     path('loading/', loading_screen, name='loading-screen'),
+    path('log-js/', log_javascript, name='log_js'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

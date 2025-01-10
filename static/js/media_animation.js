@@ -4,30 +4,24 @@ class MediaAnimator {
         this.currentIndex = 0;
         this.container = document.createElement('div');
         this.container.className = 'media-animation-container';
-        this.transitionDuration = 500; // Reduced to 500ms
+        this.transitionDuration = 500;
         this.isPlaying = true;
+        console.log('MediaAnimator initialized');
     }
 
     async initialize() {
         try {
-            // Fetch media features from backend
             const response = await fetch('/api/media-features/');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('API Response:', data); // Debug log
-
-            if (!data.media_features || !Array.isArray(data.media_features)) {
-                throw new Error('Invalid media features data');
-            }
+            console.log('API Response:', data);
 
             this.mediaItems = data.media_features;
-            console.log('Media items loaded:', this.mediaItems.length); // Debug log
+            console.log('Media items loaded:', this.mediaItems.length);
 
-            // Only proceed if we have media items
             if (this.mediaItems.length > 0) {
-                this.sortMediaByFeatures();
                 this.createAnimationElements();
                 this.startAnimation();
             } else {
@@ -44,55 +38,8 @@ class MediaAnimator {
         }
     }
 
-    sortMediaByFeatures() {
-        // If no media items, return early
-        if (this.mediaItems.length === 0) return;
-
-        // Start with the first item
-        const sorted = [this.mediaItems[0]];
-        const remaining = this.mediaItems.slice(1);
-
-        // Keep finding the most similar item until we've used all items
-        while (remaining.length > 0) {
-            const lastItem = sorted[sorted.length - 1];
-            let nearestIndex = 0;
-            let minDistance = Infinity;
-
-            // Find the most similar remaining item
-            for (let i = 0; i < remaining.length; i++) {
-                if (!remaining[i].features || !lastItem.features) continue;
-                
-                const distance = this.calculateDistance(
-                    remaining[i].features, 
-                    lastItem.features
-                );
-                
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestIndex = i;
-                }
-            }
-
-            // Add the most similar item to sorted and remove from remaining
-            sorted.push(remaining[nearestIndex]);
-            remaining.splice(nearestIndex, 1);
-        }
-
-        this.mediaItems = sorted;
-    }
-
-    calculateDistance(features1, features2) {
-        // Simple Euclidean distance between feature vectors
-        if (!Array.isArray(features1) || !Array.isArray(features2)) return Infinity;
-        
-        return Math.sqrt(
-            features1.reduce((sum, val, i) => {
-                return sum + Math.pow((val - features2[i]), 2);
-            }, 0)
-        );
-    }
-
     createAnimationElements() {
+        console.log('Creating animation elements');
         this.container.innerHTML = `
             <div class="media-stage">
                 <div class="current-media"></div>
@@ -103,11 +50,11 @@ class MediaAnimator {
 
         document.body.appendChild(this.container);
 
-        // Add pause/play toggle
-        this.container.querySelector('.toggle-flow').addEventListener('click', () => {
+        const toggleButton = this.container.querySelector('.toggle-flow');
+        toggleButton.addEventListener('click', () => {
             this.isPlaying = !this.isPlaying;
-            this.container.querySelector('.toggle-flow').textContent = 
-                this.isPlaying ? 'Pause' : 'Play';
+            toggleButton.textContent = this.isPlaying ? 'Pause' : 'Play';
+            console.log('Animation:', this.isPlaying ? 'playing' : 'paused');
             if (this.isPlaying) this.startAnimation();
         });
     }
@@ -118,28 +65,21 @@ class MediaAnimator {
         const currentElement = this.container.querySelector('.current-media');
         const nextElement = this.container.querySelector('.next-media');
 
-        // Set up current media
         this.displayMedia(this.mediaItems[this.currentIndex], currentElement);
         
-        // Set up next media
         const nextIndex = (this.currentIndex + 1) % this.mediaItems.length;
         this.displayMedia(this.mediaItems[nextIndex], nextElement);
 
-        // Simple toggle without crossfade
         currentElement.style.display = 'flex';
         nextElement.style.display = 'none';
 
         setTimeout(() => {
-            // Instant switch
             currentElement.style.display = 'none';
             nextElement.style.display = 'flex';
+            console.log('Transitioning to next media:', nextIndex);
 
-            // Move to next item
             this.currentIndex = nextIndex;
-
-            // Queue up next transition immediately
             if (this.isPlaying) this.startAnimation();
-            
         }, this.transitionDuration);
     }
 
@@ -149,13 +89,16 @@ class MediaAnimator {
             return;
         }
         
+        const url = mediaItem.local_url || mediaItem.web_url;
         if (mediaItem.type === 'video') {
             element.innerHTML = `
                 <video autoplay loop muted playsinline>
-                    <source src="${mediaItem.local_url || mediaItem.web_url}" type="video/mp4">
+                    <source src="${url}" type="video/mp4">
                 </video>`;
+            console.log('Loading video:', url);
         } else {
-            element.innerHTML = `<img src="${mediaItem.local_url || mediaItem.web_url}" alt="Media item">`;
+            element.innerHTML = `<img src="${url}" alt="Media item">`;
+            console.log('Loading image:', url);
         }
     }
 }

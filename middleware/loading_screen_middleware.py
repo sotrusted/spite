@@ -14,6 +14,10 @@ class LoadingScreenMiddleware:
         logger.info(f"Cookies present: {request.COOKIES}")
         
         # Skip conditions with logging
+        if 'page' in request.GET:
+            logger.info("Skipping - pagination request")
+            return self.get_response(request)
+            
         if request.path.startswith('/static/'):
             logger.info("Skipping - static file")
             return self.get_response(request)
@@ -33,13 +37,18 @@ class LoadingScreenMiddleware:
         if request.path.startswith('/api/'):
             logger.info("Skipping - API request")
             return self.get_response(request)
+
+        # Check for search using the correct parameter 'query'
+        if 'query' in request.GET:
+            logger.info("Skipping - search request")
+            return self.get_response(request)
             
         if request.COOKIES.get('loading_complete'):
             logger.info("Skipping - loading already completed")
             return self.get_response(request)
 
         # If we get here, we need to show loading screen
-        target_url = request.path
+        target_url = f"{request.path}{'?' + request.GET.urlencode() if request.GET else ''}"
         loading_url = f"{reverse('loading-screen')}?to={quote(target_url)}"
         
         logger.info(f"Redirecting to loading screen. Target URL: {target_url}")

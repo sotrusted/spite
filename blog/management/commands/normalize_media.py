@@ -108,6 +108,13 @@ class Command(BaseCommand):
                 img.save(output, format='JPEG', quality=quality, optimize=True)
                 output.seek(0)
 
+                # Get original image size for logging
+                original_size = len(img_data)
+                
+                # Get compressed size for logging
+                compressed_data = output.getvalue()
+                compressed_size = len(compressed_data)
+                
                 # Save back to storage
                 if s3_client:
                     try:
@@ -118,6 +125,8 @@ class Command(BaseCommand):
                             ExtraArgs={'ContentType': 'image/jpeg'}
                         )
                         logger.info(f"Saved compressed image to S3: {file_field.name}")
+                        logger.info(f"Size reduced from {original_size/1024:.1f}KB to {compressed_size/1024:.1f}KB")
+                        successfully_normalized.add(post.id)
                     except Exception as e:
                         logger.error(f"Failed to upload to S3: {str(e)}")
                 else:
@@ -125,11 +134,26 @@ class Command(BaseCommand):
                         with open(file_field.path, 'wb') as f:
                             f.write(output.getvalue())
                         logger.info(f"Saved compressed image locally: {file_field.path}")
+                        logger.info(f"Size reduced from {original_size/1024:.1f}KB to {compressed_size/1024:.1f}KB")
+                        successfully_normalized.add(post.id)
                     except Exception as e:
                         logger.error(f"Failed to save local file: {str(e)}")
+
+                n += 1
+                # Save progress periodically
+                if n % 10 == 0:
+                    normalized_ids.update(successfully_normalized)
+                    with open(normalized_path, 'w') as f:
+                        json.dump(list(normalized_ids), f)
+                    logger.info(f"Progress saved: {n}/{total_posts} items processed")
 
             except Exception as e:
                 logger.error(f"Error processing post {post.id}: {str(e)}", exc_info=True)
                 continue
 
-        logger.info("Image normalization complete") 
+        # Final save of normalized images list
+        normalized_ids.update(successfully_normalized)
+        with open(normalized_path, 'w') as f:
+            json.dump(list(normalized_ids), f)
+
+        logger.info(f"Image normalization complete. Successfully processed {len(successfully_normalized)} images") 

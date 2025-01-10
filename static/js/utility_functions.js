@@ -1,3 +1,22 @@
+function logToBackend(message, level = 'info') {
+    // Get the current domain and construct the full URL
+    const baseUrl = window.location.origin;
+    
+    fetch(`${baseUrl}/log-js/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `message=${encodeURIComponent(message)}&level=${level}`
+    })
+    .catch(error => {
+        console.error('Error logging to backend:', error);
+        // Fallback to console logging if backend fails
+        console.log(`[${level}] ${message}`);
+    });
+}
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -367,13 +386,19 @@ function setWriteLinksScrollers() {
 
 
 function addPostToPage(post) {
+    const postId = post.id;
     const postList = document.getElementById('post-list');
+
+    // Check if post already exists
+    if (document.getElementById(`post-${postId}`)) {
+        console.log(`Post ${post.id} already exists in DOM`);
+        return null;
+    }
 
     const newPost = document.createElement('div');
     newPost.classList.add('item');
     newPost.classList.add('post');
 
-    const postId = post.id;
     newPost.id = `post-${postId}`;
 
     newPost.innerHTML = `
@@ -474,16 +499,15 @@ function addPostToPage(post) {
 
 function addCommentToPage(comment) {
     const postList = document.getElementById('post-list');
-
     const newComment = document.createElement('div');
     newComment.classList.add('item');
     newComment.classList.add('comment');
-
+    
     const commentId = comment.id;
     newComment.id = `comment-${commentId}`;
-
+    
     comment.name = comment.name || "Anonymous";
-
+    
     newComment.innerHTML = `
         <h2 class="${comment.title}">
             Re: 
@@ -493,41 +517,31 @@ function addCommentToPage(comment) {
         </h2>
         <div class="post-content">
             <strong>${comment.name}</strong>: ${comment.content}
+            ${comment.media_file && comment.is_video ? `
+                <div class="video-container">
+                    <video controls>
+                        <source src="${comment.media_file.url}" type="video/mp4">
+                    </video>
+                </div>` : ''}
+            ${comment.media_file && comment.is_image ? `
+                <div class="image-container">
+                    <img src="${comment.media_file.url}" alt="Comment image">
+                </div>` : ''}
+            ${comment.image ? `
+                <div class="image-container">
+                    <img src="${comment.image.url}" alt="Comment image">
+                </div>` : ''}
         </div>
         <div class="menu">
             <p><em>${comment.created_on}</em></p>
-
-            <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="toggle-reply">Reply</a>
+            <a href="javascript:void(0);" id="toggle-reply-${commentId}" class="toggle-reply">Reply</a>
         </div>
-        <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+        <div id="reply-form-${commentId}" class="reply-form" style="display: none;">
         </div>
     `;
-    postList.prepend(newComment); // Add the new post to the top of the list
 
-    newComment.classList.add("highlight");
-    setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
-
-    // Add comment to the comments list if it exists
-    const commentsListDiv = document.querySelector(`#comments-list-${comment.post_id}`);
-    if (commentsListDiv) {
-        const commentElement = document.createElement('div');
-        commentElement.className = 'comment';
-        commentElement.innerHTML = `
-            <strong>${comment.name}</strong>: ${comment.content}
-            <p><em>${comment.created_on}</em></p>
-        `;
-        commentsListDiv.appendChild(commentElement);
-
-        // Update comment count in toggle button
-        const toggleButton = document.querySelector(`#toggle-comments-${comment.post_id}`);
-        if (toggleButton) {
-            const currentCount = parseInt(toggleButton.textContent.match(/\d+/)[0]);
-            toggleButton.textContent = `Comments (${currentCount + 1})`;
-        }
-    }
-
-    attachEventListeners();
-    return newPost;
+    // Rest of your existing code...
+    return newComment;
 }
 
 function loadCommentForm(postId) {
@@ -571,6 +585,18 @@ function loadCommentForm(postId) {
 }
 
 function submitCommentForm(formElement, postId) {
+    // Prevent double submission
+    const submitButton = formElement.querySelector('button[type="submit"]');
+    if (submitButton && submitButton.disabled) {
+        return;
+    }
+    
+    // Disable submit button
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.value = 'Submitting...';
+    }
+
 
     const formData = new FormData(formElement); // Create a FormData object for the form
 
@@ -585,8 +611,10 @@ function submitCommentForm(formElement, postId) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
+            logToBackend(`Comment submitted: ${data.comment}`, 'info');
             if (data.success) {
                 console.log("Comment submitted:", data.comment);
+                logToBackend(`Comment submitted: ${data.comment.id}`, 'info');
 
                 // Optionally add the comment to the page
                 addCommentToPage(data.comment);
@@ -600,9 +628,23 @@ function submitCommentForm(formElement, postId) {
         })
         .catch(error => {
             console.error("Error:", error);
-        });
+        })
+        .finally(() => {
+            // Re-enable submit button
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+        }, 1000);
+
 }
 
+
+
+
+// Usage examples:
+logToBackend('User clicked pagination', 'info');
+logToBackend('Error loading comments', 'error');
+logToBackend('Missing user data', 'warning');
 
 // Attach to window object to make it globally accessible
 window.refreshCSRFToken = refreshCSRFToken;
@@ -611,5 +653,6 @@ window.attachEventListeners = attachEventListeners;
 window.scrollToElementById = scrollToElementById;
 window.showModalIfNeeded = showModalIfNeeded;
 window.attachToggleReplyButtons = attachToggleReplyButtons;
+window.logToBackend = logToBackend;
 
 
