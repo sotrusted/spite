@@ -119,7 +119,11 @@ ROOT_URLCONF = 'spite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'templates/blog'),
+            os.path.join(BASE_DIR, 'templates/spite'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

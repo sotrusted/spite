@@ -18,7 +18,7 @@ const notificationSound = document.getElementById("notification-sound");
 postSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     console.log(data);
-    const post = data.message;
+    const post = data.post || data.message;
 
     // Check if the post already exists in the DOM
     if (!document.getElementById(`post-${post.id}`)) {
@@ -54,7 +54,7 @@ postSocket.onmessage = function (e) {
 commentSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     console.log(data);
-    const comment = data;
+    const comment = data || data.comment || data.message;
 
     // Check if the post already exists in the DOM
     if (!document.getElementById(`comment-${comment.id}`)) {
@@ -71,6 +71,10 @@ commentSocket.onmessage = function (e) {
 
         // Add the post to the DOM
         addCommentToPage(comment);
+
+        attachCopyLinks();
+        attachEventListeners();
+        attachToggleReplyButtons();
 
      } else {
         console.log(`Comment with ID ${comment.id} already exists.`);

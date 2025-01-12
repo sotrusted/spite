@@ -113,18 +113,26 @@ def broadcast_new_comment(sender, instance, created, **kwargs):
             "content": instance.content,
             "name": instance.name,
             "created_on": localtime(instance.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+            "media_file": {
+                "url": instance.media_file.url if instance.media_file else None,
+            } if instance.media_file else None,
+            "is_image": instance.is_image(),
+            "is_video": instance.is_video(),
+            "parent_comment": {
+                "id": instance.parent_comment.id,
+                "content": instance.parent_comment.content,
+                "name": instance.parent_comment.name
+            } if instance.parent_comment else None
         }
-        logger.info(message)
 
-        # Validate JSON
         try:
-            json.dumps(message, cls=DjangoJSONEncoder)  # Ensure serializability
+            json.dumps(message, cls=DjangoJSONEncoder)
             async_to_sync(channel_layer.group_send)(
                 "comments", 
                 {"type": "comment_message", "message": message}
             )
         except TypeError as e:
-            print(f"JSON serialization error: {e}")
+            logger.error(f"JSON serialization error: {e}")
 
 
 # @receiver(post_save, sender=Post)

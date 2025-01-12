@@ -25,7 +25,8 @@ class PostConsumer(AsyncWebsocketConsumer):
     async def post_message(self, event):
         # Send the message to WebSocket
         await self.send(text_data=json.dumps({
-            "message": event["message"]
+            "success": True,
+            "post": event["message"]
         }))
 
 
@@ -41,4 +42,7 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
     async def comment_message(self, event):
         # Send the comment message to the WebSocket
-        await self.send(text_data=json.dumps(event["message"]))
+        await self.send(text_data=json.dumps({
+            "success": True,
+            "comment": event["message"]
+        }))

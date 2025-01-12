@@ -97,9 +97,9 @@ class Post(models.Model):
     
     def is_image(self):
         """Check if the media_file is an image."""
-        if self.image: 
+        if hasattr(self, 'image') and self.image: 
             return True
-        if not self.media_file: 
+        if not hasattr(self, 'media_file') or not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else self.image.name)
 
@@ -111,9 +111,9 @@ class Post(models.Model):
 
     def is_video(self):
         """Check if the media_file is a video."""
-        if self.image:
+        if hasattr(self, 'image') and self.image:
             return False
-        if not self.media_file: 
+        if not hasattr(self, 'media_file') or not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
@@ -174,10 +174,7 @@ class Comment(models.Model):
         logger.info(f"media_file: {self.media_file}")
         logger.info(f"image: {getattr(self, 'image', None)}")
         
-        if hasattr(self, 'image') and self.image: 
-            logger.info("Has image field")
-            return True
-        if not self.media_file: 
+        if not hasattr(self, 'media_file') or not self.media_file: 
             logger.info("No media file")
             return False
             
@@ -195,9 +192,7 @@ class Comment(models.Model):
 
     def is_video(self):
         """Check if the media_file is a video."""
-        if self.image:
-            return False
-        if not self.media_file: 
+        if not hasattr(self, 'media_file') or not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')

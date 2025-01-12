@@ -393,12 +393,22 @@ def add_comment(request, post_id, post_type='Post'):
                 return JsonResponse({
                     'success': True,
                     'comment': {
+                        'id': comment.id,
+                        'post_id': post.id,
+                        'post_title': post.title,
                         'name': comment.name,
                         'content': comment.content,
                         'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
                         'media_file': {
-                            'url': comment.media_file.url if comment.media_file.url else None,
+                            'url': comment.media_file.url if comment.media_file else None,
                         } if comment.media_file else None,
+                        'is_image': comment.is_image(),
+                        'is_video': comment.is_video(),
+                        'parent_comment': {
+                            'id': parent_comment.id,
+                            'content': parent_comment.content,
+                            'name': parent_comment.name
+                        } if parent_comment else None
                     }
                 })
 

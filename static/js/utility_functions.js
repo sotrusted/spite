@@ -40,6 +40,17 @@ function setCookie(name, value, days) {
 }
 
 
+function scrollToElementById(id) {
+    const targetElement = document.getElementById(id);
+    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+    const offset = 100; // Adjust this value for desired spacing
+    console.log(targetPosition - offset)
+    window.scrollTo({
+        top: targetPosition - offset,
+    });
+}
+
+
 // Function to save input and hide the modal
 function saveInput() {
     // Select all input elements with the class or ID "user-input"
@@ -206,92 +217,73 @@ function attachCopyLinks() {
 
 // Attach submit event to all comment forms
 function attachEventListeners() {
+    // Handle regular comment forms
     document.querySelectorAll('form[id^="comment-form-"]').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent default form submission
+        if (!form.hasAttribute('data-listener-attached')) {
+            form.setAttribute('data-listener-attached', 'true');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const url = this.action;
 
-            const formData = new FormData(this);
-            const postId = this.id.split('-').pop(); // Extract post ID from form ID
-            const url = this.action; // Form action URL
-
-            // Perform AJAX request
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
-                },
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Clear the form
-                    this.reset();
-
-                    // Append the new comment to the comment list
-                    const commentList = document.getElementById(`comments-list-${postId}`);
-                    const newComment = document.createElement('div');
-                    newComment.classList.add('comment');
-                    newComment.innerHTML = `
-                        <strong>${data.comment.name || 'Anonymous'}</strong>: ${data.comment.content}
-                        <p><em>${data.comment.created_on}</em></p>
-                    `;
-                    commentList.appendChild(newComment);
-
-                    // Make sure the comments container is visible
-                    const commentsContainer = document.getElementById(`comments-container-${postId}`);
-                    commentsContainer.style.display = 'block';
-                } else {
-                    alert('Failed to add comment. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while adding the comment.');
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.reset();
+                        console.log("Comment submitted successfully");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
             });
-        });
-    });
-
-
-    // Automatically expand comments if data-has-comments is true
-    console.log("Expanding comments...");
-    document.querySelectorAll('.comments-container').forEach(container => {
-        const hasComments = container.dataset.hasComments === 'true';
-        console.log(hasComments);
-
-        if (hasComments) {
-            container.style.display = 'block';
-            console.log('Expanded');
         }
     });
 
-    // Add click listeners for toggling comments
-    document.querySelectorAll('.toggle-comments').forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.dataset.postId;
-            const commentsContainer = document.getElementById(`comments-container-${postId}`);
-            if (commentsContainer) {
-                commentsContainer.style.display = 
-                    commentsContainer.style.display === 'none' ? 'block' : 'none';
-            }
-        });
+    // Handle reply forms
+    document.querySelectorAll('form[id^="reply-form-"]').forEach(form => {
+        if (!form.hasAttribute('data-listener-attached')) {
+            form.setAttribute('data-listener-attached', 'true');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const url = this.action;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.reset();
+                        this.closest('.reply-form').style.display = 'none';
+                        console.log("Reply submitted successfully");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        }
     });
 
-
-    setWriteLinksScrollers();
-
-    document.querySelectorAll('#feed-scroller').forEach(a => {
-       a.addEventListener('click', function() {
-            scrollToElementById('recent-posts');
-       });
-    });
-
-
+    // Attach other event listeners
     attachToggleReplyButtons();
-
-
-}; 
+    setWriteLinksScrollers();
+    
+    document.querySelectorAll('#feed-scroller').forEach(a => {
+        a.addEventListener('click', () => scrollToElementById('recent-posts'));
+    });
+}
 
 
 function disableSubmitButton() {
@@ -366,15 +358,6 @@ function showNewCommentNotification(message) {
     }, 10000); // Hide after 10 seconds
 }
 
-function scrollToElementById(id) {
-    const targetElement = document.getElementById(id);
-    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
-    const offset = 100; // Adjust this value for desired spacing
-    console.log(targetPosition - offset)
-    window.scrollTo({
-        top: targetPosition - offset,
-    });
-}
 
 function setWriteLinksScrollers() {
     document.querySelectorAll('.post-link').forEach(a => {
@@ -497,50 +480,89 @@ function addPostToPage(post) {
     return newPost;
 }
 
+function createCommentElement(comment, isInline = false) {
+    const element = document.createElement('div');
+    element.classList.add('comment');
+    
+    if (isInline) {
+        element.id = `comment-${comment.id}-inline`;
+        // Match detail.html inline comment format
+        element.innerHTML = `
+            <strong>${comment.name || 'Anonymous'}</strong>: ${comment.content}
+            ${comment.media_file || comment.image ? `
+                <div class="image-container">
+                    ${comment.media_file && comment.is_video ? `
+                        <video controls>
+                            <source src="${comment.media_file.url}" type="video/mp4">
+                        </video>` : ''}
+                    ${comment.media_file && comment.is_image ? `
+                        <img src="${comment.media_file.url}" alt="Comment image" loading="lazy">` : ''}
+                    ${comment.image ? `
+                        <img src="${comment.image.url}" alt="Comment image" loading="lazy">` : ''}
+                </div>` : ''}
+            <p><em>${comment.created_on}</em></p>
+        `;
+    } else {
+        // Match comment.html format for feed view
+        element.classList.add('item');
+        element.id = `comment-${comment.id}`;
+        element.innerHTML = `
+            <h2>
+                Re: <a href="/post/${comment.post_id}">
+                    ${comment.post_title}
+                </a>
+            </h2>
+            <div class="post-content">
+                <strong>${comment.name || 'Anonymous'}</strong>: ${comment.content}
+                ${comment.media_file || comment.image ? `
+                    <div class="image-container">
+                        ${comment.media_file && comment.is_video ? `
+                            <div class="video-container">
+                                <video controls>
+                                    <source src="${comment.media_file.url}" type="video/mp4">
+                                </video>
+                            </div>` : ''}
+                        ${comment.media_file && comment.is_image ? `
+                            <div class="image-container">
+                                <img src="${comment.media_file.url}" alt="Comment image">
+                            </div>` : ''}
+                        ${comment.image ? `
+                            <div class="image-container">
+                                <img src="${comment.image.url}" alt="Comment image">
+                            </div>` : ''}
+                    </div>` : ''}
+            </div>
+            <div class="menu">
+                <p><em>${comment.created_on}</em></p>
+                <a href="javascript:void(0);" id="toggle-reply-${comment.id}" class="toggle-reply">Reply</a>
+            </div>
+            <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+            </div>
+        `;
+    }
+
+    return element;
+}
+
 function addCommentToPage(comment) {
     const postList = document.getElementById('post-list');
-    const newComment = document.createElement('div');
-    newComment.classList.add('item');
-    newComment.classList.add('comment');
-    
-    const commentId = comment.id;
-    newComment.id = `comment-${commentId}`;
-    
-    comment.name = comment.name || "Anonymous";
-    
-    newComment.innerHTML = `
-        <h2 class="${comment.title}">
-            Re: 
-            <a href="/post/${comment.post_id}">
-                ${comment.post_title}
-            </a>
-        </h2>
-        <div class="post-content">
-            <strong>${comment.name}</strong>: ${comment.content}
-            ${comment.media_file && comment.is_video ? `
-                <div class="video-container">
-                    <video controls>
-                        <source src="${comment.media_file.url}" type="video/mp4">
-                    </video>
-                </div>` : ''}
-            ${comment.media_file && comment.is_image ? `
-                <div class="image-container">
-                    <img src="${comment.media_file.url}" alt="Comment image">
-                </div>` : ''}
-            ${comment.image ? `
-                <div class="image-container">
-                    <img src="${comment.image.url}" alt="Comment image">
-                </div>` : ''}
-        </div>
-        <div class="menu">
-            <p><em>${comment.created_on}</em></p>
-            <a href="javascript:void(0);" id="toggle-reply-${commentId}" class="toggle-reply">Reply</a>
-        </div>
-        <div id="reply-form-${commentId}" class="reply-form" style="display: none;">
-        </div>
-    `;
+    const newComment = createCommentElement(comment);
+    postList.insertBefore(newComment, postList.firstChild);
 
-    // Rest of your existing code...
+    // Add to comment list if it exists
+    const commentList = document.getElementById(`comments-list-${comment.post_id}`);
+    if (commentList) {
+        const inlineComment = createCommentElement(comment, true);
+        commentList.appendChild(inlineComment);
+
+        // Update comment count if button exists
+        const commentButton = document.getElementById(`toggle-comments-${comment.post_id}`);
+        if (commentButton) {
+            const currentCount = parseInt(commentButton.textContent.match(/\d+/)[0]);
+            commentButton.textContent = `Comments (${currentCount + 1})`;
+        }
+    }
+
     return newComment;
 }
 

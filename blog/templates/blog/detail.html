@@ -57,6 +57,20 @@
                     {% for comment in post.get_recent_comments %}
                         <div class="comment">
                             <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
+                            {% if comment.media_file or comment.image %}
+                            <div class="image-container">
+                                {% if comment.media_file and comment.is_video %}
+                                    <video controls>
+                                        <source src="{{ comment.media_file.url }}" type="video/mp4">
+                                    </video>
+                                {% elif comment.media_file and comment.is_image %}
+                                    <img src="{{ comment.media_file.url }}" alt="Comment image" loading="lazy">
+                                {% elif comment.image %}
+                                    <img src="{{ comment.image.url }}" alt="Comment image" loading="lazy">
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
                             <p><em>{{ comment.created_on }}</em></p>
                         </div>
                     {% endfor %}
