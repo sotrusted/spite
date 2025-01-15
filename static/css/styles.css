@@ -646,7 +646,7 @@ main {
         -ms-touch-action: manipulation; /* For older IE/Edge support */
     }
     h2 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     p {
         font-size 0.9rem;

@@ -8,11 +8,11 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GP22W6QCYV" defer></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-    gtag('config', 'G-GP22W6QCYV');
+        gtag('config', 'G-GP22W6QCYV');
     </script>
 
     <meta charset="UTF-8">
@@ -23,6 +23,11 @@
         <meta property="og:title" content="SPITE Magazine">
         <meta property="og:description" content="Anyone can write for spite">
         <meta property="og:image" content="https://spite.fr/static/media/spite-logo.webp">
+        {% if debug %}
+            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+            <meta http-equiv="Pragma" content="no-cache">
+            <meta http-equiv="Expires" content="0">
+        {% endif %}
     {% endblock %}
 
     {% block title %}
@@ -39,11 +44,12 @@
         href="{% static 'media/anon.webp' %}" 
         type="image/webp"
         fetchpriority="high"
+        as="image"
         >
     {% endblock %}
     {% block stylesheets %}        
         {% compress css %}
-        <link rel="preload" href="{% static 'css/styles.css' %}" rel="stylesheet">
+            <link rel="preload" href="{% static 'css/styles.css' %}" rel="stylesheet">
         {% endcompress %}
     {% endblock %}
     {% progressive_web_app_meta %}
@@ -59,11 +65,16 @@
             margin: 0 auto;  /* Center horizontally */
             display: block;  /* Needed for margin auto to work */
         }
-
     </style>
+
+    {% block head_scripts %}
+        <script type="module" src="{% static 'js/modules/load_document_functions.js' %}"></script>
+    {% endblock %}
+
 </head>
 <body>
 {% block submission %}
+{% if not ip_has_submitted %}
 <div id="modal-overlay">
     <div id="list-submission">
         <label for="user-input">Enter a NAME onto the INTERESTING LIST to continue</label><br>
@@ -71,6 +82,7 @@
         <button onclick="saveInput()">Submit</button>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block spitebar %}
@@ -176,27 +188,13 @@
     }
 
     </script>
-Register the service worker -->
-
+    Register the service worker -->
+        // Load modules
+        <script type="module" src="{% static 'js/modules/utility_functions.js' %}"></script>
+        <script type="module" src="{% static 'js/ajax_posts.js' %}" defer></script>
+        <script type="module" src="{% static 'js/websocket_updates.js' %}" defer></script>
+        <script type="module" src="{% static 'js/base.js' %}"></script>
         {% compress js %}
-            <script src="{% static 'js/utility_functions.js' %}" defer></script>
-            <script defer>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Function to get CSRF token from cookies
-
-
-
-                refreshCSRFToken();
-                attachEventListeners();
-                attachCopyLinks();
-
-                showModalIfNeeded();
-
-            });
-            </script>
-
-            <script src="{% static 'js/ajax_posts.js' %}" defer></script>
-            <script src="{% static 'js/websocket_updates.js' %}" defer></script>
             <script src="{% static 'js/snowfall.js' %}" defer></script>
         {% endcompress %}
     {% endblock %}

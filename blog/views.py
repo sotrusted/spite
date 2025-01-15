@@ -88,8 +88,22 @@ def home(request):
     
     # Get the immediate total count
     total_pageviews = cache.get('current_total_views', 0)
+
+    # Cache the IP submission status for each IP
+    client_ip = get_client_ip(request)
+    cache_key = f'ip_submitted_{client_ip}'
     
-    return render(request, 'blog/home.html', {'pageview_count': total_pageviews})
+    ip_has_submitted = cache.get(cache_key)
+    if ip_has_submitted is None:
+        # Only hit the database if not in cache
+        ip_has_submitted = List.objects.filter(ip_address=client_ip).exists()
+        # Cache for 1 hour (3600 seconds)
+        cache.set(cache_key, ip_has_submitted, 60 * 60 * 7)
+
+    
+    return render(request, 'blog/home.html', 
+                {'pageview_count': total_pageviews,
+                 'ip_has_submitted': ip_has_submitted})
 
 def all_posts(request):
     _, posts, _ = get_posts()
@@ -354,7 +368,18 @@ def reply_comment(request, comment_id):
                         'is_image': comment.is_image(),
                         'is_video': comment.is_video(),
                         'post_id': post.id,
-                        'post_title': post.title
+                        'post_title': post.title,
+                        'post_content': post.content,
+                        'post_media_file': {
+                            'url': post.media_file.url if post.media_file else None,
+                        } if post.media_file else None,
+                        'has_parent_comment': comment.has_parent_comment(),
+                        'parent_comment_id': comment.parent_comment.id if comment.has_parent_comment() else None,
+                        'parent_comment_content': comment.parent_comment.content if comment.has_parent_comment() else None,
+                        'parent_comment_name': comment.parent_comment.name if comment.has_parent_comment() else None,
+                        'parent_comment_media_file': {
+                            'url': comment.parent_comment.media_file.url if comment.parent_comment.media_file else None,
+                        } if comment.parent_comment.media_file else None,
                     }
                 })
 
@@ -441,20 +466,29 @@ def get_comment_form(request, post_id):
         'action_url': f'/add-comment/{post_id}/',
     })
 
-def get_comment_reply_form(request, comment_id):
+def get_comment_reply_form_html(request, comment_id):
     """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
-    comment = Comment.objects.filter(id=comment_id).exists()
+    try:
+        comment = Comment.objects.filter(id=comment_id).exists()
 
-    if not comment:
-        return JsonResponse({'error': 'Comment not found'}, status=404)
-
-    form = CommentForm()
-    form_html = as_crispy_form(form)
-
-    return JsonResponse({
-        'form': form_html,
-        'action_url': f'/add-comment/comment/{comment_id}/',
-    })
+        if not comment:
+            return JsonResponse({'error': 'Comment not found'}, status=404)
+        
+        form = CommentForm()
+        form_html = render_to_string('blog/partials/comment_form.html',
+                                        {'comment_form': form,
+                                        'post_id' : comment.post.id,},
+                                        request=request  # Pass the request to include CSRF token
+                                    )
+        action_url = reverse("reply_comment", args=[comment.id])            
+        logger.info(f"Debug: Generated action_url = {action_url}")
+        return JsonResponse({
+            'form': form_html,
+            'action_url': action_url, 
+        })
+    except Exception as e:
+        logger.error(f"Error in get_comment_reply_form_html: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 
@@ -478,14 +512,13 @@ def get_comment_form_html(request, post_id):
 
         action_url = reverse('add_comment', args=[post_id])
         logger.info(f"Debug: Generated action_url = {action_url}")  # Debugging action_url
-        # Append the button
         return JsonResponse({
             'form': form_html,
             'action_url': action_url, 
         })
     except Exception as e:
         # Log the exception for debugging
-        logger.info(f"Error in get_comment_form_html: {e}")
+        logger.error(f"Error in get_comment_form_html: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
 

@@ -8,6 +8,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     preview_pdf_template, search_results,
                     store_page, add_comment, reply_comment, get_csrf_token, 
                     offline_view, all_posts, get_comment_form_html,
+                    get_comment_reply_form_html,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
                     loading_screen, log_javascript)
@@ -46,6 +47,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('sitemap.xml.gz', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
     path('api/get-comment-form-html/<int:post_id>/', get_comment_form_html, name='get_comment_form_html'),
+    path('api/get-comment-reply-form/<int:comment_id>/', get_comment_reply_form_html, name='get_comment_reply_form'),
     path('api/save-list/', SaveListView.as_view(), name='save_list'),
     path('api/word-cloud/', get_word_cloud, name='word_cloud'),
     path('stream-posts/', download_posts_as_html_stream, name='stream_posts'),
@@ -53,7 +55,8 @@ urlpatterns = [
     path('media-flow/', media_flow, name='media-flow'),
     path('media-flow-standalone/', media_flow_standalone, name='media-flow-standalone'),
     path('loading/', loading_screen, name='loading-screen'),
-    path('log-js/', log_javascript, name='log_js'),
+    path('api/log-js/', log_javascript, name='log_js'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

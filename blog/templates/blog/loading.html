@@ -1,7 +1,9 @@
 {% load static %}
+{% load compress %}
 <!DOCTYPE html>
 <html>
 <head>
+    {% compress css inline %}
     <style>
         /* Critical CSS for hero section */
         .hero-image {
@@ -90,30 +92,10 @@
             100% { transform: translateX(300%); }
         }
     </style>
+    {% endcompress %}
 
-    <script src="{% static 'js/log_to_backend.js' %}"></script>
-    <script>
-        console.log("Loading screen initialized");
-        
-        // Set cookie and log it
-        document.cookie = "loading_complete=true; path=/";
-        console.log("Set loading_complete cookie");
-        console.log("Current cookies:", document.cookie);
-        
-        // Redirect with logging
-        setTimeout(() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetUrl = urlParams.get('to');
-            
-            logToBackend(`URL Params - to: ${targetUrl}`, 'info');
 
-            if (targetUrl) {
-                console.log("Redirecting to:", targetUrl);
-                logToBackend(`Redirecting to: ${targetUrl}`, 'info');
-                window.location.href = targetUrl;
-            }
-        }, 100);
-    </script>
+    <script type="module" src="{% static 'js/loading.js' %}"></script>
 </head>
 <body>
     <div class="site-loading-splash">

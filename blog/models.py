@@ -21,10 +21,18 @@ def validate_media_file(value):
     if not mime_type or not mime_type.startswith(('image/', 'video/')):
         raise ValidationError("File must be an image or a video.")
 
+
 def validate_video_file_size(file):
     max_size_mb = 50
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError(f"File size exceeds {max_size_mb} MB.")
+
+
+def get_image_filename(instance, filename):
+    title = instance.personal.title
+    slug = slugify(title)
+    return "uploads/%s-%s" % (slug, filename)
+
 
 
 class Post(models.Model):
@@ -49,8 +57,6 @@ class Post(models.Model):
     #meta/not implemented
     like_count = models.PositiveIntegerField(default=0)
     parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
-    
-
 
     # deprecated
     city = models.CharField(max_length=100, blank=True, null=True, verbose_name='city or neighborhood')
@@ -139,12 +145,6 @@ class Post(models.Model):
         ]
 
 
-def get_image_filename(instance, filename):
-    title = instance.personal.title
-    slug = slugify(title)
-    return "uploads/%s-%s" % (slug, filename)
-
-
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
 
@@ -172,11 +172,7 @@ class Comment(models.Model):
         """Check if the media_file is an image."""
         logger.info(f"Checking is_image for comment {self.id}")
         logger.info(f"media_file: {self.media_file}")
-        logger.info(f"image: {getattr(self, 'image', None)}")
         
-        if hasattr(self, 'image') and self.image: 
-            logger.info("Has image field")
-            return True
         if not self.media_file: 
             logger.info("No media file")
             return False
@@ -195,12 +191,16 @@ class Comment(models.Model):
 
     def is_video(self):
         """Check if the media_file is a video."""
-        if self.image:
-            return False
-        if not self.media_file: 
+        logger.info(f"Checking is_video for comment {self.id}")
+        logger.info(f"media_file: {self.media_file}")
+
+        if hasattr(self, 'media_file') and not self.media_file: 
             return False
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
+
+    def has_parent_comment(self):
+        return self.parent_comment is not None
     
 
 class SearchQueryLog(models.Model):

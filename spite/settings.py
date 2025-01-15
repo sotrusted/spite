@@ -211,7 +211,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
                     ]
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 STATIC_URL = 'https://spite.fr/static/'
@@ -226,11 +226,14 @@ STATICFILES_FINDERS = [
 # Use a timestamp for dynamic versioning
 STATIC_VERSION = str(int(time.time()))
 
+COMPRESS_ENABLED = True
+COMPRESS_URL = STATIC_URL
 COMPRESS_OFFLINE = True  # Enable offline compression for production
+COMPRESS_ROOT = STATIC_ROOT
 
 COMPRESS_OFFLINE_CONTEXT = {
-    'STATIC_URL': os.path.join(BASE_DIR, 'static'),
-    'MEDIA_URL': os.path.join(BASE_DIR, 'media'),
+    'STATIC_URL': 'https://spite.fr/static/',  # Match your STATIC_URL
+    'MEDIA_URL': 'https://spite.fr/media/',    # Match your MEDIA_URL
     'STATIC_VERSION': STATIC_VERSION,
 }
 
@@ -416,6 +419,7 @@ PWA_APP_ICONS = [
     }
 ]
 PWA_APP_OFFLINE_PAGE = '/offline/'  # URL for offline fallback page
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static', 'sw.js')
 
 OPENAI_SECRET_KEY = env('OPENAI_SECRET_KEY')
 OPENAI_ORGANIZATION_KEY = env('OPENAI_ORGANIZATION_KEY')
@@ -461,3 +465,4 @@ if DEBUG:
     }
 
 
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

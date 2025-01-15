@@ -54,33 +54,13 @@
 		<p>My only choice is to create my own online publication. I have playfully dubbed it <em>Spite</em>.</p>
 		<p><em>Anyone can write for Spite.</em></p>
     </div>
-    <div id="list-submission">
-        <label for="user-input">Enter a NAME onto the INTERESTING LIST</label><br>
-        <input type="text" id="user-input" />
-        <button onclick="saveInput()">Submit</button>
-    </div>
-
-    <!--
-    {% if highlight_comments %}
-    <div class="comment-highlight">
-        <h2 class="section-header">recent comments</h2>
-        {% for comment in highlight_comments %}
-            <div class="comment">
-                <strong>
-                    {{ comment.name|default:"Anonymous" }}
-                </strong>: {{ comment.content }}
-                <p><em>{{ comment.created_on }}</em></p>
-                <p>Posted on: 
-                    <a href="{% url 'post-detail' comment.post.id %}">
-                        {{ comment.post.title }}
-                    </a>
-                </p>
-            </div>
-        {% endfor %}
-    </div>
+    {% if not ip_has_submitted %}
+        <div id="list-submission">
+            <label for="user-input">Enter a NAME onto the INTERESTING LIST</label><br>
+            <input type="text" id="user-input" />
+            <button onclick="saveInput()">Submit</button>
+        </div>
     {% endif %}
--->
-
 </div>
 {% endblock %}
 
