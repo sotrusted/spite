@@ -63,6 +63,8 @@ class Post(models.Model):
     contact = models.TextField(blank=True, null=True, verbose_name='contact info')
     description = models.TextField(blank=True, null=True)
 
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
     def __str__(self):
         return f'{self.id} - {self.title}'
 

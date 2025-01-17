@@ -28,7 +28,7 @@ export function initPostWebsocketUpdates() {
             updateSpiteCounter();
 
             // Display notification
-            showNewPostNotification(post, notificationTitle, notificationButton);
+            showNewPostNotification(post);
 
             // Add the post to the DOM
             addPostToPage(post);

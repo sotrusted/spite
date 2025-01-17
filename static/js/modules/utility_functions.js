@@ -46,6 +46,17 @@ function toggleContent(postId) {
     }
 }
 
+function attachToggleContentButtons() {
+    log("Attaching toggle content buttons");
+    const toggleContentButtons = document.querySelectorAll('a[id^="toggle-link-"]');
+    log(`Found ${toggleContentButtons.length} toggle content buttons`);
+    toggleContentButtons.forEach(a => {
+        a.addEventListener('click', function() {
+            toggleContent(a.id.replace('toggle-link-', ''));
+        });
+    });
+}
+
 function attachToggleReplyButtons() {
     log("Attaching toggle reply buttons");
     const toggleReplyButtons = document.querySelectorAll('a[id^="toggle-reply-"]');
@@ -123,7 +134,7 @@ function attachCopyLinks() {
 
 function attachToggleCommentsButtons() {
     log('Attaching toggle comments buttons');
-    const buttons = document.querySelectorAll('.toggle-comments');
+    const buttons = document.querySelectorAll('[id^="toggle-comments-"]');
     
     if (buttons.length === 0) {
         log('No toggle comments buttons found', 'warning');
@@ -133,11 +144,18 @@ function attachToggleCommentsButtons() {
     buttons.forEach(button => {
         if (!button.hasAttribute('data-listener-attached')) {
             button.setAttribute('data-listener-attached', 'true');
-            const postId = button.getAttribute('data-post-id');
+            
+            // Extract post ID from button ID instead of data attribute
+            const postId = button.id.replace('toggle-comments-', '');
             
             log(`Attaching click listener to comments button for post ${postId}`);
             
             button.addEventListener('click', function() {
+                if (!postId) {
+                    log('No post ID found for comments button', 'error');
+                    return;
+                }
+                
                 log(`Comments button clicked for post ${postId}`);
                 
                 const commentsContainer = document.getElementById(`comments-container-${postId}`);
@@ -240,6 +258,9 @@ export function attachEventListeners() {
 
     setWriteLinksScrollers();
     log('Write links scrollers attached');
+
+    attachToggleContentButtons();
+    log('Toggle content buttons attached');
 
     attachCopyLinks();
     log('Copy links attached');
@@ -385,7 +406,7 @@ export function addPostToPage(post) {
                         ${post.content ? `<p>${post.content}</p>` : ''}
                     </div>
                     <div class="menu">
-                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
+                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}">Expand</a>
                         <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
                     </div>
                     ${post.display_name ? `<p class="post-author">by ${post.display_name}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
@@ -638,9 +659,7 @@ function loadReplyForm(commentId, postId) {
 function submitCommentForm(formElement, postId) {
     // Prevent double submission
     const submitButton = formElement.querySelector('button[type="submit"]');
-    if (submitButton && submitButton.disabled) {
-        return;
-    }
+    if (submitButton?.disabled) return;
     
     // Disable submit button
     if (submitButton) {
@@ -659,32 +678,33 @@ function submitCommentForm(formElement, postId) {
             'X-Requested-With': 'XMLHttpRequest', 
         },
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            logToBackend(`Comment submitted: ${data.comment}`, 'info');
-            if (data.success) {
-                console.log("Comment submitted:", data.comment);
-                logToBackend(`Comment submitted: ${data.comment.id}`, 'info');
-
-                // Optionally add the comment to the page
-                addCommentToPage(data.comment);
-
-                // Reset the form
-                form.reset();
-            } else {
-                console.error("Error submitting comment:", data.errors);
-                displayFormErrors(form, data.errors); // Display validation errors
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        })
-        .finally(() => {
-            // Re-enable submit button
-            if (submitButton) {
-                submitButton.disabled = false;
-            }
-        }, 1000);
-
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        logToBackend(`Comment submitted successfully`, 'info');
+        if (data.success) {
+            formElement.reset();
+            
+            // Don't add comment here - let the websocket handle it
+            // This prevents duplicate comments
+            console.log("Comment submitted successfully");
+        } else {
+            console.error("Error submitting comment:", data.errors);
+            displayFormErrors(formElement, data.errors);
+        }
+    })
+    .catch(error => {
+        console.error("Error submitting comment:", error);
+        logToBackend(`Error submitting comment: ${error.message}`, 'error');
+    })
+    .finally(() => {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.value = 'Submit';
+        }
+    });
 }

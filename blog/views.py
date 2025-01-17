@@ -27,7 +27,7 @@ from blog.models import Post, Comment, SearchQueryLog, PageView, List
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
-from datetime import datetime 
+from datetime import datetime, timedelta
 from spite.context_processors import get_posts
 from django.http import StreamingHttpResponse
 from weasyprint import HTML
@@ -36,6 +36,9 @@ import numpy as np
 from django.conf import settings
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from difflib import SequenceMatcher
+import hashlib
+
 logger = logging.getLogger('spite')
 
 def write_ip(ip, *args, **kwargs):
@@ -45,6 +48,54 @@ def write_ip(ip, *args, **kwargs):
             if args or kwargs:
                 log.write(f'--- {" ".join([*args, *kwargs.values()])}')
             log.write('\n')
+
+
+def check_spam(request, content, author_name=''):
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
+    
+    # 1. Rate limiting
+    cache_key = f'post_count_{client_ip}'
+    post_count = cache.get(cache_key, 0)
+    
+    if post_count > 5:  # Max 5 posts per minute
+        return True, "Please wait a minute before posting again"
+    
+    # Increment post count
+    cache.set(cache_key, post_count + 1, 60)  # Expires in 60 seconds
+    
+    # 2. Check recent posts for similar content
+    recent_posts_key = f'recent_posts_{client_ip}'
+    recent_posts = cache.get(recent_posts_key, [])
+    
+    # Create content hash including name
+    content_to_check = f"{content.lower().strip()} {author_name.lower().strip()}"
+    content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
+    
+    # Check for duplicate or similar content
+    for recent_hash in recent_posts:
+        if content_hash == recent_hash:
+            return True, "This looks like a duplicate post"
+    
+    # Check content similarity with recent posts
+    for recent_post in Post.objects.filter(
+        date_posted__gte=now() - timedelta(minutes=5)
+    ).order_by('-date_posted')[:10]:
+        similarity = SequenceMatcher(
+            None,
+            content_to_check,
+            f"{recent_post.content.lower().strip()} {recent_post.display_name.lower().strip()}"
+        ).ratio()
+        
+        if similarity > 0.8:  # 80% similarity threshold
+            return True, "This content is too similar to a recent post"
+    
+    # Store this content hash
+    recent_posts.append(content_hash)
+    if len(recent_posts) > 10:  # Keep last 10 posts
+        recent_posts.pop(0)
+    cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
+    
+    return False, ""
 
 
 def log_ip1(request, *args, **kwargs):
@@ -113,71 +164,138 @@ def all_posts(request):
 class PostCreateView(CreateView):
     model = Post
     fields = ['title', 'content', 'media_file', 'display_name']
-
     template_name = 'blog/post_form.html'
     form_context_name = 'postForm'
     form = PostForm
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context[self.form_context_name] = self.form()
         return context
+
+    def check_spam(self, request, content, author_name=''):
+        client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
+        
+        # 1. Rate limiting
+        cache_key = f'post_count_{client_ip}'
+        post_count = cache.get(cache_key, 0)
+        
+        if post_count > 5:  # Max 5 posts per minute
+            return True, "Please wait a minute before posting again"
+        
+        # Increment post count
+        cache.set(cache_key, post_count + 1, 60)  # Expires in 60 seconds
+        
+        # 2. Check recent posts for similar content
+        recent_posts_key = f'recent_posts_{client_ip}'
+        recent_posts = cache.get(recent_posts_key, [])
+        
+        # Create content hash including name
+        content_to_check = f"{content.lower().strip()} {author_name.lower().strip()}"
+        content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
+        
+        # Check for duplicate or similar content
+        for recent_hash in recent_posts:
+            if content_hash == recent_hash:
+                return True, "This looks like a duplicate post"
+        
+        # Check content similarity with recent posts
+        for recent_post in Post.objects.filter(
+            date_posted__gte=localtime() - timedelta(minutes=5)
+        ).order_by('-date_posted')[:10]:
+            similarity = SequenceMatcher(
+                None,
+                content_to_check,
+                f"{recent_post.content.lower().strip()} {recent_post.display_name.lower().strip()}"
+            ).ratio()
+            
+            if similarity > 0.8:  # 80% similarity threshold
+                return True, "This content is too similar to a recent post"
+        
+        # Store this content hash
+        recent_posts.append(content_hash)
+        if len(recent_posts) > 10:  # Keep last 10 posts
+            recent_posts.pop(0)
+        cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
+        
+        return False, ""
  
     def post(self, request, *args, **kwargs):
-        logger.info("Request POST data: %s", request.POST)  # Log POST data
+        logger.info("Request POST data: %s", request.POST)
         logger.info("Request FILES data: %s", request.FILES)
-        # Log CSRF-related data
+        
         csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
         csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
         logger.info(f"CSRF token in POST data: {csrf_token_post}")
         logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
+
+        # Check for spam before processing the form
+        is_spam, spam_message = self.check_spam(
+            request, 
+            request.POST.get('content', ''), 
+            request.POST.get('display_name', '')
+        )
+        
+        if is_spam:
+            logger.warning(f"Spam detected: {spam_message}")
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False, 
+                    'error': spam_message
+                }, status=400)
+            # For non-AJAX requests, add error to messages
+            messages.error(request, spam_message)
+            return self.form_invalid(self.get_form())
+
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
         logger.info(f"Form data: {form.cleaned_data}")
-        post = form.save()
-        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, media file: {post.media_file}, display name {post.display_name}")
+        
+        # Save the form and get the post instance
+        post = form.save(commit=False)
+        
+        # Add IP address to the post
+        post.ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+                         self.request.META.get('REMOTE_ADDR')
+        
+        post.save()
+        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, "
+                   f"media file: {post.media_file}, display name {post.display_name}")
+        
         post = get_object_or_404(Post, pk=post.id)
+        
         # Return JSON response for AJAX requests
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 
-                                'post': {
-                                    'id': post.id,
-                                    'title': post.title,
-                                    'content': post.content,
-                                    'date_posted': localtime(post.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
-                                    'anon_uuid': post.anon_uuid,
-                                    'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
-                                    'city': post.city,
-                                    'contact': post.contact,
-                                    'media_file': {
-                                        'url': post.media_file.url if post.media_file.url else None,
-                                    } if post.media_file else None,
-                                    'display_name': post.display_name,
-                                    'image': post.image.url if post.image else None,
-                                    'is_image': post.is_image(), 
-                                    'is_video': post.is_video(),
-                                }})
+            return JsonResponse({
+                'success': True, 
+                'post': {
+                    'id': post.id,
+                    'title': post.title,
+                    'content': post.content,
+                    'date_posted': localtime(post.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                    'anon_uuid': post.anon_uuid,
+                    'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
+                    'city': post.city,
+                    'contact': post.contact,
+                    'media_file': {
+                        'url': post.media_file.url if post.media_file else None,
+                    } if post.media_file else None,
+                    'display_name': post.display_name,
+                    'image': post.image.url if post.image else None,
+                    'is_image': post.is_image(), 
+                    'is_video': post.is_video(),
+                }
+            })
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        logger.error("Form errors: %s", form.errors)  # Log the form errors
-        # Return JSON response for AJAX requests
+        logger.error("Form errors: %s", form.errors)
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
 
-''' 
-venv_activate = '/home/sargent/spite/.spite/bin/activate'
-
-try: 
-    subprocess.run(f'source {venv_activate} && python backup_database.py', shell=True, check=True, executable='/bin/bash')
-    print('Post uploaded, migrations run, and backup created successfully.')
-
-except subprocess.CalledProcessError as e:
-    print('Post uploaded and migrations run, but backup failed: {str(e)}')   
-'''
 
 class PostReplyView(PostCreateView):
     template_name = 'blog/post_reply.html'
@@ -402,35 +520,50 @@ def add_comment(request, post_id, post_type='Post'):
     if request.method == 'POST':
         form = CommentForm(request.POST, request.FILES)
         if form.is_valid():
-            comment = form.save(commit=False)
-            # every comment has a post
-            # if a comment is a child comment its post is the post of its parent 
-            comment.post = post
+            try:
+                comment = form.save(commit=False)
+                # every comment has a post
+                # if a comment is a child comment its post is the post of its parent 
+                comment.post = post
 
-        
-            if parent_comment: 
-                comment.parent_comment = parent_comment
+            
+                if parent_comment: 
+                    comment.parent_comment = parent_comment
 
-            comment.save()
+                comment.save()
 
-            # Return JSON response for AJAX requests
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'comment': {
-                        'name': comment.name,
-                        'content': comment.content,
-                        'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
-                        'media_file': {
-                            'url': comment.media_file.url if comment.media_file.url else None,
-                        } if comment.media_file else None,
-                    }
-                })
+                # Prepare consistent comment data structure
+                comment_data = {
+                    'id': comment.id,
+                    'name': comment.name,
+                    'content': comment.content,
+                    'created_on': localtime(comment.created_on).strftime('%b. %d, %Y, %I:%M %p'),
+                    'post_id': comment.post.id,
+                    'post_title': comment.post.title,
+                    'media_file': {
+                        'url': comment.media_file.url if comment.media_file else None,
+                        'is_image': comment.media_file and comment.media_file.name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')),
+                        'is_video': comment.media_file and comment.media_file.name.lower().endswith(('.mp4', '.webm'))
+                    } if comment.media_file else None
+                }
 
-            # Non-AJAX fallback
-            return redirect('post-detail', pk=post.id)
+                logger.info(f"Comment data: {comment_data}")
 
-    return JsonResponse({'success': False}, status=400)
+                # Return JSON response for AJAX requests
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'comment': comment_data,
+                    })
+
+                # Non-AJAX fallback
+                return redirect('post-detail', pk=post.id)
+            
+            except Exception as e:
+                logger.error(f"Error in add_comment: {e}")
+                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        return JsonResponse({'success': False}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 def custom_csrf_failure(request, reason=""):
     logger.error(f"CSRF failure occurred. Reason: {reason}. Path: {request.path}")
@@ -469,20 +602,29 @@ def get_comment_form(request, post_id):
 def get_comment_reply_form_html(request, comment_id):
     """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
     try:
-        comment = Comment.objects.filter(id=comment_id).exists()
+        # Explicitly get the comment with its related post
+        comment = Comment.objects.select_related('post').get(id=comment_id)
+
 
         if not comment:
             return JsonResponse({'error': 'Comment not found'}, status=404)
         
         form = CommentForm()
+        context = {
+            'form': form,
+            'comment_id': comment_id,
+            'post_id': comment.post.id,
+            'parent_comment': comment
+        }
+
         form_html = render_to_string('blog/partials/comment_form.html',
-                                        {'comment_form': form,
-                                        'post_id' : comment.post.id,},
+                                        context=context,
                                         request=request  # Pass the request to include CSRF token
                                     )
         action_url = reverse("reply_comment", args=[comment.id])            
         logger.info(f"Debug: Generated action_url = {action_url}")
         return JsonResponse({
+            'success': True,
             'form': form_html,
             'action_url': action_url, 
         })
