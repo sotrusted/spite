@@ -286,13 +286,17 @@ export function attachEventListeners() {
 
 
 
-export function disableSubmitButton() {
+export function disableSubmitButton(form) {
     var submitButton = document.getElementById('submit-id-submit');
     console.log(submitButton.value);
-    submitButton.disabled = true;
-    submitButton.value = 'Posting...';  // Change the button text
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+    }
 }
-export function enableSubmitButton() {
+
+
+export function enableSubmitButton(form) {
     var submitButton = document.getElementById('submit-id-submit');
     submitButton.disabled = false;
     submitButton.value = 'Post';  // Change the button text

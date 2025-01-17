@@ -1,13 +1,16 @@
 // static/js/ajax_posts.js
 
 import { getCookie } from './modules/load_document_functions.js';
-import { addPostToPage, updateSpiteCounter, enableSubmitButton } from './modules/utility_functions.js';
+import { addPostToPage, updateSpiteCounter, enableSubmitButton, disableSubmitButton } from './modules/utility_functions.js';
+
+
 
 export function initAjaxPostForm() {
     const postForm = document.getElementById('post-form');
 
     postForm.addEventListener('submit', function (e) {
         e.preventDefault(); // Prevent the default form submission
+        disableSubmitButton(postForm);
 
         const formData = new FormData(this); // Collect form data
         const url = this.action; // Get the form's action URL
@@ -30,7 +33,7 @@ export function initAjaxPostForm() {
             .then(data => {
                 if (data.success) {
                     postForm.reset(); // Clear the form
-                    enableSubmitButton();
+                    enableSubmitButton(postForm);
 
                     document.getElementById('post-success').style.display = 'block';
                     document.getElementById('post-error').style.display = 'none';

@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<form id="post-form" method="post" action="{% url 'post-create' %}" enctype="multipart/form-data" onsubmit="disableSubmitButton()" %}">
+<form id="post-form" method="post" action="{% url 'post-create' %}" enctype="multipart/form-data">
     {% csrf_token %}
     {% crispy postForm postForm.helper %}
     {% if form.errors %}
