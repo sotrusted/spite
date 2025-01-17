@@ -39,7 +39,7 @@ urlpatterns = [
     path('preview-pdf-template/', preview_pdf_template, name='preview_pdf_template'),
     path('search/', search_results, name='search_results'),
     path('shop/', store_page, name='shop'),
-    path('add-comment/<int:post_id>/', add_comment, name='add_comment'),
+    path('add-comment/<int:post_id>/', add_comment, name='add-comment'),
     path('add-comment/comment/<int:comment_id>', reply_comment, name='reply-comment'),
     path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
     path("graphql/", GraphQLView.as_view(graphiql=True, schema=schema)),

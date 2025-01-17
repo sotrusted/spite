@@ -621,7 +621,7 @@ def get_comment_reply_form_html(request, comment_id):
                                         context=context,
                                         request=request  # Pass the request to include CSRF token
                                     )
-        action_url = reverse("reply_comment", args=[comment.id])            
+        action_url = reverse("reply-comment", args=[comment.id])            
         logger.info(f"Debug: Generated action_url = {action_url}")
         return JsonResponse({
             'success': True,
@@ -652,7 +652,7 @@ def get_comment_form_html(request, post_id):
                                         request=request  # Pass the request to include CSRF token
                                     )
 
-        action_url = reverse('add_comment', args=[post_id])
+        action_url = reverse('add-comment', args=[post_id])
         logger.info(f"Debug: Generated action_url = {action_url}")  # Debugging action_url
         return JsonResponse({
             'form': form_html,

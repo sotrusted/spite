@@ -34,14 +34,14 @@
                     </div>
 
                     <!-- Comment Form -->
-                    <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add_comment' post.id %}">
+                    <form id="comment-form-{{ post.id }}" method="post" action="{% url 'add-comment' post.id %}">
                         {% csrf_token %}
                         {{ comment_form|crispy }}
                         <button type="submit">Submit</button>
                     </form>
                 </div>
             </div>
-            {% endfor %}
+        {% endfor %}
         </div>
     {% endif %}
 
