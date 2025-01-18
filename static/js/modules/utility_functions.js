@@ -285,7 +285,6 @@ export function attachEventListeners() {
 }
 
 
-
 export function disableSubmitButton(form) {
     var submitButton = document.getElementById('submit-id-submit');
     console.log(submitButton.value);
@@ -458,7 +457,7 @@ export function addPostToPage(post) {
                     <p class="post-date">${post.date_posted}</p>
                 </div>
                 <div class="menu">
-                    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}" onclick="toggleContent(${postId})">Expand</a>
+                    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}">Expand</a>
                     <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
                 </div>
             </div>
