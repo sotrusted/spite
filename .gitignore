@@ -33,3 +33,5 @@ logs/django_debug.log
 .env
 *.env
 config.json
+
+logs/
