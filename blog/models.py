@@ -164,6 +164,8 @@ class Comment(models.Model):
                             max_length=255, verbose_name = 'Image or video (<50 MB)', \
                             validators=[validate_media_file, validate_video_file_size])  # New field
 
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
     def __str__(self):
         return f'{self.name or "Anonymous"}: \"{self.content}\" on {self.post.title}'
 
@@ -243,3 +245,52 @@ def get_post_data(post_id):
         cache.set(cache_key, data, 60 * 15)  # 15 minutes
     return data
 
+
+class ChatMessage(models.Model):
+    # Message metadata
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    chat_session = models.CharField(max_length=255, editable=False)  # To group messages from same chat session
+    sender_id = models.UUIDField(editable=False)   # Anonymous user identifier
+    
+    # Message content
+    message = models.TextField()
+    message_type = models.CharField(max_length=20, choices=[
+        ('message', 'Message'),
+        ('status', 'Status'),
+        ('matched', 'Matched'),
+        ('disconnected', 'Disconnected')
+    ])
+    
+    # System metadata
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+   
+    class Meta:
+        ordering = ['timestamp']
+        indexes = [
+            models.Index(fields=['chat_session']),
+            models.Index(fields=['sender_id']),
+        ]
+    
+    def __str__(self):
+        return (f'[Chat {self.chat_session}] User {self.sender_id}@{self.ip_address}: {self.message}')
+
+class BlockedIP(models.Model):
+    ip_address = models.GenericIPAddressField(unique=True)
+    reason = models.TextField(blank=True)
+    date_blocked = models.DateTimeField(default=timezone.now)
+    is_permanent = models.BooleanField(default=False)
+    expires = models.DateTimeField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.ip_address} ({self.reason})"
+    
+    @property
+    def is_active(self):
+        if self.is_permanent:
+            return True
+        if self.expires and timezone.now() > self.expires:
+            return False
+        return True
+
+    class Meta:
+        db_table = 'blocked_ips'

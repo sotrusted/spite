@@ -112,6 +112,7 @@ MIDDLEWARE = [
     'middleware.active_session_middleware.ActiveSessionMiddleware',
     'middleware.page_view_middleware.PageViewMiddleware',
     'middleware.loading_screen_middleware.LoadingScreenMiddleware',
+    'blog.middleware.BlockIPMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
@@ -466,3 +467,6 @@ if DEBUG:
 
 
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+ALLOWED_HOSTS = ['spite.fr', 'www.spite.fr', 'localhost', '127.0.0.1', '192.3.30.202', '69.48.163.194']
+

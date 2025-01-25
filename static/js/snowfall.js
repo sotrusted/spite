@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Toggle snowfall on
-    toggleSnowfall();
+    // toggleSnowfall();
 
     // Add Toggle Button
     const toggleButton = document.createElement('button');

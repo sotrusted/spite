@@ -3,19 +3,22 @@
     <div class="post-content">
         <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
         
-        {% if post.media_file or post.image %}
+        {% if post.media_file and post.is_video %}
             <div class="image-container">
-                {% if post.media_file and post.is_video %}
-                    <video controls autoplay muted loop playsinline>
-                        <source src="{{ post.media_file.url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                {% elif post.media_file and post.is_image %}
-                    <img src="{{ post.media_file.url }}" alt="Comment image" loading="lazy">
-                {% elif post.image %}
-                    <img src="{{ post.image.url }}" alt="Comment image" loading="lazy">
-                {% endif %}
+                <video 
+                    controls 
+                    playsinline
+                    preload="metadata"
+                    data-post-id="{{ post.id }}"
+                >
+                    <source src="{{ post.media_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
+        {% elif post.media_file and post.is_image %}
+            <img src="{{ post.media_file.url }}" alt="Comment image" loading="lazy">
+        {% elif post.image %}
+            <img src="{{ post.image.url }}" alt="Comment image" loading="lazy">
         {% endif %}
     </div>
 

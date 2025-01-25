@@ -50,9 +50,12 @@ def write_ip(ip, *args, **kwargs):
             log.write('\n')
 
 
-def check_spam(request, content, author_name=''):
+def check_spam(request, content='', author_name=''):
+    logger.info("Checking spam")
     client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
-    
+    logger.info(f"Client IP: {client_ip}")
+
+
     # 1. Rate limiting
     cache_key = f'post_count_{client_ip}'
     post_count = cache.get(cache_key, 0)
@@ -66,10 +69,13 @@ def check_spam(request, content, author_name=''):
     # 2. Check recent posts for similar content
     recent_posts_key = f'recent_posts_{client_ip}'
     recent_posts = cache.get(recent_posts_key, [])
+    logger.info(f"Recent posts: {recent_posts}")
     
     # Create content hash including name
-    content_to_check = f"{content.lower().strip()} {author_name.lower().strip()}"
+    content_to_check = f"{content.lower().strip() if content else ''} {author_name.lower().strip() if author_name else ''}"
     content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
+    logger.info(f"Content to check: {content_to_check}")
+    logger.info(f"Content hash: {content_hash}")
     
     # Check for duplicate or similar content
     for recent_hash in recent_posts:
@@ -83,9 +89,10 @@ def check_spam(request, content, author_name=''):
         similarity = SequenceMatcher(
             None,
             content_to_check,
-            f"{recent_post.content.lower().strip()} {recent_post.display_name.lower().strip()}"
+            f"{recent_post.content.lower().strip() if recent_post.content else ''} {recent_post.display_name.lower().strip() if recent_post.display_name else ''}"
         ).ratio()
         
+        logger.info(f"Similarity: {similarity}")
         if similarity > 0.8:  # 80% similarity threshold
             return True, "This content is too similar to a recent post"
     
@@ -94,7 +101,8 @@ def check_spam(request, content, author_name=''):
     if len(recent_posts) > 10:  # Keep last 10 posts
         recent_posts.pop(0)
     cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
-    
+
+    logger.info("Post is not spam")
     return False, ""
 
 
@@ -173,7 +181,7 @@ class PostCreateView(CreateView):
         context[self.form_context_name] = self.form()
         return context
 
-    def check_spam(self, request, content, author_name=''):
+    def check_spam(self, request, title, content, author_name=''):
         client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
         
         # 1. Rate limiting
@@ -191,7 +199,7 @@ class PostCreateView(CreateView):
         recent_posts = cache.get(recent_posts_key, [])
         
         # Create content hash including name
-        content_to_check = f"{content.lower().strip()} {author_name.lower().strip()}"
+        content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {author_name.lower().strip() if author_name else ''}"
         content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
         
         # Check for duplicate or similar content
@@ -206,7 +214,9 @@ class PostCreateView(CreateView):
             similarity = SequenceMatcher(
                 None,
                 content_to_check,
-                f"{recent_post.content.lower().strip()} {recent_post.display_name.lower().strip()}"
+                f"{recent_post.title.lower().strip() if recent_post.title else ''} \
+                {recent_post.content.lower().strip() if recent_post.content else ''} \
+                {recent_post.display_name.lower().strip() if recent_post.display_name else ''}"
             ).ratio()
             
             if similarity > 0.8:  # 80% similarity threshold
@@ -232,6 +242,7 @@ class PostCreateView(CreateView):
         # Check for spam before processing the form
         is_spam, spam_message = self.check_spam(
             request, 
+            request.POST.get('title', ''),
             request.POST.get('content', ''), 
             request.POST.get('display_name', '')
         )
@@ -470,6 +481,7 @@ def reply_comment(request, comment_id):
             if parent_comment:
                 comment.parent_comment = parent_comment
             
+            comment.ip_address = get_client_ip(request)
             comment.save()
 
             # Return json response for ajax requests
@@ -529,6 +541,8 @@ def add_comment(request, post_id, post_type='Post'):
             
                 if parent_comment: 
                     comment.parent_comment = parent_comment
+
+                comment.ip_address = get_client_ip(request)
 
                 comment.save()
 

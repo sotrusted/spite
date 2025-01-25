@@ -165,6 +165,37 @@
     {% block feed %}
     {% endblock %}
 
+    {% block chat %}
+    <div id="chat-toggle" class="chat-toggle">
+        <button class="chat-toggle-btn">
+            <span class="spite-text">SPITE CHAT</span>
+        </button>
+    </div>
+
+    <div id="chat-container" class="chat-container hidden">
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <img src="{% static 'media/anon.webp' %}" alt="" class="chat-avatar">
+                <div class="chat-title">
+                    <img src="{% static 'media/spite-logo.webp' %}" alt="" class="chat-logo">
+                    <span class="spite-text">SPITE CHAT</span>
+                    <button class="sound-toggle" aria-label="Toggle Sound">🔊</button>
+                </div>
+            </div>
+            <div class="chat-controls">
+                <button class="new-chat-btn">New Chat</button>
+                <button class="maximize-chat-btn">□</button>
+                <button class="close-chat-btn">×</button>
+            </div>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button class="send-message-btn">Send</button>
+        </div>
+    </div>
+    {% endblock %}
+
     {% block tail %}
     {% endblock %}
 
@@ -195,7 +226,10 @@
         <script type="module" src="{% static 'js/modules/utility_functions.js' %}"></script>
         <script type="module" src="{% static 'js/ajax_posts.js' %}" defer></script>
         <script type="module" src="{% static 'js/websocket_updates.js' %}" defer></script>
+        <script type="module" src="{% static 'js/video_enhancements.js' %}" defer></script>
+        <script type="module" src="{% static 'js/chat_sounds.js' %}" defer></script>
         <script type="module" src="{% static 'js/base.js' %}"></script>
+        <script type="module" src="{% static 'js/chat.js' %}"></script>
         {% compress js %}
             <script src="{% static 'js/snowfall.js' %}" defer></script>
         {% endcompress %}
@@ -205,6 +239,7 @@
 
     {% endblock %}
 </div>
+
     <script>
         window.addEventListener('beforeunload', (e) => {
             // Get the target URL from the navigation

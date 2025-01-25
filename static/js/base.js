@@ -1,7 +1,7 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded } from './modules/load_document_functions.js';
 import { attachEventListeners } from './modules/utility_functions.js';
 import { initAjaxPostForm } from './ajax_posts.js';
-import { initPostWebsocketUpdates, initCommentWebsocketUpdates } from './websocket_updates.js';
+import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
 
 logToBackend("Base.js initialized", 'info');
 console.log("Base.js initialized");
@@ -27,4 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initCommentWebsocketUpdates();
     logToBackend("Comment Websocket updates initialized", 'info');
 
+    initChatWebsocketUpdates();
+    logToBackend("Chat Websocket updates initialized", 'info');
 });

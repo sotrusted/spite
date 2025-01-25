@@ -42,16 +42,22 @@ export function initAjaxPostForm() {
 
                     const newPost = addPostToPage(post);
 
+                    // Only scroll if post was added successfully
+                    if (newPost) {
+                        updateSpiteCounter();
 
-                    updateSpiteCounter();
-
-                    // Scroll slightly above the newly added post
-                    const newPostPosition = newPost.getBoundingClientRect().top + window.scrollY;
-                    const offset = 100; // Adjust this value for desired spacing
-                    window.scrollTo({
-                        top: newPostPosition - offset,
-                        behavior: 'smooth'
-                    });
+                        // Wait for the post to be fully rendered
+                        setTimeout(() => {
+                            const newPostPosition = newPost.getBoundingClientRect().top + window.scrollY;
+                            const offset = 100;
+                            window.scrollTo({
+                                top: newPostPosition - offset,
+                                behavior: 'smooth'
+                            });
+                        }, 100); // Small delay to ensure post is rendered
+                    } else {
+                        console.log('Post was not added to page');
+                    }
                 } else {
                     // Display error message
                     document.getElementById('post-error').style.display = 'block';
