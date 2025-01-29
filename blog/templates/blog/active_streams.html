@@ -1,0 +1,165 @@
+{% extends "blog/spite_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="streams-list">
+        <div class="streams-header">
+            <h1>Live Streams</h1>
+            <a href="{% url 'create-stream' %}" class="btn btn-primary">Start Streaming</a>
+        </div>
+        
+        {% if streams %}
+            <div class="streams-grid">
+                {% for stream in streams %}
+                    <div class="stream-card">
+                        <div class="stream-thumbnail">
+                            <a href="{% url 'view-stream' stream.stream_key %}">
+                                <div class="live-badge">LIVE</div>
+                                <div class="viewer-count">{{ stream.viewer_count }} viewers</div>
+                            </a>
+                        </div>
+                        <div class="stream-info">
+                            <h2>
+                                <a href="{% url 'view-stream' stream.stream_key %}">
+                                    {{ stream.title }}
+                                </a>
+                            </h2>
+                            <p class="streamer">{{ stream.streamer }}</p>
+                            <p class="stream-time">Started {{ stream.created_at|timesince }} ago</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-streams">
+                <p>No active streams right now.</p>
+                <p>Why not <a href="{% url 'create-stream' %}">start one</a>?</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.streams-list {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.streams-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.streams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.stream-card {
+    background: #111;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.stream-card:hover {
+    transform: translateY(-5px);
+}
+
+.stream-thumbnail {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    background: #000;
+}
+
+.live-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #f00;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.viewer-count {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.stream-info {
+    padding: 15px;
+}
+
+.stream-info h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.stream-info h2 a {
+    color: white;
+    text-decoration: none;
+}
+
+.streamer {
+    color: #666;
+    margin: 5px 0;
+}
+
+.stream-time {
+    color: #444;
+    font-size: 12px;
+    margin: 0;
+}
+
+.no-streams {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+}
+
+.no-streams a {
+    color: #300;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background: #300;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background: #400;
+}
+
+@media (max-width: 768px) {
+    .streams-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .streams-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %} 

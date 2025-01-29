@@ -50,10 +50,17 @@ function attachToggleContentButtons() {
     log("Attaching toggle content buttons");
     const toggleContentButtons = document.querySelectorAll('a[id^="toggle-link-"]');
     log(`Found ${toggleContentButtons.length} toggle content buttons`);
+    
     toggleContentButtons.forEach(a => {
-        a.addEventListener('click', function() {
-            toggleContent(a.id.replace('toggle-link-', ''));
-        });
+        // Only attach listener if not already attached
+        if (!a.hasAttribute('data-listener-attached')) {
+            a.setAttribute('data-listener-attached', 'true');
+            a.addEventListener('click', function() {
+                const postId = a.id.replace('toggle-link-', '');
+                toggleContent(postId);
+            });
+            log(`Attached listener to toggle button for post ${a.id}`);
+        }
     });
 }
 
@@ -483,8 +490,26 @@ export function addPostToPage(post) {
     setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
 
 
-    attachEventListeners();
+
+    attachToggleContentButtons();
+    log('Toggle content buttons attached');
+
     attachCopyLinks();
+    log('Copy links attached');
+
+    attachToggleCommentsButtons();
+    log('Toggle comments buttons attached');
+
+    attachToggleReplyButtons();
+    log('Toggle reply buttons attached');
+
+    handleCommentFormSubmit();
+    log('Comment form submit listener attached');
+
+    handleReplyFormSubmit();
+    log('Reply form submit listener attached');
+
+    
     return newPost;
 }
 

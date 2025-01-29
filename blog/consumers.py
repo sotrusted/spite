@@ -190,3 +190,79 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ip_address=self.scope.get('client')[0] if self.scope.get('client') else None
         )
         return msg.timestamp.isoformat()
+
+class LiveStreamConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.stream_id = self.scope['url_route']['kwargs']['stream_id']
+        self.stream_group_name = f'stream_{self.stream_id}'
+        
+        # Join stream group
+        await self.channel_layer.group_add(
+            self.stream_group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+        
+    async def disconnect(self, close_code):
+        # Leave stream group
+        await self.channel_layer.group_discard(
+            self.stream_group_name,
+            self.channel_name
+        )
+        
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message_type = data.get('type')
+        
+        if message_type == 'offer':
+            # Forward offer to viewers
+            await self.channel_layer.group_send(
+                self.stream_group_name,
+                {
+                    'type': 'stream_offer',
+                    'offer': data['offer'],
+                    'streamer_id': data['streamer_id']
+                }
+            )
+        elif message_type == 'answer':
+            # Forward answer to streamer
+            await self.channel_layer.group_send(
+                self.stream_group_name,
+                {
+                    'type': 'stream_answer',
+                    'answer': data['answer'],
+                    'viewer_id': data['viewer_id']
+                }
+            )
+        elif message_type == 'ice_candidate':
+            # Forward ICE candidate
+            await self.channel_layer.group_send(
+                self.stream_group_name,
+                {
+                    'type': 'stream_ice_candidate',
+                    'candidate': data['candidate'],
+                    'sender_id': data['sender_id']
+                }
+            )
+            
+    async def stream_offer(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'offer',
+            'offer': event['offer'],
+            'streamer_id': event['streamer_id']
+        }))
+        
+    async def stream_answer(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'answer',
+            'answer': event['answer'],
+            'viewer_id': event['viewer_id']
+        }))
+        
+    async def stream_ice_candidate(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'ice_candidate',
+            'candidate': event['candidate'],
+            'sender_id': event['sender_id']
+        }))

@@ -294,3 +294,19 @@ class BlockedIP(models.Model):
 
     class Meta:
         db_table = 'blocked_ips'
+
+class LiveStream(models.Model):
+    title = models.CharField(max_length=200)
+    streamer = models.CharField(max_length=100)  # Store anonymous ID or display name
+    stream_key = models.UUIDField(default=uuid.uuid4, unique=True)
+    is_active = models.BooleanField(default=False)
+    viewer_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.title} by {self.streamer}"
+        
+    class Meta:
+        ordering = ['-created_at']

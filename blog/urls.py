@@ -11,7 +11,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     get_comment_reply_form_html,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
-                    loading_screen, log_javascript)
+                    loading_screen, log_javascript, resume,
+                    create_stream, view_stream, end_stream, active_streams)
 
 
 from django.conf.urls.static import static
@@ -56,6 +57,11 @@ urlpatterns = [
     path('media-flow-standalone/', media_flow_standalone, name='media-flow-standalone'),
     path('loading/', loading_screen, name='loading-screen'),
     path('api/log-js/', log_javascript, name='log_js'),
+    path('resume/', resume, name='resume'),
+    path('stream/create/', create_stream, name='create-stream'),
+    path('stream/<uuid:stream_key>/', view_stream, name='view-stream'),
+    path('stream/<uuid:stream_key>/end/', end_stream, name='end-stream'),
+    path('streams/', active_streams, name='active-streams'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

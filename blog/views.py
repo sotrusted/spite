@@ -23,7 +23,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List
+from blog.models import Post, Comment, SearchQueryLog, PageView, List, LiveStream
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
@@ -920,3 +920,51 @@ def log_javascript(request):
     except Exception as e:
         javascript_logger.error(f"Error in log_javascript view: {str(e)}", exc_info=True)
         return JsonResponse({'error': str(e)}, status=500)
+
+def resume(request):
+    return render(request, 'blog/resume.html')
+
+@never_cache
+def create_stream(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        display_name = request.POST.get('display_name', 'Anonymous')
+        
+        stream = LiveStream.objects.create(
+            title=title,
+            streamer=display_name,
+            ip_address=get_client_ip(request),
+            is_active=True
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'stream_id': str(stream.stream_key),
+            'title': stream.title
+        })
+    
+    return render(request, 'blog/create_stream.html')
+
+@never_cache
+def view_stream(request, stream_key):
+    stream = get_object_or_404(LiveStream, stream_key=stream_key, is_active=True)
+    return render(request, 'blog/view_stream.html', {
+        'stream': stream
+    })
+
+@never_cache
+def active_streams(request):
+    streams = LiveStream.objects.filter(is_active=True).order_by('-viewer_count')
+    return render(request, 'blog/active_streams.html', {
+        'streams': streams
+    })
+
+@require_POST
+def end_stream(request, stream_key):
+    stream = get_object_or_404(LiveStream, stream_key=stream_key)
+    if stream.ip_address == get_client_ip(request):
+        stream.is_active = False
+        stream.ended_at = now()
+        stream.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)

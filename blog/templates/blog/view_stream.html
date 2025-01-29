@@ -1,0 +1,158 @@
+{% extends "blog/spite_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="stream-viewer">
+        <h1>{{ stream.title }}</h1>
+        <p class="streamer-info">Streaming by: {{ stream.streamer }}</p>
+        
+        <div id="stream-player">
+            <video id="remote-video" autoplay playsinline></video>
+        </div>
+        
+        <div class="stream-controls">
+            <button id="toggle-audio" class="btn btn-secondary">Mute</button>
+            <span class="viewer-count">{{ stream.viewer_count }} viewers</span>
+        </div>
+    </div>
+</div>
+
+<script>
+let peerConnection = null;
+let websocket = null;
+
+async function setupViewer() {
+    // Create WebSocket connection
+    websocket = new WebSocket(
+        `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/stream/{{ stream.stream_key }}/`
+    );
+    
+    // Create RTCPeerConnection
+    const configuration = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }
+        ]
+    };
+    
+    peerConnection = new RTCPeerConnection(configuration);
+    
+    // Set up video element when remote stream is received
+    peerConnection.ontrack = event => {
+        const remoteVideo = document.getElementById('remote-video');
+        if (remoteVideo.srcObject !== event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+        }
+    };
+    
+    // Handle ICE candidates
+    peerConnection.onicecandidate = event => {
+        if (event.candidate) {
+            websocket.send(JSON.stringify({
+                type: 'ice_candidate',
+                candidate: event.candidate,
+                sender_id: 'viewer'
+            }));
+        }
+    };
+    
+    // Handle WebSocket messages
+    websocket.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'offer') {
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                
+                websocket.send(JSON.stringify({
+                    type: 'answer',
+                    answer: answer,
+                    viewer_id: 'viewer'
+                }));
+            } catch (error) {
+                console.error('Error handling offer:', error);
+            }
+        } else if (data.type === 'ice_candidate') {
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            } catch (error) {
+                console.error('Error adding ICE candidate:', error);
+            }
+        }
+    };
+}
+
+// Toggle audio
+document.getElementById('toggle-audio').addEventListener('click', (e) => {
+    const video = document.getElementById('remote-video');
+    video.muted = !video.muted;
+    e.target.textContent = video.muted ? 'Unmute' : 'Mute';
+});
+
+// Setup viewer when page loads
+setupViewer();
+
+// Cleanup when page is closed
+window.addEventListener('beforeunload', () => {
+    if (peerConnection) {
+        peerConnection.close();
+    }
+    if (websocket) {
+        websocket.close();
+    }
+});
+</script>
+
+<style>
+.stream-viewer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#stream-player {
+    width: 100%;
+    max-width: 960px;
+    margin: 20px auto;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#remote-video {
+    width: 100%;
+    height: auto;
+}
+
+.stream-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.viewer-count {
+    color: #666;
+    font-style: italic;
+}
+
+.streamer-info {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #222;
+    color: white;
+}
+</style>
+{% endblock %} 

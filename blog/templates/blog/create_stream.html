@@ -1,0 +1,229 @@
+{% extends "blog/spite_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="stream-setup">
+        <h1>Start Streaming</h1>
+        <div id="stream-preview"></div>
+        
+        <form id="stream-form" class="form-container">
+            <div class="form-group">
+                <label for="title">Stream Title</label>
+                <input type="text" id="title" name="title" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="display_name">Display Name</label>
+                <input type="text" id="display_name" name="display_name" class="form-control" placeholder="Anonymous">
+            </div>
+            
+            <div class="stream-controls">
+                <button type="submit" id="start-stream" class="btn btn-primary" disabled>Start Streaming</button>
+                <button type="button" id="toggle-camera" class="btn btn-secondary">Toggle Camera</button>
+                <button type="button" id="toggle-mic" class="btn btn-secondary">Toggle Mic</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let mediaStream = null;
+let peerConnection = null;
+let websocket = null;
+
+async function setupStream() {
+    try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+        
+        const preview = document.getElementById('stream-preview');
+        const video = document.createElement('video');
+        video.srcObject = mediaStream;
+        video.autoplay = true;
+        video.muted = true; // Mute preview to prevent feedback
+        preview.appendChild(video);
+        
+        document.getElementById('start-stream').disabled = false;
+    } catch (error) {
+        console.error('Error accessing media devices:', error);
+        alert('Unable to access camera/microphone. Please ensure they are connected and permissions are granted.');
+    }
+}
+
+document.getElementById('stream-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    
+    try {
+        const response = await fetch('/stream/create/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            startWebRTCStream(data.stream_id);
+        }
+    } catch (error) {
+        console.error('Error creating stream:', error);
+        alert('Failed to create stream. Please try again.');
+    }
+});
+
+function startWebRTCStream(streamId) {
+    // Create WebSocket connection
+    websocket = new WebSocket(
+        `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/stream/${streamId}/`
+    );
+    
+    // Create RTCPeerConnection
+    const configuration = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }
+        ]
+    };
+    
+    peerConnection = new RTCPeerConnection(configuration);
+    
+    // Add local stream tracks to peer connection
+    mediaStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, mediaStream);
+    });
+    
+    // Handle ICE candidates
+    peerConnection.onicecandidate = event => {
+        if (event.candidate) {
+            websocket.send(JSON.stringify({
+                type: 'ice_candidate',
+                candidate: event.candidate,
+                sender_id: streamId
+            }));
+        }
+    };
+    
+    // Handle WebSocket messages
+    websocket.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'answer') {
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            } catch (error) {
+                console.error('Error setting remote description:', error);
+            }
+        } else if (data.type === 'ice_candidate') {
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            } catch (error) {
+                console.error('Error adding ICE candidate:', error);
+            }
+        }
+    };
+    
+    // Create and send offer
+    peerConnection.createOffer()
+        .then(offer => peerConnection.setLocalDescription(offer))
+        .then(() => {
+            websocket.send(JSON.stringify({
+                type: 'offer',
+                offer: peerConnection.localDescription,
+                streamer_id: streamId
+            }));
+        });
+}
+
+// Toggle camera
+document.getElementById('toggle-camera').addEventListener('click', () => {
+    if (mediaStream) {
+        const videoTrack = mediaStream.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.enabled = !videoTrack.enabled;
+        }
+    }
+});
+
+// Toggle microphone
+document.getElementById('toggle-mic').addEventListener('click', () => {
+    if (mediaStream) {
+        const audioTrack = mediaStream.getAudioTracks()[0];
+        if (audioTrack) {
+            audioTrack.enabled = !audioTrack.enabled;
+        }
+    }
+});
+
+// Setup stream when page loads
+setupStream();
+
+// Cleanup when page is closed
+window.addEventListener('beforeunload', () => {
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+    }
+    if (peerConnection) {
+        peerConnection.close();
+    }
+    if (websocket) {
+        websocket.close();
+    }
+});
+</script>
+
+<style>
+.stream-setup {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#stream-preview {
+    width: 100%;
+    max-width: 640px;
+    margin: 20px auto;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#stream-preview video {
+    width: 100%;
+    height: auto;
+}
+
+.stream-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #300;
+    color: white;
+}
+
+.btn-secondary {
+    background: #222;
+    color: white;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %} 

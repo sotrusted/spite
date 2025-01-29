@@ -1,0 +1,197 @@
+{% load static %}
+
+<html>
+    <head>
+        <style>
+            body {
+                font-size: 14px;
+                background-color: antiquewhite;
+            }
+            .resume-container {
+                max-width: 800px;
+                margin: 2rem auto;
+                padding: 2rem;
+                font-family: 'Times New Roman', serif;
+                line-height: 1.3;
+                background-color: white;
+            }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 0;
+                font-weight: normal;
+            }
+            
+            .subtitle {
+                font-style: italic;
+                font-size: 16px;
+                margin: 4px 0;
+            }
+            
+            .section-title {
+                font-size: 14px;
+                font-weight: bold;
+                margin: 20px 0 10px 0;
+            }
+            
+            .role {
+                margin: 15px 0;
+            }
+            
+            .role-header {
+                display: flex;
+                justify-content: space-between;
+                font-style: italic;
+                margin-bottom: 5px;
+            }
+            
+            .metrics {
+                display: flex;
+                gap: 50px;
+                margin: 10px 0;
+            }
+            
+            .metric {
+                text-align: center;
+            }
+            
+            .metric-value {
+                font-weight: bold;
+            }
+            
+            .metric-label {
+                font-style: italic;
+            }
+            
+            ul {
+                margin: 5px 0;
+                padding-left: 20px;
+            }
+            
+            li {
+                margin: 2px 0;
+            }
+            
+            .sub-list {
+                list-style-type: circle;
+            }
+            
+            .skills {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+            
+            @media print {
+                .resume-container {
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                @page {
+                    margin: 1.5cm;
+                    size: letter;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="resume-container">
+            <h1>Thomas Sargent Moore</h1>
+            <div class="subtitle">Full Stack Developer & Technical Product Manager</div>
+            <div class="subtitle">New York, NY • LinkedIn</div>
+
+            <div class="section-title">Professional Summary</div>
+            <div>Full-stack developer and technical product manager with expertise in e-commerce, digital publishing, and Linux system administration. Creator of Spite Magazine and multiple successful e-commerce platforms. Specialized in end-to-end development from infrastructure setup to user experience, managing self-hosted <b>Linux</b> environments, and building scalable web applications.</div>
+
+            <div class="section-title">Professional Experience</div>
+            
+            <div class="role">
+                <div class="role-header">
+                    <div>Creator & Lead Developer -- <i>Spite Magazine</i></div>
+                    <div>2024 - Present</div>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">150+</div>
+                        <div class="metric-label">Daily Posts</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2K+</div>
+                        <div class="metric-label">Monthly Active Users</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">100</div>
+                        <div class="metric-label">Days to Market</div>
+                    </div>
+                </div>
+                
+                <ul>
+                    <li>Architected and developed a high-traffic digital publishing platform using <b>Python</b>, <b>Django</b>, and <b>JavaScript</b></li>
+                    <li>Built real-time features using <b>Django Channels</b> and <b>WebSocket</b> protocol:
+                        <ul class="sub-list">
+                            <li>Live content updates and notifications</li>
+                            <li>Real-time chat system with user matching</li>
+                            <li>Asynchronous comment system</li>
+                        </ul>
+                    </li>
+                    <li>Implemented distributed task processing with <b>Celery</b> and <b>Redis</b> for:
+                        <ul class="sub-list">
+                            <li>Background media processing and optimization</li>
+                            <li>Cache management and data aggregation</li>
+                            <li>Asynchronous notifications</li>
+                        </ul>
+                    </li>
+                    <li>Built and deployed complete infrastructure on self-managed <b>Linux</b> servers:
+                        <ul class="sub-list">
+                            <li><b>Nginx</b> and <b>Gunicorn</b> with <b>ASGI/WSGI</b> support</li>
+                            <li><b>PostgreSQL</b> database optimization and backup strategies</li>
+                            <li><b>Redis</b> for caching and WebSocket backing</li>
+                            <li><b>Docker</b> containerization for consistent deployments</li>
+                        </ul>
+                    </li>
+                    <li>Developed AI-powered media processing pipeline using <b>OpenCV</b> and <b>NumPy</b> for image analysis</li>
+                    <li>Implemented <b>GraphQL</b> API for efficient data fetching and content previews</li>
+                    <li>Built Progressive Web App (PWA) with offline support and push notifications</li>
+                    <li>Optimized performance with <b>AWS S3</b> and <b>CloudFront</b> CDN integration</li>
+                    <li>Implemented comprehensive monitoring using custom logging and analytics</li>
+                </ul>
+            </div>
+
+            <div class="role">
+                <div class="role-header">
+                    <div>Technical Product Manager - E-commerce Data Migration & SEO -- <i>SAVED NY</i></div>
+                    <div>2022 - 2023</div>
+                </div>
+                
+                <ul>
+                    <li>Led full-scale e-commerce platform migration, successfully transitioning 15,000+ luxury products to new website architecture</li>
+                    <li>Implemented enterprise-level commerce integrations including:
+                        <ul class="sub-list">
+                            <li><b>Stripe</b> payment processing and fraud detection</li>
+                            <li><b>Google Analytics 4</b> for advanced e-commerce tracking</li>
+                            <li><b>Google Search Console</b> for SEO optimization and performance monitoring</li>
+                            <li>AI-powered commerce analytics for inventory forecasting and price optimization</li>
+                        </ul>
+                    </li>
+                    <li>Architected and deployed <b>Python</b>-based ETL pipeline for automated product data transformation</li>
+                    <li>Executed comprehensive SEO optimization strategy across entire product catalog</li>
+                </ul>
+            </div>
+
+            <div class="role">
+                <div class="role-header">
+                    <div>Freelance Full Stack Developer -- <i>Independent Contractor</i></div>
+                    <div>2020 - Present</div>
+                </div>
+                
+                <ul>
+                    <li>Designed and developed multiple custom e-commerce platforms using <b>Shopify</b> and <b>WooCommerce</b></li>
+                    <li>Managed complete infrastructure setup and maintenance on <b>Linux</b> servers</li>
+                    <li>Implemented comprehensive analytics using <b>Google Analytics</b> and <b>Tag Manager</b></li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
