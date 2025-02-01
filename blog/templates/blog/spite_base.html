@@ -39,17 +39,16 @@
         <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
         <link rel="manifest" href="{% static 'manifest.json' %}">
         <link 
-        rel="preload" 
-        as="image" 
-        href="{% static 'media/anon.webp' %}" 
-        type="image/webp"
-        fetchpriority="high"
-        as="image"
-        >
+            rel="preload" 
+            as="image" 
+            href="{% static 'media/anon.webp' %}" 
+            type="image/webp"
+            fetchpriority="high">
+        <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
     {% endblock %}
     {% block stylesheets %}        
         {% compress css %}
-            <link rel="preload" href="{% static 'css/styles.css' %}" rel="stylesheet">
+            <link href="{% static 'css/styles.css' %}" rel="stylesheet">
         {% endcompress %}
     {% endblock %}
     {% progressive_web_app_meta %}
@@ -111,7 +110,7 @@
         <div id="new-comment-notification">
             New comment on <span id="new-comment-post"></span>
         </div>
-        <audio id="notification-sound" src="{% static 'sounds/jinglebell-sound.mp3' %}" hidden></audio>
+        <audio id="notification-sound" src="{% static 'sounds/harp.mp3' %}" hidden></audio>
     {% endblock %}
 
     {% block header %}
@@ -168,11 +167,18 @@
     {% block chat %}
     <div id="chat-toggle" class="chat-toggle">
         <button class="chat-toggle-btn">
-            <span class="spite-text">SPITE CHAT</span>
+            <span class="spite-text">SPITE CHAT (<span 
+                id="online-count" 
+                hx-get="{% url 'online_count' %}" 
+                hx-trigger="load, every 15s, refreshCount from:body, activeChatPing from:body">-</span> online)</span>
         </button>
     </div>
 
-    <div id="chat-container" class="chat-container hidden">
+    <div id="chat-container" class="chat-container hidden"
+         hx-get="{% url 'remove_user' %}"
+         hx-trigger="beforeunload"
+         hx-target="#online-count"
+         hx-swap="innerHTML">
         <div class="chat-header">
             <div class="chat-header-content">
                 <img src="{% static 'media/anon.webp' %}" alt="" class="chat-avatar">
@@ -183,7 +189,10 @@
                 </div>
             </div>
             <div class="chat-controls">
-                <button class="new-chat-btn">New Chat</button>
+                <button class="new-chat-btn"
+                    hx-get="{% url 'online_count' %}"
+                    hx-trigger="click"
+                    hx-target="#online-count">New Chat</button>
                 <button class="maximize-chat-btn">□</button>
                 <button class="close-chat-btn">×</button>
             </div>
@@ -194,6 +203,27 @@
             <button class="send-message-btn">Send</button>
         </div>
     </div>
+
+    <script>
+        // Monitor chat status and trigger more frequent updates when waiting
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.target.textContent.includes('Waiting for someone to join')) {
+                    // Start more frequent pings while waiting
+                    setInterval(function() {
+                        htmx.trigger('#online-count', 'activeChatPing');
+                    }, 5000); // Ping every 5 seconds while waiting
+                }
+            });
+        });
+
+        // Start observing chat messages for waiting status
+        observer.observe(document.getElementById('chat-messages'), {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    </script>
     {% endblock %}
 
     {% block tail %}
@@ -231,7 +261,7 @@
         <script type="module" src="{% static 'js/base.js' %}"></script>
         <script type="module" src="{% static 'js/chat.js' %}"></script>
         {% compress js %}
-            <script src="{% static 'js/snowfall.js' %}" defer></script>
+            <script src="{% static 'js/snow.js' %}" defer></script>
         {% endcompress %}
     {% endblock %}
 

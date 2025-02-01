@@ -1,0 +1,19 @@
+{% for post in posts %}
+    {% if post.get_item_type == 'Post' %}
+        {% include 'blog/partials/post.html' with post=post %}
+    {% elif post.get_item_type == 'Comment' %}
+        {% include 'blog/partials/comment.html' with comment=post %}
+    {% endif %}
+{% endfor %}
+
+{% if posts.has_next %}
+<div class="load-more-container"
+     hx-get="{% url 'load-more-posts' %}?page={{ posts.next_page_number }}"
+     hx-trigger="revealed"
+     hx-swap="afterend"
+     hx-indicator=".loading-indicator">
+</div>
+<div class="loading-indicator" style="display: none;">
+    Loading more posts...
+</div>
+{% endif %} 

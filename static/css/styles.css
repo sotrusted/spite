@@ -207,8 +207,8 @@ body.modal-active {
 .content {
     padding: 0 15px;
     background-color: antiquewhite;
-    background-color: #006400;
-    color:  white;
+    background-color: pink; 
+    color:  black;
 }
 
 .content p {
@@ -656,7 +656,7 @@ main {
         font-size: 1.1rem;
     }
     p {
-        font-size 0.9rem;
+        font-size: 0.9rem;
     }
     .container {
 	    max-width:100%;
@@ -884,6 +884,15 @@ main {
     padding: 10px 20px;
     cursor: pointer;
     font-family: 'Crimson Text', serif;
+    white-space: nowrap;
+}
+
+.chat-toggle-btn .user-count {
+    padding: 2px 6px;
+    background-color: black;
+    border-radius: 10px;
+    margin: 0 2px;
+    font-size: 0.9em;
 }
 
 .chat-messages {
@@ -1292,4 +1301,23 @@ video:focus {
 @keyframes typing-dot {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
+}
+
+.heart-toggle {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.heart-toggle:hover {
+    transform: scale(1.1);
+    background: rgba(255, 192, 203, 0.9) !important;
+}
+
+@media (max-width: 768px) {
+    .heart-toggle {
+        transform: scale(0.8);
+    }
+    .heart-toggle:hover {
+        transform: scale(0.9);
+    }
 }

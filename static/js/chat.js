@@ -36,29 +36,41 @@ export class SpiteChat {
             this.socket = new WebSocket(wsUrl);
             
             this.socket.onopen = () => {
+                console.log('WebSocket connection established');
                 this._connected = true;
                 logToBackend('Chat WebSocket connection established', 'info');
+                
+                // Log the state of the user count element
+                const userCountElement = document.querySelector('.chat-toggle-btn .user-count');
+                console.log('User count element on connection:', userCountElement);
+                console.log('Chat toggle button HTML:', document.querySelector('.chat-toggle-btn')?.innerHTML);
+                
                 this.addSystemMessage('Connected to chat server');
             };
 
             this.socket.onmessage = (event) => {
+                console.log('Raw WebSocket message:', event.data);
                 const data = JSON.parse(event.data);
+                console.log('Parsed WebSocket message:', data);
                 logToBackend(`Chat message received: ${data.type}`, 'info');
                 this.handleMessage(data);
             };
 
             this.socket.onclose = () => {
+                console.log('WebSocket connection closed');
                 this._connected = false;
                 logToBackend('Chat WebSocket connection closed', 'warning');
                 this.addSystemMessage('Disconnected from chat server');
             };
 
             this.socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
                 this._connected = false;
                 logToBackend(`Chat WebSocket error: ${error}`, 'error');
                 this.addSystemMessage('Connection error - please try again');
             };
         } catch (error) {
+            console.error('Failed to create WebSocket connection:', error);
             logToBackend(`Failed to create WebSocket connection: ${error}`, 'error');
             this.addSystemMessage('Failed to connect - please try again later');
         }
@@ -77,23 +89,41 @@ export class SpiteChat {
 
     // Route different types of messages to appropriate handlers
     handleMessage(data) {
+        console.log('Handling message type:', data.type);
         switch(data.type) {
             case 'status':
+                console.log('Handling status message:', data.message);
                 playSound('message');
                 this.addSystemMessage(data.message, data.timestamp);
                 break;
             case 'matched':
+                console.log('Handling matched message:', data.message);
                 playSound('join');
                 this.addSystemMessage(data.message, data.timestamp);
                 break;
             case 'disconnected':
+                console.log('Handling disconnected message:', data.message);
                 playSound('leave');
                 this.addSystemMessage(data.message, data.timestamp);
                 break;
             case 'message':
+                console.log('Handling chat message:', data.message);
                 playSound('message');
                 this.addChatMessage(data.message, 'incoming', data.timestamp);
                 break;
+            case 'user_count':
+                console.log('Handling user count update. Count:', data.count);
+                const userCountElement = document.querySelector('.chat-toggle-btn .user-count');
+                if (userCountElement) {
+                    console.log('Found user count element, updating to:', data.count);
+                    userCountElement.textContent = data.count;
+                } else {
+                    console.warn('User count element not found in DOM');
+                    console.log('Current DOM structure:', document.querySelector('.chat-toggle-btn')?.innerHTML);
+                }
+                break;
+            default:
+                console.warn('Unknown message type:', data.type);
         }
     }
 

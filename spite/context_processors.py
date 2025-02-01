@@ -17,6 +17,64 @@ from django.urls import resolve
 from spite.utils import cache_large_data
 
 logger = logging.getLogger('spite')
+def get_optimized_posts():
+    # Remove author-related queries and only select needed fields
+    base_query = Post.objects.prefetch_related('comments')\
+        .only(
+            'id',
+            'title',
+            'content',
+            'display_name',
+            'date_posted',
+            'is_pinned',
+            'media_file',
+            'image'
+        ).defer(
+            'city',
+            'contact',
+            'description'
+        )
+
+    # Single query to get all posts
+    all_posts = base_query.order_by('-date_posted')
+    
+    # Split posts in memory
+    pinned_posts = [post for post in all_posts if post.is_pinned]
+    regular_posts = [post for post in all_posts if not post.is_pinned]
+
+    return {
+        'posts': regular_posts,
+        'pinned_posts': pinned_posts,
+    }
+
+def get_cached_posts():
+    try:
+        # Get pinned posts
+        compressed_pinned = cache.get('pinned_posts')
+        pinned_posts = []
+        if compressed_pinned:
+            pickled_pinned = lz4.decompress(compressed_pinned)
+            pinned_posts = pickle.loads(pickled_pinned)
+
+        # Get regular posts from chunks
+        regular_posts = []
+        chunk_count = cache.get('posts_chunk_count', 0)
+        
+        for i in range(chunk_count):
+            compressed_chunk = cache.get(f'posts_chunk_{i}')
+            if compressed_chunk:
+                pickled_chunk = lz4.decompress(compressed_chunk)
+                chunk = pickle.loads(pickled_chunk)
+                regular_posts.extend(chunk)
+
+        return {
+            'posts': regular_posts,
+            'pinned_posts': pinned_posts
+        }
+    except Exception as e:
+        logger.error(f"Error loading cached posts: {e}")
+        return get_optimized_posts()  # Fallback to database query
+
 
 
 def load_posts(request):
@@ -35,64 +93,6 @@ def load_posts(request):
         }
     elif current_route == 'stream-posts':
         return { 'is_loading': is_loading }
-
-    def get_optimized_posts():
-        # Remove author-related queries and only select needed fields
-        base_query = Post.objects.prefetch_related('comments')\
-            .only(
-                'id',
-                'title',
-                'content',
-                'display_name',
-                'date_posted',
-                'is_pinned',
-                'media_file',
-                'image'
-            ).defer(
-                'city',
-                'contact',
-                'description'
-            )
-
-        # Single query to get all posts
-        all_posts = base_query.order_by('-date_posted')
-        
-        # Split posts in memory
-        pinned_posts = [post for post in all_posts if post.is_pinned]
-        regular_posts = [post for post in all_posts if not post.is_pinned]
-
-        return {
-            'posts': regular_posts,
-            'pinned_posts': pinned_posts,
-        }
-
-    def get_cached_posts():
-        try:
-            # Get pinned posts
-            compressed_pinned = cache.get('pinned_posts')
-            pinned_posts = []
-            if compressed_pinned:
-                pickled_pinned = lz4.decompress(compressed_pinned)
-                pinned_posts = pickle.loads(pickled_pinned)
-
-            # Get regular posts from chunks
-            regular_posts = []
-            chunk_count = cache.get('posts_chunk_count', 0)
-            
-            for i in range(chunk_count):
-                compressed_chunk = cache.get(f'posts_chunk_{i}')
-                if compressed_chunk:
-                    pickled_chunk = lz4.decompress(compressed_chunk)
-                    chunk = pickle.loads(pickled_chunk)
-                    regular_posts.extend(chunk)
-
-            return {
-                'posts': regular_posts,
-                'pinned_posts': pinned_posts
-            }
-        except Exception as e:
-            logger.error(f"Error loading cached posts: {e}")
-            return get_optimized_posts()  # Fallback to database query
 
     # Try cache first, fallback to database
     posts_data = get_cached_posts()

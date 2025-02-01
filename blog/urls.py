@@ -11,8 +11,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     get_comment_reply_form_html,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
-                    loading_screen, log_javascript, resume,
-                    create_stream, view_stream, end_stream, active_streams)
+                    loading_screen, log_javascript, resume, update_online_status,
+                    remove_user)
 
 
 from django.conf.urls.static import static
@@ -34,7 +34,7 @@ urlpatterns = [
     path('all-posts', PostListView.as_view(), name='post-list'),
     path('catalog', all_posts, name='catalog'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
-    path('load-more-posts/', load_more_posts, name='load-more-posts'),
+    path('load-more/', load_more_posts, name='load-more-posts'),
     path('reading/', reading_flyer, name='reading'),
     path('generate-pdf/', generate_pdf, name='generate_pdf'),
     path('preview-pdf-template/', preview_pdf_template, name='preview_pdf_template'),
@@ -58,10 +58,8 @@ urlpatterns = [
     path('loading/', loading_screen, name='loading-screen'),
     path('api/log-js/', log_javascript, name='log_js'),
     path('resume/', resume, name='resume'),
-    path('stream/create/', create_stream, name='create-stream'),
-    path('stream/<uuid:stream_key>/', view_stream, name='view-stream'),
-    path('stream/<uuid:stream_key>/end/', end_stream, name='end-stream'),
-    path('streams/', active_streams, name='active-streams'),
+    path('api/online-count/', update_online_status, name='online_count'),
+    path('api/remove-user/', remove_user, name='remove_user'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

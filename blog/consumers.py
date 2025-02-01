@@ -54,14 +54,40 @@ class CommentConsumer(AsyncWebsocketConsumer):
 class ChatConsumer(AsyncWebsocketConsumer):
     waiting_users = []  # Class variable to store waiting users
     active_chats = {}   # Class variable to store active chat pairs
+    online_users = set()  # Class variable to track all online users
 
     async def connect(self):
         self.user_id = str(uuid.uuid4())
         logger.info(f"New chat connection: {self.user_id}")
         
-        # Add the user to their personal channel group
-        await self.channel_layer.group_add(self.user_id, self.channel_name)
+        # Add user to online users set
+        self.__class__.online_users.add(self.user_id)
+        logger.info(f"Added user to online_users. Current users: {self.__class__.online_users}")
+        
+        # Accept the connection first
         await self.accept()
+        logger.info(f"WebSocket connection accepted for user {self.user_id}")
+
+        # Send initial user count to this client
+        await self.send(text_data=json.dumps({
+            'type': 'user_count',
+            'count': len(self.__class__.online_users)
+        }))
+        logger.info(f"Sent initial user count to client: {len(self.__class__.online_users)}")
+        
+        # Then add to groups and broadcast to others
+        await self.channel_layer.group_add(self.user_id, self.channel_name)
+        await self.channel_layer.group_add("chat_updates", self.channel_name)
+        logger.info(f"Added user {self.user_id} to groups")
+
+        # Broadcast updated count to all other clients
+        await self.channel_layer.group_send(
+            "chat_updates",
+            {
+                "type": "chat.user_count",
+                "count": len(self.__class__.online_users)
+            }
+        )
         
         if not self.waiting_users:
             # First user waiting
@@ -112,12 +138,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         logger.info(f"Chat disconnection: {self.user_id}")
         
-        # Remove from waiting list if present
+        # Remove from online users set first
+        self.__class__.online_users.discard(self.user_id)
+        logger.info(f"Removed user from online_users. Current users: {self.__class__.online_users}")
+        
+        # Handle rest of disconnect logic
         if self.user_id in self.waiting_users:
             self.waiting_users.remove(self.user_id)
             logger.info(f"Removed {self.user_id} from waiting list")
         
-        # Handle active chat disconnection
         if self.user_id in self.active_chats:
             partner_id = self.active_chats[self.user_id]
             await self.channel_layer.group_send(
@@ -128,13 +157,60 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
             
-            # Clean up active_chats
             del self.active_chats[self.user_id]
             del self.active_chats[partner_id]
             logger.info(f"Ended chat between {self.user_id} and {partner_id}")
         
-        # Remove from channel group
+        # Remove from channel groups
         await self.channel_layer.group_discard(self.user_id, self.channel_name)
+        await self.channel_layer.group_discard("chat_updates", self.channel_name)
+
+        # Broadcast updated user count after disconnect
+        await self.broadcast_user_count()
+
+    async def broadcast_user_count(self):
+        """Helper method to broadcast current user count to all clients"""
+        try:
+            count = len(self.__class__.online_users)
+            logger.info(f"Broadcasting user count: {count} (Users: {self.__class__.online_users})")
+            
+            # First try sending directly to the current client
+            try:
+                await self.send(text_data=json.dumps({
+                    'type': 'user_count',
+                    'count': count
+                }))
+                logger.info(f"Sent user count directly to client: {self.channel_name}")
+            except Exception as e:
+                logger.error(f"Error sending direct user count to client: {str(e)}")
+            
+            # Then try broadcasting to all clients
+            try:
+                await self.channel_layer.group_send(
+                    "chat_updates",
+                    {
+                        "type": "chat.user_count",
+                        "count": count
+                    }
+                )
+                logger.info(f"Successfully broadcast user count to chat_updates group")
+            except Exception as e:
+                logger.error(f"Error broadcasting to chat_updates group: {str(e)}")
+                
+        except Exception as e:
+            logger.error(f"Error in broadcast_user_count: {str(e)}")
+
+    async def chat_user_count(self, event):  # Rename to match the type
+        """Send user count update to WebSocket"""
+        logger.info(f"Sending user count update to client: {event['count']}")
+        try:
+            await self.send(text_data=json.dumps({
+                'type': 'user_count',  # Keep the client-side type the same
+                'count': event['count']
+            }))
+            logger.info(f"Successfully sent user count to client")
+        except Exception as e:
+            logger.error(f"Error sending user count to client: {str(e)}")
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -190,79 +266,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ip_address=self.scope.get('client')[0] if self.scope.get('client') else None
         )
         return msg.timestamp.isoformat()
-
-class LiveStreamConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.stream_id = self.scope['url_route']['kwargs']['stream_id']
-        self.stream_group_name = f'stream_{self.stream_id}'
-        
-        # Join stream group
-        await self.channel_layer.group_add(
-            self.stream_group_name,
-            self.channel_name
-        )
-        
-        await self.accept()
-        
-    async def disconnect(self, close_code):
-        # Leave stream group
-        await self.channel_layer.group_discard(
-            self.stream_group_name,
-            self.channel_name
-        )
-        
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        message_type = data.get('type')
-        
-        if message_type == 'offer':
-            # Forward offer to viewers
-            await self.channel_layer.group_send(
-                self.stream_group_name,
-                {
-                    'type': 'stream_offer',
-                    'offer': data['offer'],
-                    'streamer_id': data['streamer_id']
-                }
-            )
-        elif message_type == 'answer':
-            # Forward answer to streamer
-            await self.channel_layer.group_send(
-                self.stream_group_name,
-                {
-                    'type': 'stream_answer',
-                    'answer': data['answer'],
-                    'viewer_id': data['viewer_id']
-                }
-            )
-        elif message_type == 'ice_candidate':
-            # Forward ICE candidate
-            await self.channel_layer.group_send(
-                self.stream_group_name,
-                {
-                    'type': 'stream_ice_candidate',
-                    'candidate': data['candidate'],
-                    'sender_id': data['sender_id']
-                }
-            )
-            
-    async def stream_offer(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'offer',
-            'offer': event['offer'],
-            'streamer_id': event['streamer_id']
-        }))
-        
-    async def stream_answer(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'answer',
-            'answer': event['answer'],
-            'viewer_id': event['viewer_id']
-        }))
-        
-    async def stream_ice_candidate(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'ice_candidate',
-            'candidate': event['candidate'],
-            'sender_id': event['sender_id']
-        }))

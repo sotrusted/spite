@@ -16,19 +16,19 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 import logging
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import os
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List, LiveStream
+from blog.models import Post, Comment, SearchQueryLog, PageView, List
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
 from datetime import datetime, timedelta
-from spite.context_processors import get_posts
+from spite.context_processors import get_posts, get_optimized_posts, get_cached_posts
 from django.http import StreamingHttpResponse
 from weasyprint import HTML
 import cv2
@@ -38,6 +38,9 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from difflib import SequenceMatcher
 import hashlib
+import lz4
+import pickle
+import time
 
 logger = logging.getLogger('spite')
 
@@ -159,7 +162,6 @@ def home(request):
         # Cache for 1 hour (3600 seconds)
         cache.set(cache_key, ip_has_submitted, 60 * 60 * 7)
 
-    
     return render(request, 'blog/home.html', 
                 {'pageview_count': total_pageviews,
                  'ip_has_submitted': ip_has_submitted})
@@ -371,17 +373,43 @@ class PostListView(ListView):
 
 
 def load_more_posts(request):
-    post_list = Post.objects.all().order_by('-date_posted')
-    paginator = Paginator(post_list, 100)
-
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
+    """View specifically for handling HTMX load-more requests"""
+    page = request.GET.get('page', 1)
+    
+    # Get posts from cache or database using context processor functions
+    posts_data = get_cached_posts()
+    posts = posts_data['posts']  # We only need regular posts, not pinned ones
+    all_comments = Comment.objects.all().order_by('-created_on')
+    
+    # Combine posts and comments into a single feed
+    combined_items = sorted(
+        chain(posts, all_comments),
+        key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+        reverse=True
+    )
+    
+    # Create paginator
+    paginator = Paginator(combined_items, 20)
+    
+    try:
+        posts_page = paginator.page(page)
+    except PageNotAnInteger:
+        posts_page = paginator.page(1)
+    except EmptyPage:
+        posts_page = paginator.page(paginator.num_pages)
+    
+    # Add comment counts for posts
+    for item in posts_page:
+        if item.get_item_type() == 'Post':
+            comments = Comment.objects.filter(post=item).order_by('-created_on')
+            item.comments_total = comments.count()
+            item.recent_comments = comments
+    
     context = {
-        'posts': page_obj,
-        'is_paginated': page_obj.has_other_pages(),
+        'posts': posts_page,
     }
-    return render(request, 'blog/post_list_partial.html', context)
+    
+    return render(request, 'blog/partials/load_more_posts.html', context)
 
 
 def reading_flyer(request):
@@ -924,47 +952,38 @@ def log_javascript(request):
 def resume(request):
     return render(request, 'blog/resume.html')
 
-@never_cache
-def create_stream(request):
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        display_name = request.POST.get('display_name', 'Anonymous')
-        
-        stream = LiveStream.objects.create(
-            title=title,
-            streamer=display_name,
-            ip_address=get_client_ip(request),
-            is_active=True
-        )
-        
-        return JsonResponse({
-            'success': True,
-            'stream_id': str(stream.stream_key),
-            'title': stream.title
-        })
+def remove_user(request):
+    """Remove user from online users when they disconnect"""
+    client_id = request.META.get('REMOTE_ADDR', '') + request.META.get('HTTP_USER_AGENT', '')
+    online_users = cache.get('online_users', {})
     
-    return render(request, 'blog/create_stream.html')
+    if client_id in online_users:
+        del online_users[client_id]
+        cache.set('online_users', online_users, 60)
+    
+    return HttpResponse(str(len(online_users)))
 
-@never_cache
-def view_stream(request, stream_key):
-    stream = get_object_or_404(LiveStream, stream_key=stream_key, is_active=True)
-    return render(request, 'blog/view_stream.html', {
-        'stream': stream
-    })
-
-@never_cache
-def active_streams(request):
-    streams = LiveStream.objects.filter(is_active=True).order_by('-viewer_count')
-    return render(request, 'blog/active_streams.html', {
-        'streams': streams
-    })
-
-@require_POST
-def end_stream(request, stream_key):
-    stream = get_object_or_404(LiveStream, stream_key=stream_key)
-    if stream.ip_address == get_client_ip(request):
-        stream.is_active = False
-        stream.ended_at = now()
-        stream.save()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
+def update_online_status(request):
+    """Update user's online status and return total online count"""
+    current_time = int(time.time())
+    client_id = request.META.get('REMOTE_ADDR', '') + request.META.get('HTTP_USER_AGENT', '')
+    
+    # Get current online users dict from cache
+    online_users = cache.get('online_users', {})
+    
+    # Check if this is an active chat ping
+    is_active_chat = 'HX-Trigger' in request.headers and request.headers['HX-Trigger'] == 'activeChatPing'
+    
+    # Update this user's timestamp
+    online_users[client_id] = current_time
+    
+    # Remove users who haven't checked in for 30 seconds (or 5 seconds for active chat users)
+    cutoff_time = current_time - (5 if is_active_chat else 30)
+    online_users = {k: v for k, v in online_users.items() if v > cutoff_time}
+    
+    # Save back to cache with longer TTL for active chat users
+    cache_ttl = 300 if is_active_chat else 60  # 5 minutes for active chat, 1 minute otherwise
+    cache.set('online_users', online_users, cache_ttl)
+    
+    # Return just the number for HTMX to update the span content
+    return HttpResponse(str(len(online_users)))

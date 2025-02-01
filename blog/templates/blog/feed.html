@@ -80,6 +80,23 @@
     </div>
 
     {% if home %}
+    <!-- Load More Button -->
+    {% if posts.has_next %}
+    <div class="load-more-section">
+        <button class="load-more-btn"
+                hx-get="{% url 'load-more-posts' %}?page={{ posts.next_page_number }}"
+                hx-target="#post-list"
+                hx-swap="beforeend"
+                hx-indicator=".loading-indicator">
+            --&lt Load More Posts &gt--
+        </button>
+        <div class="loading-indicator" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Loading more posts...</p>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="pagination">
         <span class="step-links">
             {% if posts.has_previous %}
@@ -99,6 +116,50 @@
     </div>
     {% endif %}
 </div>
+
+<style>
+.load-more-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.load-more-btn {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    padding: 10px 20px;
+    font-family: 'Crimson Text', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+}
+
+.load-more-btn:hover {
+    background-color: white;
+    color: black;
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
 
 <script src="{% static 'js/load_more.js' %}" defer></script>
 <script>
