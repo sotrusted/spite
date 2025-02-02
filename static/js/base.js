@@ -1,4 +1,4 @@
-import { logToBackend, refreshCSRFToken, showModalIfNeeded } from './modules/load_document_functions.js';
+import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
 import { attachEventListeners } from './modules/utility_functions.js';
 import { initAjaxPostForm } from './ajax_posts.js';
 import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initChatWebsocketUpdates();
     logToBackend("Chat Websocket updates initialized", 'info');
 
+    scrollToElementById('post-list');
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for(let registration of registrations) {
@@ -38,4 +40,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     }
+
 });

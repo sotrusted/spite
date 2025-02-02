@@ -46,8 +46,9 @@ const DYNAMIC_PATHS = [
     '.js',  // Any JavaScript file anywhere
     '/templates/',  // All templates
     '.html',  // Any HTML file
-    '/post/'  // Add this for post detail pages
-    '/comment/'  // Add this for comment detail pages
+    '/post/',  // Add this for post detail pages
+    '/comment/',  // Add this for comment detail pages
+    '/loading/',  // Add this for loading screen
 ];
 
 console.log('SW.JS: Service Worker Initialized');

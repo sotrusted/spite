@@ -41,6 +41,8 @@ import hashlib
 import lz4
 import pickle
 import time
+import requests
+from django.db import connection
 
 logger = logging.getLogger('spite')
 
@@ -913,17 +915,47 @@ def media_flow_standalone(request):
 
 
 def loading_screen(request):
+    """Loading screen view that periodically checks server status"""
     logger.info("Loading screen view called")
-    logger.info(f"Query parameters: {request.GET}")
-    logger.info(f"Current cookies: {request.COOKIES}")
+    target_url = request.GET.get('to', '/')
     
-    response = render(request, 'blog/loading.html')
+    try:
+        # Try to fetch the target URL with a timeout
+        response = requests.get(
+            request.build_absolute_uri(target_url),
+            timeout=5,
+            headers={'X-Requested-With': 'XMLHttpRequest'}
+        )
+        
+        if response.status_code == 200:
+            logger.info("Server check successful, redirecting to target")
+            redirect_response = redirect(target_url)
+            # Set an explicit value and max_age
+            redirect_response.set_cookie(
+                'loading_complete', 
+                'true', 
+                path='/',
+                max_age=3600,  # 1 hour
+                httponly=True
+            )
+            # Reset retry count on success
+            request.session['loading_retry_count'] = 0
+            return redirect_response
+            
+    except (requests.Timeout, requests.RequestException) as e:
+        logger.error(f"Request error during server check: {e}")
+        
+    finally:
+        # Clean up database connections
+        connection.close()
     
-    # Set the cookie in the response
-    response.set_cookie('loading_complete', 'true', path='/')
-    logger.info("Set loading_complete cookie in response")
-    
-    return response
+    # Show loading screen with retry count
+    retry_count = request.session.get('loading_retry_count', 0)
+    return render(request, 'blog/loading.html', {
+        'target_url': target_url,
+        'retry_count': retry_count,
+        'error_message': 'Server is starting up...' if retry_count < 3 else 'Taking longer than usual...'
+    })
 
 javascript_logger = logging.getLogger('javascript')
 

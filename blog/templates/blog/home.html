@@ -5,6 +5,16 @@
 {% block content %}
 <div class="home content"> 
 
+    <!-- Mobile Collapsible Shop -->
+    <div class="mobile-shop">
+        <button class="shop-toggle">
+            --&lt Shop Spite &gt--
+        </button>
+        <div id="mobile-shop-content" class="shop-content">
+            {% include 'blog/products.html' %}
+        </div>
+    </div>
+
 	<div class="cta">
         <p>Tired of biting your tongue? </p>
         <button class="post-button" id="post-button">
@@ -76,9 +86,29 @@
 
 {% block tail %}
 
-<div class="shop">
+<!-- Desktop Shop Sidebar -->
+<!--
+<div class="shop-sidebar">
     {% include 'blog/products.html' %}
-</div>  
+</div>
+-->
+
+<!-- Invisible bottom trigger -->
+<div class="bottom-trigger"
+     hx-get="{% url 'load-more-posts' %}?page={{ posts.next_page_number }}"
+     hx-target="#post-list"
+     hx-swap="beforeend"
+     hx-trigger="intersect once"
+     hx-indicator=".loading-indicator">
+</div>
+
+<!-- Loading indicator -->
+<div class="loading-indicator">
+    <div class="loading-spinner"></div>
+    <div>Loading more posts...</div>
+</div>
+
+
 {% endblock %}
 
 {% block page_scripts %}

@@ -458,6 +458,13 @@ form {
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
     padding-left: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .comment { 
@@ -899,6 +906,8 @@ main {
     flex-grow: 1;
     overflow-y: auto;
     padding: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
     background: #0a0a0a;
     color: #fff;
     display: flex;
@@ -1319,5 +1328,205 @@ video:focus {
     }
     .heart-toggle:hover {
         transform: scale(0.9);
+    }
+}
+
+.load-more-btn {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    padding: 10px 20px;
+    font-family: 'Crimson Text', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    position: relative;
+    overflow: hidden;
+}
+
+.load-more-btn:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+/* Shine animation */
+.load-more-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+/* Invisible bottom trigger */
+.bottom-trigger {
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    margin-top: -200px; /* Trigger earlier before reaching bottom */
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: opacity 0.3s ease;
+}
+
+.loading-indicator.htmx-request {
+    opacity: 1;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Shop Layout Styles */
+.shop-sidebar {
+    width: 300px;
+    position: fixed;
+    top: 0;
+    right: -300px; /* Start completely offscreen */
+    height: 100vh;
+    display: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+    background: black;
+    transition: right 0.3s ease;
+    z-index: 999;
+}
+
+.shop-sidebar:hover {
+    right: 0; /* Slide in on hover */
+}
+
+/* Add a visible tab */
+.shop-sidebar::before {
+    content: 'SHOP';
+    position: absolute;
+    left: -80px;
+    top: 50%;
+    width: 80px;
+    padding: 15px;
+    background: black;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: none;
+    transform: rotate(-90deg);
+    transform-origin: right top;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Crimson Text', serif;
+}
+
+/* Keep other shop styles the same */
+.shop-container {
+    padding: 10px;
+}
+
+.shop-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+}
+
+.product-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Mobile Collapsible Shop */
+.mobile-shop {
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: black;
+}
+
+.shop-toggle {
+    width: 100%;
+    padding: 10px;
+    background: black;
+    color: white;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    font-family: 'Crimson Text', serif;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+}
+
+.shop-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.shop-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.shop-content.expanded {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* Stripe Button Customization */
+.shop-content stripe-buy-button {
+    margin: 10px 0;
+    display: block;
+}
+
+@media (min-width: 1024px) {
+    .shop-sidebar {
+        display: block;
+    }
+    
+    .mobile-shop {
+        display: none;
+    }
+}
+
+@media (max-width: 1023px) {
+    .shop-sidebar {
+        display: none;
+    }
+    
+    .mobile-shop {
+        display: block;
     }
 }
