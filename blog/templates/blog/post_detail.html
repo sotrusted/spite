@@ -10,8 +10,13 @@
     {% endif %}
 {% endblock %}
 
+{% block stylesheets %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+{% endblock %}
+
 {% block content %}
-    <div class="detail mb-3">
+    <div class="detail mb-3 ml-3">
         <a class="back" href="{% url 'home' %}">Back to Spite</a>
         {% include 'blog/detail.html' with post=post nested=False %}
     </div>

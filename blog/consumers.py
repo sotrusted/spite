@@ -5,11 +5,13 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import ChatMessage
 from django.utils import timezone
+from .models import SecureIPStorage
 
 logger = logging.getLogger('spite')
 
 class PostConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        
         # Add the user to a group for broadcasting
         await self.channel_layer.group_add("posts", self.channel_name)
         await self.accept()
@@ -50,11 +52,30 @@ class CommentConsumer(AsyncWebsocketConsumer):
         # Send the comment message to the WebSocket
         await self.send(text_data=json.dumps(event["message"]))
 
+def get_client_ip(self):
+    """Get real client IP, even behind proxy"""
+    # Try X-Forwarded-For header first
+    forwarded_for = self.scope.get('headers', {}).get(
+        b'x-forwarded-for', b''
+    ).decode().split(',')[0].strip()
+    
+    if forwarded_for:
+        return forwarded_for
+        
+    # Fall back to direct client IP
+    return self.scope['client'][0]
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    # Class variables to store waiting users, active chat pairs, and online users
     waiting_users = []  # Class variable to store waiting users
     active_chats = {}   # Class variable to store active chat pairs
     online_users = set()  # Class variable to track all online users
+
+    client_ip = get_client_ip()
+
+    storage = SecureIPStorage()
+    client_ip = storage.decrypt_ip(client_ip)
 
     async def connect(self):
         self.user_id = str(uuid.uuid4())
@@ -263,6 +284,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender_id=sender_id,
             chat_session=chat_session,
             message_type=message_type,
-            ip_address=self.scope.get('client')[0] if self.scope.get('client') else None
+            ip_address=self.client_ip
         )
         return msg.timestamp.isoformat()

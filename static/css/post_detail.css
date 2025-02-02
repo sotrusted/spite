@@ -1,0 +1,11 @@
+.detail {
+    background-color: antiquewhite;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.post-flexbox {
+    max-width: 1200px;
+    margin: 0 auto;
+
+}

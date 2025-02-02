@@ -1,4 +1,5 @@
 import uuid
+from cryptography.fernet import Fernet
 import logging
 from django.db import models
 from django.utils import timezone
@@ -12,6 +13,18 @@ from django.template.defaultfilters import slugify
 import mimetypes
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
+from django.conf import settings
+from django.core.cache import cache
+
+class SecureIPStorage:
+    def __init__(self):
+        self.fernet = Fernet(settings.IP_ENCRYPTION_KEY)
+    
+    def encrypt_ip(self, ip):
+        return self.fernet.encrypt(ip.encode()).decode()
+    
+    def decrypt_ip(self, encrypted_ip):
+        return self.fernet.decrypt(encrypted_ip.encode()).decode()
 
 logger = logging.getLogger('spite')
 
@@ -64,6 +77,10 @@ class Post(models.Model):
     description = models.TextField(blank=True, null=True)
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+        # Encrypted IP storage
+    encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
+
 
     def __str__(self):
         return f'{self.id} - {self.title}'
@@ -130,13 +147,22 @@ class Post(models.Model):
         comments = Comment.objects.filter(post=self).order_by('-created_on')
         return comments
 
-    @cached_property
+    @property
     def comment_count(self):
         return self.comments.count()
 
     @cached_property
     def has_media(self):
         return bool(self.media_file or self.image)
+
+    @cached_property
+    def get_ip_address(self):
+        storage = SecureIPStorage()
+        return storage.decrypt_ip(self.encrypted_ip)
+    
+    def set_ip_address(self, value):
+        storage = SecureIPStorage()
+        self.encrypted_ip = storage.encrypt_ip(value)
 
     class Meta:
         indexes = [
@@ -172,6 +198,16 @@ class Comment(models.Model):
     def get_item_type(self):
         return "Comment"
     
+    @cached_property
+    def get_ip_address(self):
+        storage = SecureIPStorage()
+        return storage.decrypt_ip(self.encrypted_ip)
+    
+    def set_ip_address(self, value):
+        storage = SecureIPStorage()
+        self.encrypted_ip = storage.encrypt_ip(value)
+    
+    @cached_property
     def is_image(self):
         """Check if the media_file is an image."""
         logger.info(f"Checking is_image for comment {self.id}")
@@ -193,6 +229,7 @@ class Comment(models.Model):
         logger.info(f"Is image: {is_image}")
         return is_image
 
+    @cached_property
     def is_video(self):
         """Check if the media_file is a video."""
         logger.info(f"Checking is_video for comment {self.id}")
@@ -203,6 +240,7 @@ class Comment(models.Model):
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
 
+    @cached_property
     def has_parent_comment(self):
         return self.parent_comment is not None
     
@@ -210,11 +248,20 @@ class Comment(models.Model):
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)
     user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
     timestamp = models.DateTimeField(default=now)
 
     def __str__(self):
         return f"{self.query} - {self.timestamp}"
+
+    @cached_property
+    def get_ip_address(self):
+        storage = SecureIPStorage()
+        return storage.decrypt_ip(self.encrypted_ip)
+    
+    def set_ip_address(self, value):
+        storage = SecureIPStorage()
+        self.encrypted_ip = storage.encrypt_ip(value)
 
 
 class Summary(models.Model):
@@ -231,7 +278,16 @@ class List(models.Model):
     input = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
+    encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
 
+    @cached_property
+    def get_ip_address(self):
+        storage = SecureIPStorage()
+        return storage.decrypt_ip(self.encrypted_ip)
+    
+    def set_ip_address(self, value):
+        storage = SecureIPStorage()
+        self.encrypted_ip = storage.encrypt_ip(value)
 
     def __str__(self):
         return self.input[:50]  # Show first 50 characters
@@ -260,6 +316,9 @@ class ChatMessage(models.Model):
         ('matched', 'Matched'),
         ('disconnected', 'Disconnected')
     ])
+
+    # Encrypted IP storage
+    encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
     
     # System metadata
     ip_address = models.GenericIPAddressField(null=True, blank=True)
@@ -270,7 +329,7 @@ class ChatMessage(models.Model):
             models.Index(fields=['chat_session']),
             models.Index(fields=['sender_id']),
         ]
-    
+
     def __str__(self):
         return (f'[Chat {self.chat_session}] User {self.sender_id}@{self.ip_address}: {self.message}')
 

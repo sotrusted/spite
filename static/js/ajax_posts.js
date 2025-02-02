@@ -8,6 +8,11 @@ import { addPostToPage, updateSpiteCounter, enableSubmitButton, disableSubmitBut
 export function initAjaxPostForm() {
     const postForm = document.getElementById('post-form');
 
+    if (!postForm) {
+        console.log('Post form not found');
+        return;
+    }
+
     postForm.addEventListener('submit', function (e) {
         e.preventDefault(); // Prevent the default form submission
         disableSubmitButton(postForm);

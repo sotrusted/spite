@@ -29,4 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initChatWebsocketUpdates();
     logToBackend("Chat Websocket updates initialized", 'info');
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+        });
+
+    }
 });

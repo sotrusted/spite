@@ -58,7 +58,7 @@ export function initCommentWebsocketUpdates() {
     const commentSocket = new WebSocket('wss://spite.fr/ws/comments/');
 
     // Reference the notification sound element
-    const notificationSound = document.getElementById("notification-sound");
+    const notificationSound = document.getElementById("new-comment-sound");
 
     commentSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);

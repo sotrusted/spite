@@ -2,23 +2,34 @@ const CACHE_NAME = 'pwa-cache-v2';
 
 // Separate static assets that rarely change
 const STATIC_ASSETS = [
-    '/static/images/anon.jpg',
-    '/static/images/spite-logo.jpg',
-    '/static/sounds/harp.mp3'
+    '/static/media/anon.webp',
+    '/static/media/spite.gif',
+    '/static/media/spite-logo.webp',
+    '/static/media/spitemagazine.gif',
+    '/static/sounds/message.mp3',
+    '/static/sounds/join.mp3',
+    '/static/sounds/notification-sound.mp3',
+    '/static/sounds/jinglebell-sound.mp3',
+    '/static/sounds/shining-sound.mp3',
+    '/static/sounds/harp.mp3',
+    '/static/sounds/sword-sound.mp3',
+    '/static/sounds/leave.mp3',
+    '/static/sounds/send.mp3',
 ];
 
 // Dynamic assets that need frequent updates
 const DYNAMIC_ASSETS = [
     '/static/css/styles.css',
     '/static/js/modules/utility_functions.js',
-    '/static/js/ajax_posts.js',
-    '/static/js/websocket_updates.js'
 ];
 
 // External resources to bypass service worker
 const BYPASS_URLS = [
     'fonts.googleapis.com',
+    'stackpath.bootstrapcdn.com',
     'fonts.gstatic.com',
+    'js.stripe.com',
+    'unpkg.com',
     'www.googletagmanager.com',
     'www.google-analytics.com',
     'stats.g.doubleclick.net',
@@ -34,7 +45,9 @@ const DYNAMIC_PATHS = [
     '/static/js/',  // All JavaScript files
     '.js',  // Any JavaScript file anywhere
     '/templates/',  // All templates
-    '.html'  // Any HTML file
+    '.html',  // Any HTML file
+    '/post/'  // Add this for post detail pages
+    '/comment/'  // Add this for comment detail pages
 ];
 
 console.log('SW.JS: Service Worker Initialized');
@@ -82,17 +95,50 @@ self.addEventListener('fetch', event => {
     if (isDynamicPath) {
         console.log('SW.JS: Dynamic content request for:', url.pathname);
         event.respondWith(
-            fetch(event.request, { cache: 'no-store' })  // Force network request
+            fetch(event.request)
                 .then(response => {
-                    if (!response || !response.ok) {
-                        throw new Error('Network fetch failed');
+                    if (!response || response.status !== 200) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
                     }
-                    console.log('SW.JS: Got fresh response for:', url.pathname);
+                    
+                    const responseToCache = response.clone();
+
+                    // Cache successful responses
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        })
+                        .catch(err => {
+                            console.warn('SW.JS: Failed to cache dynamic content:', err);
+                        });
+
                     return response;
                 })
                 .catch(error => {
-                    console.log('SW.JS: Network failed for dynamic content, using cache:', url.pathname);
-                    return caches.match(event.request);
+                    console.log('SW.JS: Network failed, checking cache for:', url.pathname);
+                    
+                    return caches.match(event.request)
+                        .then(cachedResponse => {
+                            if (cachedResponse) {
+                                console.log('SW.JS: Serving from cache:', url.pathname);
+                                return cachedResponse;
+                            }
+                            
+                            // If no cache, try the homepage as fallback
+                            return caches.match('/')
+                                .then(homepageResponse => {
+                                    if (homepageResponse) {
+                                        return homepageResponse;
+                                    }
+                                    // Last resort - error page
+                                    return new Response('Content temporarily unavailable', {
+                                        status: 503,
+                                        headers: {
+                                            'Content-Type': 'text/html'
+                                        }
+                                    });
+                                });
+                        });
                 })
         );
         return;
@@ -167,16 +213,16 @@ self.addEventListener('fetch', event => {
 
 // Update the service worker
 self.addEventListener('activate', event => {
-    const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
-        caches.keys().then(cacheNames =>
-            Promise.all(
-                cacheNames.map(cacheName => {
-                    if (!cacheWhitelist.includes(cacheName)) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            )
-        )
+        Promise.all([
+            // Clear old caches
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => caches.delete(cacheName))
+                );
+            }),
+            // Claim clients
+            self.clients.claim()
+        ])
     );
 });
