@@ -43,7 +43,7 @@
 
 {% if post.media_file or post.image %}
 <div class="image-content">
-    <div class="image-container">
+    <div class="image-container preview-image-container" id="preview-image-container-{{post.id}}" data-post-id="{{post.id}}">
         {% if post.media_file and post.is_video %}
             <video 
                 controls 

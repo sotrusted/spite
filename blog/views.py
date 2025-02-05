@@ -376,8 +376,9 @@ class PostListView(ListView):
 
 def load_more_posts(request):
     """View specifically for handling HTMX load-more requests"""
-    page = request.GET.get('page', 1)
-    
+    page = int(request.GET.get('page', 1))
+    logger.info(f"Loading more posts for page {page}")
+
     # Get posts from cache or database using context processor functions
     posts_data = get_cached_posts()
     posts = posts_data['posts']  # We only need regular posts, not pinned ones
@@ -396,9 +397,11 @@ def load_more_posts(request):
     try:
         posts_page = paginator.page(page)
     except PageNotAnInteger:
-        posts_page = paginator.page(1)
+        page = 1
+        posts_page = paginator.page(page)
     except EmptyPage:
-        posts_page = paginator.page(paginator.num_pages)
+        page = paginator.num_pages
+        posts_page = paginator.page(page)
     
     # Add comment counts for posts
     for item in posts_page:
@@ -406,6 +409,7 @@ def load_more_posts(request):
             comments = Comment.objects.filter(post=item).order_by('-created_on')
             item.comments_total = comments.count()
             item.recent_comments = comments
+    
     
     context = {
         'posts': posts_page,
@@ -488,7 +492,7 @@ def search_results(request):
 
 def store_page(request):
 
-    return render(request, 'blog/shop.html')
+    return render(request, 'blog/products.html')
 
 class IncorrectObjectTypeException(Exception):
     def __init__(self):
@@ -525,18 +529,18 @@ def reply_comment(request, comment_id):
                         'media_file': {
                             'url': comment.media_file.url if comment.media_file else None,
                         } if comment.media_file else None,
-                        'is_image': comment.is_image(),
-                        'is_video': comment.is_video(),
+                        'is_image': comment.is_image,
+                        'is_video': comment.is_video,
                         'post_id': post.id,
                         'post_title': post.title,
                         'post_content': post.content,
                         'post_media_file': {
                             'url': post.media_file.url if post.media_file else None,
                         } if post.media_file else None,
-                        'has_parent_comment': comment.has_parent_comment(),
-                        'parent_comment_id': comment.parent_comment.id if comment.has_parent_comment() else None,
-                        'parent_comment_content': comment.parent_comment.content if comment.has_parent_comment() else None,
-                        'parent_comment_name': comment.parent_comment.name if comment.has_parent_comment() else None,
+                        'has_parent_comment': comment.has_parent_comment,
+                        'parent_comment_id': comment.parent_comment.id if comment.has_parent_comment else None,
+                        'parent_comment_content': comment.parent_comment.content if comment.has_parent_comment else None,
+                        'parent_comment_name': comment.parent_comment.name if comment.has_parent_comment else None,
                         'parent_comment_media_file': {
                             'url': comment.parent_comment.media_file.url if comment.parent_comment.media_file else None,
                         } if comment.parent_comment.media_file else None,
@@ -631,7 +635,7 @@ def offline_view(request):
 def get_comment_form(request, post_id):
     """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
     post = Post.objects.filter(id=post_id).exists()
-
+    logger.info(f"Post exists: {post}")
     if not post:
         return JsonResponse({'error': 'Post not found'}, status=404)
 

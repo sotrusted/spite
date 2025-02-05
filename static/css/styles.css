@@ -481,6 +481,18 @@ form {
     object-fit: contain;
 }
 
+.comment .post-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment .text-content {
+    flex: 0;
+}
+
+.comment .image-container {
+    flex: 1;
+}
 
 .highlight {
     background-color: rgb(255, 255, 124);
@@ -564,8 +576,9 @@ form {
 	display: flex; 
 	justify-content: center;
 	align-items: center;
-	max-width: 100%;
+	width: 100%;
 	margin: 10px 0;
+    overflow: hidden;
 }
 
 
@@ -1235,6 +1248,15 @@ main {
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
+
+    .highlight {
+        margin-left: 0 !important;
+    }
+
+    .image-thumbnail {
+        max-width: 25%
+    }
+
     /* Sticky video when scrolling */
     .detail .image-container.sticky-video {
         position: fixed;
@@ -1254,6 +1276,14 @@ main {
         height: 100%;
     }
 
+    .detail .menu {
+        margin-bottom: 10px;
+    }
+
+    .preview .image-content, .detail .image-content {
+        margin-bottom: 10px;
+    }
+
     /* Improve tap targets */
     .video-controls {
         min-height: 44px;
@@ -1262,6 +1292,11 @@ main {
     video[controls] {
         outline: none;
         -webkit-tap-highlight-color: transparent;
+    }
+
+
+    .comment .post-content {
+        align-items: center;
     }
 }
 

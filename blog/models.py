@@ -237,12 +237,15 @@ class Comment(models.Model):
 
         if hasattr(self, 'media_file') and not self.media_file: 
             return False
+
         mime_type, _ = mimetypes.guess_type(self.media_file.name if self.media_file else None)
         return mime_type and mime_type.startswith('video/')
 
     @cached_property
     def has_parent_comment(self):
-        return self.parent_comment is not None
+        return self.parent_comment is not None \
+            and hasattr(self.parent_comment, 'id') \
+                and Comment.objects.filter(id=self.parent_comment.id).exists()
     
 
 class SearchQueryLog(models.Model):

@@ -1,7 +1,9 @@
 {% load crispy_forms_tags %}
 <div id="comment-{{post.id}}" class="comment item">
     <div class="post-content">
-        <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+        <div class="text-content"> 
+            <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+        </div>
         
         {% if post.media_file and post.is_video %}
             <div class="image-container">
@@ -16,9 +18,9 @@
                 </video>
             </div>
         {% elif post.media_file and post.is_image %}
-            <img src="{{ post.media_file.url }}" alt="Comment image" loading="lazy">
-        {% elif post.image %}
-            <img src="{{ post.image.url }}" alt="Comment image" loading="lazy">
+            <div class="image-container">
+                <img src="{{ post.media_file.url }}" alt="Comment image" loading="lazy">
+            </div>
         {% endif %}
     </div>
 
@@ -28,31 +30,48 @@
     {% endif %}>
         {% if post.parent_comment %}
             <div class="parent-comment">
-                <span class="reply-to">Re: {{ post.parent_comment.content }} -- <strong>{{ post.parent_comment.name|default:"Anonymous" }}</strong></span>
+                <div class="parent-comment-content">
+                    <span class="reply-to">Re: {{ post.parent_comment_content }} -- <strong>{{ post.parent_comment_name|default:"Anonymous" }}</strong></span>
+                </div>
+                {% if post.parent_comment_media_file %}
+                    {% if post.parent_comment_is_video %}
+                        <div class="video-container">
+                            <video controls autoplay muted loop playsinline>
+                                <source src="{{ post.post_media_file_url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    {% elif post.parent_comment_is_image %}
+                        <div class="image-container">
+                            <img src="{{ post.parent_comment_media_file.url }}" alt="{{ post.parent_comment_name }}" loading="lazy">
+                        </div>
+                    {% endif %}
+                {% endif %}
             </div>
         {% endif %}
+        
         <div class="parent-post preview">
             <div class="text-content">
                 <h2 class="post-title">
-                Re:<a href="{% url 'post-detail' post.post.id %}">
-                    {{ post.post.title }}
+                Re:<a href="{% url 'post-detail' post.post_id %}">
+                    {{ post.post_title }}
                 </a>
                 </h2>
-                <p class="parent-content">{{post.post.content|truncatewords:30}}</p>
+                <p class="parent-content">{{post.post_content|truncatewords:30}}</p>
             </div>
             <div class="image-content">
-                {% if post.post.media_file %}
+                {% if post.post_media_file_url or post.post_image_url %}
                     <div class="image-container">
-                        <a href="{% url 'post-detail' post.post.id %}">
-                            {% if post.post.media_file and post.post.is_video %}
+                        <a href="{% url 'post-detail' post.post_id %}">
+                            {% if post.post_image %}
+                                <img src="{{ post.post_image_url }}" alt="{{ post.post_title }}" loading="lazy">
+                            {% elif post.post_media_file_url and post.post_is_video %}
                                 <video controls autoplay muted loop playsinline>
-                                    <source src="{{ post.post.media_file.url }}" type="video/mp4">
+                                    <source src="{{ post.post_media_file_url }}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
-                            {% elif post.post.media_file and post.post.is_image %}
-                                <img src="{{ post.post.media_file.url }}" alt="{{ post.post.title }}" loading="lazy">
-                            {% elif post.post.image %}
-                                <img src="{{ post.post.image.url }}" alt="{{ post.post.title }}" loading="lazy">
+                            {% elif post.post_media_file_url and post.post_is_image %}
+                                <img src="{{ post.post_media_file_url }}" alt="{{ post.post_title }}" loading="lazy">
                             {% endif %}
                         </a>
                     </div>
@@ -60,6 +79,7 @@
             </div>
         </div>  
     </div>
+    
     <div class="menu">
         <p><em>{{ post.created_on }}</em></p>
         <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="toggle-reply">Reply</a>
@@ -71,4 +91,10 @@
             <button type="submit">Submit</button>
         </form>
     </div>
-    </div>
+</div>
+
+<script>
+    console.log(`Comment {{post.id}} ({{post.content}}) has post media file url: {{post.post_media_file_url}}`)
+
+
+</script>

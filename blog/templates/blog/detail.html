@@ -15,7 +15,7 @@
 
     {% if post.media_file or post.image %}
     <div class="image-content">
-        <div class="image-container">
+        <div class="image-container" id="image-container-{{post.id}}" style="display: none;">
             {% if post.media_file and post.is_video %}
                 <video controls muted autoplay playsinline>
                     <source src="{{ post.media_file.url }}" type="video/mp4">
@@ -26,7 +26,25 @@
             {% elif post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
             {% endif %}
+            <a href="javascript:void(0);" class="detail-toggle-image" id="detail-
+                toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
         </div>
+        <div class="image-thumbnail" id="image-thumbnail-{{post.id}}" style="display: block;">
+            {% if post.media_file and post.is_video %}
+                <video class="image-thumbnail" controls muted autoplay playsinline>
+                    <source src="{{ post.media_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% elif post.media_file and post.is_image %}
+                <img class="image-thumbnail" src="{{ post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
+            {% elif post.image %}
+                <img class="image-thumbnail" src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+            {% endif %}
+            <a href="javascript:void(0);" class="detail-toggle-image" id="detail-
+                toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
+
+        </div>
+
     </div>
     {% endif %}
 

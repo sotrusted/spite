@@ -46,6 +46,34 @@ function toggleContent(postId) {
     }
 }
 
+function toggleDetailImage(postId) {
+    const imageThumbnail = document.getElementById(`image-thumbnail-${postId}`);
+    const imageContainer = document.getElementById(`image-container-${postId}`);
+    if (imageThumbnail && imageContainer) {
+        if (imageThumbnail.style.display === 'block') {
+            imageThumbnail.style.display = 'none';
+            imageContainer.style.display = 'block';
+        } else {
+            imageThumbnail.style.display = 'block';
+            imageContainer.style.display = 'none';
+        }
+    } else {
+        log(`Image thumbnail or image container not found for post ${postId}`, 'error');
+    }
+}
+
+
+function attachDetailToggleImages() {
+    const detailToggleImages = document.querySelectorAll('.detail-toggle-image');
+    detailToggleImages.forEach(detailToggleImage => {
+        detailToggleImage.addEventListener('click', function() {
+            const postId = detailToggleImage.getAttribute('data-post-id')
+            toggleDetailImage(postId);
+        });
+    });
+}
+
+
 function attachToggleContentButtons() {
     log("Attaching toggle content buttons");
     const toggleContentButtons = document.querySelectorAll('a[id^="toggle-link-"]');
@@ -62,7 +90,21 @@ function attachToggleContentButtons() {
             log(`Attached listener to toggle button for post ${a.id}`);
         }
     });
+
+    const previewToggleImages = document.querySelectorAll('.preview-image-container');
+    previewToggleImages.forEach(previewToggleImage => {
+        if (!previewToggleImage.hasAttribute('data-listener-attached')) {
+            previewToggleImage.setAttribute('data-listener-attached', 'true');
+            previewToggleImage.addEventListener('click', function() {
+                const postId = previewToggleImage.getAttribute('data-post-id');
+                toggleContent(postId);
+                toggleDetailImage(postId);
+
+            });
+        }
+    });
 }
+
 
 function attachToggleReplyButtons() {
     log("Attaching toggle reply buttons");
@@ -274,6 +316,9 @@ export function attachEventListeners() {
 
     attachToggleCommentsButtons();
     log('Toggle comments buttons attached');
+
+    attachDetailToggleImages();
+    log('Detail toggle images attached');
 
     attachToggleReplyButtons();
     log('Toggle reply buttons attached');

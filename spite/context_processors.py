@@ -125,14 +125,37 @@ def load_posts(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    for post in page_obj.object_list:
-        if post.get_item_type() == 'Post':
+    for item in page_obj.object_list:
+        if item.get_item_type() == 'Post':
+            post = item
             comments = Comment.objects.filter(post=post).order_by('-created_on')
             # Attach comments and total count directly to the post object
             post.comments_total = comments.count()
             post.recent_comments = comments
+        elif item.get_item_type() == 'Comment':
+            item.post_id = item.post.id
+            item.post_title = item.post.title
+            item.post_content = item.post.content
+            item.post_date_posted = item.post.date_posted
+            item.post_display_name = item.post.display_name
 
+            if item.post.media_file:
+                item.post_media_file_url = item.post.media_file.url
+                item.post_is_video = item.post.is_video
+                item.post_is_image = item.post.is_image
+            elif item.post.image:
+                item.post_image_url = item.post.image_url
 
+            if item.has_parent_comment:
+                item.parent_comment_id = item.parent_comment.id
+                item.parent_comment_name = item.parent_comment.name
+                item.parent_comment_content = item.parent_comment.content
+                item.parent_comment_created_on = item.parent_comment.created_on
+                if item.parent_comment.media_file:
+                    item.parent_comment_media_file = item.parent_comment.media_file
+                    item.parent_comment_media_file_url = item.parent_comment.media_file.url
+                    item.parent_comment_is_video = item.parent_comment.is_video
+                    item.parent_comment_is_image = item.parent_comment.is_image
 
     return {
         'days_since_launch': days_since_launch(),

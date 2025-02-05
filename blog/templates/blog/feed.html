@@ -3,7 +3,6 @@
 {% load crispy_forms_tags %}
 
 <div class="feed" id="feed">
-
     {% if home and pinned_posts %}
         <h2 class="section-header" id="recent-posts">spite issue of the week</h2>
         <div class="pinned-posts">
@@ -59,6 +58,65 @@
     </div>
 
     <h2 class="section-header">recent posts</h2> 
+    <div class="highlight post detail" style="margin: auto; text-align: center; margin-top: 30px; max-width: 900px; padding-top: 10px; border: 5px solid black; hyphens: none; margin: auto; padding: 40px; font-size: 1.2em;">
+        <div class="title-box" style="border-bottom: 2px solid black; margin-top: 30px; margin-bottom: 50px;">
+          <h1 class="post-title" style="padding-bottom:10px;">SPITE Magazine</h1>
+          <h1 class="post-title" style="padding-bottom:10px;">New York City</h1>
+          <h1 class="post-title" style="padding-bottom:10px;">Literary Reading</h1>
+          <h1 style="padding-bottom:10px; margin-bottom: 20px; padding:0 !important; font-size: 20px;">Rules &amp; Regulations</h1>
+        </div>
+        <div class="rules-box" style="padding:40px; margin-left:20px; margin-right:20px; margin: 20px; max-width: 85%; margin: 0 auto; max-width: 900px;">
+        <ol>
+          <li>
+            <p class="post-content">
+              Like the first, the second SPITE Magazine reading will consist exclusively of the best writing that has been posted on SPITE Magazine.
+            </p>
+          </li>
+          <li>
+            <p class="post-content">
+              Selected readers will choose SPITE Magazine post(s) to read at their own discretion and based on whatever  aesthetic criteria they decide.
+            </p>
+          </li>
+          <li>
+            <p class="post-content">
+              Selected readers will read these posts in front of a live audience in downtown NYC.
+            </p>
+          </li>
+          <li>
+            <p class="post-content">
+              The reading will also be livestreamed on the SPITE Magazine website (<a href="#">https://spite.fr</a>)
+            </p>
+          </li>
+          <li>
+            <p class="post-content">
+              <em>(Authorship Rule)</em> The posts chosen by the readers may not necessarily be their own, nor are the readers required to reveal their authorship.
+            </p>
+          </li>
+          </ol>
+      </div>
+      <p class="conclusion">The net effect of these rules is clear.</p>
+      <p class="conclusion">
+        This is not a group reading of the work of specific writers, but the reading of a single text (<a href="#">SPITE Magazine</a>) by multiple readers, like that Gertrude Stein thing from a while ago.</p><p>
+      </p>
+      <em>Please direct any inquiries to the SPITE Magazine Instagram account.</em>
+      
+      <style>
+        @media (max-width: 900px) {
+            .highlight {
+                font-size: 1em !important;
+                padding: 10px !important;
+                margin-left: 0 !important;
+                border: 0 !important;
+            } .title-box { 
+                font-size: 1em !important 
+            }
+            
+        }
+      </style>
+    </div>
+
+
+
     <div class="posts" id="post-list">
         {% if posts %} 
             {% for post in posts %} 
@@ -75,32 +133,14 @@
 
     <div class="cta">
         <div class="post-button">
-            <p> --&lt <a href="{% url 'post-create' %}">Write for Spite!</a> &gt-- </p>
+            <p> --&lt <a href="#">Write for Spite!</a> &gt-- </p>
         </div>
     </div>
-
-    {% if home %}
-    <!-- Load More Button -->
-    {% if posts.has_next %}
-    <div class="load-more-section">
-        <button class="load-more-btn"
-                hx-get="{% url 'load-more-posts' %}?page={{ posts.next_page_number }}"
-                hx-target="#post-list"
-                hx-swap="beforeend"
-                hx-indicator=".loading-indicator">
-            --&lt Load More Posts &gt--
-        </button>
-        <div class="loading-indicator" style="display: none;">
-            <div class="loading-spinner"></div>
-            <p>Loading more posts...</p>
-        </div>
-    </div>
-    {% endif %}
 
     <div class="pagination">
         <span class="step-links">
             {% if posts.has_previous %}
-                <a href="?page=1">&laquo; first</a>
+                <a href="?page=1">« first</a>
                 <a href="?page={{ posts.previous_page_number }}">previous</a>
             {% endif %}
 
@@ -110,11 +150,11 @@
 
             {% if posts.has_next %}
                 <a href="?page={{ posts.next_page_number }}">next</a>
-                <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                <a href="?page={{ posts.paginator.num_pages }}">last »</a>
             {% endif %}
         </span>
     </div>
-    {% endif %}
+
 </div>
 
 <style>
@@ -161,6 +201,3 @@
 }
 </style>
 
-<script src="{% static 'js/load_more.js' %}" defer></script>
-<script>
-</script>

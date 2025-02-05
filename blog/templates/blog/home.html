@@ -7,11 +7,10 @@
 
     <!-- Mobile Collapsible Shop -->
     <div class="mobile-shop">
-        <button class="shop-toggle">
+        <button class="shop-toggle" hx-get="{% url 'shop' %}" hx-target="#mobile-shop-content" hx-swap="afterbegin">
             --&lt Shop Spite &gt--
         </button>
         <div id="mobile-shop-content" class="shop-content">
-            {% include 'blog/products.html' %}
         </div>
     </div>
 
@@ -86,16 +85,9 @@
 
 {% block tail %}
 
-<!-- Desktop Shop Sidebar -->
-<!--
-<div class="shop-sidebar">
-    {% include 'blog/products.html' %}
-</div>
--->
-
 <!-- Invisible bottom trigger -->
 <div class="bottom-trigger"
-     hx-get="{% url 'load-more-posts' %}?page={{ posts.next_page_number }}"
+     hx-get="{% url 'load-more-posts' %}?page=1"
      hx-target="#post-list"
      hx-swap="beforeend"
      hx-trigger="intersect once"
@@ -108,9 +100,29 @@
     <div>Loading more posts...</div>
 </div>
 
+<script>
+// Keep track of the current page
+let currentPage = 1;
+
+document.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.successful && evt.detail.target.id === 'post-list') {
+        currentPage++;
+        
+        // Update the trigger with new page number
+        let trigger = document.querySelector('.bottom-trigger');
+        if (trigger) {
+            trigger.setAttribute('hx-get', `{% url 'load-more-posts' %}?page=${currentPage}`);
+            // Re-enable the trigger for the next page
+            trigger.removeAttribute('data-hx-trigger-processed');
+        }
+    } else if (!evt.detail.successful) {
+        console.log('Load more request failed:', evt.detail);
+    }
+});
+
+</script>
 
 {% endblock %}
 
 {% block page_scripts %}
-    <script src="{% static 'js/load_more.js' %}" defer></script>
 {% endblock %}

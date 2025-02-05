@@ -12,6 +12,7 @@ const STATIC_ASSETS = [
     '/static/sounds/jinglebell-sound.mp3',
     '/static/sounds/shining-sound.mp3',
     '/static/sounds/harp.mp3',
+    '/static/sounds/harp-flourish-sound.mp3',
     '/static/sounds/sword-sound.mp3',
     '/static/sounds/leave.mp3',
     '/static/sounds/send.mp3',
