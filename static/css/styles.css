@@ -544,9 +544,12 @@ form {
 .preview .image-container img, 
 .preview .image-container video {
     max-height: 300px;
+    width: auto;
     max-width: 100%;
     height: auto;
+    object-fit: contain;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+    display: block;
 }
 
 .preview .flexbox {
@@ -722,6 +725,21 @@ main {
     .comment .blockquote .parent-content {
         color: rgb(28, 36, 28);
     }
+
+    .preview .image-content {
+        background: transparent;
+        width: auto;
+        display: flex;
+        justify-content: center;
+    }
+    .preview .image-container {
+        background: transparent;
+        width: auto;
+        display: inline-block; /* Change from flex to inline-block */
+        padding: 0;
+        margin: 0;
+    }
+    
 }
 
 @media only screen and (min-width: 940px) {

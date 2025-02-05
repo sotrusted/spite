@@ -19,12 +19,7 @@
     </div>
 
     
-    <div class="menu">
-        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}">Expand</a>
-        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-        <span id="copy-message" style="display: none;">Link copied!</span>
-    </div>
-    {% if post.author %}
+     {% if post.author %}
         <p class="post-author">by {{ post.author }}</p>
     {% elif post.display_name %}
         <p class="post-author">by {{ post.display_name }}</p>
@@ -64,6 +59,8 @@
     </div>
 </div>
 {% endif %}
+
+
 
 <!--
 <button class="like-button">Like</button>

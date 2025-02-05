@@ -15,7 +15,7 @@
 
     {% if post.media_file or post.image %}
     <div class="image-content">
-        <div class="image-container" id="image-container-{{post.id}}" style="display: none;">
+        <div class="image-container detail-image-container" id="image-container-{{post.id}}" style="display: none;">
             {% if post.media_file and post.is_video %}
                 <video controls muted autoplay playsinline>
                     <source src="{{ post.media_file.url }}" type="video/mp4">
@@ -29,7 +29,7 @@
             <a href="javascript:void(0);" class="detail-toggle-image" id="detail-
                 toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
         </div>
-        <div class="image-thumbnail" id="image-thumbnail-{{post.id}}" style="display: block;">
+        <div class="image-thumbnail detail-thumbnail" id="image-thumbnail-{{post.id}}" style="display: block;">
             {% if post.media_file and post.is_video %}
                 <video class="image-thumbnail" controls muted autoplay playsinline>
                     <source src="{{ post.media_file.url }}" type="video/mp4">
@@ -57,13 +57,5 @@
             <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
         {% endif %}
         <p class="post-date">{{post.date_posted }}</p>
-        
-        {% if not export %}
-        <div class="menu">
-            <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}">Collapse</a>
-            <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-            <span id="copy-message" style="display: none;">Link copied!</span>
-        </div> 
-        {% endif %}
     </div>
 </div>

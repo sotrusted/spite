@@ -71,6 +71,22 @@ function attachDetailToggleImages() {
             toggleDetailImage(postId);
         });
     });
+
+    const detailImageContainers = document.querySelectorAll('.detail-image-container');
+    detailImageContainers.forEach(detailImageContainer => {
+        detailImageContainer.addEventListener('click', function() {
+            const postId = detailImageContainer.getAttribute('data-post-id')
+            toggleDetailImage(postId);
+        });
+    });
+
+    const detailThumbnails = document.querySelectorAll('.detail-thumbnail');
+    detailThumbnails.forEach(detailThumbnail => {
+        detailThumbnail.addEventListener('click', function() {
+            const postId = detailThumbnail.getAttribute('data-post-id')
+            toggleDetailImage(postId);
+        });
+    });
 }
 
 
@@ -566,7 +582,8 @@ function createCommentElement(comment, isInline = false) {
         element.id = `comment-${comment.id}-inline`;
         // Match detail.html inline comment format
         element.innerHTML = `
-            <strong>${comment.name || 'Anonymous'}</strong>: ${comment.content}
+            <strong>${comment.name || 'Anonymous'}</strong>
+            ${comment.content}
             ${comment.media_file || comment.image ? `
                 <div class="image-container">
                     ${comment.media_file && comment.is_video ? `

@@ -2,7 +2,8 @@
 <div id="comment-{{post.id}}" class="comment item">
     <div class="post-content">
         <div class="text-content"> 
-            <strong>{{ post.name|default:"Anonymous" }}</strong>: {{ post.content }}
+            <strong class="comment-name">{{ post.name|default:"Anonymous" }}</strong>
+            <p class="comment-content">{{ post.content }}</p>
         </div>
         
         {% if post.media_file and post.is_video %}
