@@ -378,7 +378,7 @@ BROKER_CONNECTION_RETRY_ON_STARTUP = True  # Add this to fix the warning
 CELERY_BEAT_SCHEDULE = {
     'cache-posts': {
         'task': 'spite.tasks.cache_posts_data',
-        'schedule': 60.0,  # Run every minute
+        'schedule': 300.0,  # Run every 5 minutes instead of every minute
     },
     'persist-pageviews': {
         'task': 'spite.tasks.persist_pageview_count',
@@ -471,4 +471,10 @@ if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 ALLOWED_HOSTS = ['spite.fr', 'www.spite.fr', 'localhost', '127.0.0.1', '192.3.30.202', '69.48.163.194']
+
+CELERY_WORKER_MAX_MEMORY_PER_CHILD = 40000  # 40MB
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 10  # Restart worker more frequently
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Process one task at a time
+CELERY_TASK_TIME_LIMIT = 60  # 1 minute max
+CELERY_TASK_SOFT_TIME_LIMIT = 45  # Warn at 45 seconds
 

@@ -477,6 +477,8 @@ def search_results(request):
         paginator = Paginator(list(combined_items), 10)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
+
+        SearchQueryLog.objects.create(query=query, ip_address=get_client_ip(request))
         
         context = {
             'query': query,
@@ -1023,3 +1025,11 @@ def update_online_status(request):
     
     # Return just the number for HTMX to update the span content
     return HttpResponse(str(len(online_users)))
+
+def hx_get_parent_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    logger.info(f"HX GET Parent Post: {post}")
+    response = render(request, 'blog/partials/post.html', 
+                    {'post': post, 'nested': True})
+    logger.info(f"HX GET Parent Post Response: {response}")
+    return response

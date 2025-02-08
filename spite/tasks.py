@@ -14,49 +14,89 @@ from spite.utils import cache_large_data
 # Get the 'spite' logger
 logger = logging.getLogger('spite')
 
+def process_post(post):
+    post_data = {
+        'id': post.id,
+        'title': post.title,
+        'content': post.content,
+        'display_name': post.display_name,
+        'date_posted': post.date_posted,
+        'is_image': post.is_image(),
+        'is_video': post.is_video(),
+        'anon_uuid': post.anon_uuid,
+        'is_pinned': post.is_pinned,
+        'media_file': {
+            'url': post.media_file.url if post.media_file else None,
+        } if post.media_file else None,
+        'image': {
+            'url': post.image.url if post.image else None,
+        } if post.image else None,
+        'like_count': post.like_count,
+        'parent_post': post.parent_post,
+        'ip_address': post.ip_address,
+        'encrypted_ip': post.encrypted_ip,
+    }
+    return post_data
+
 @shared_task
-@cache_large_data(key='full_posts_data', timeout=60 * 15)  # 15 minutes
+def process_post_chunk(posts_chunk):
+    """Process a small chunk of posts to reduce memory usage"""
+    return [process_post(post) for post in posts_chunk]
+
+@shared_task
 def cache_posts_data():
     try:
-        # Get posts with optimized query
-        base_query = Post.objects.only(
+        # Use iterator and values_list for minimal memory usage
+        base_query = Post.objects.values_list(
             'id', 'title', 'content', 'display_name',
-            'date_posted', 'is_pinned', 'media_file', 'image'
-        ).order_by('-date_posted')
+            'date_posted', 'is_pinned', 'media_file', 'image',
+            'parent_post', 'anon_uuid'
+        ).iterator(chunk_size=50)  # Smaller chunk size
 
-        # Process all posts
-        all_posts = list(base_query)
-        pinned_posts = [post for post in all_posts if post.is_pinned]
-        regular_posts = [post for post in all_posts if not post.is_pinned]
-
-        logger.info(f"Caching {len(all_posts)} posts")
+        pinned_posts = []
+        chunk_count = 0
+        current_chunk = []
+        
+        for post in base_query:
+            post_dict = {
+                'id': post[0],
+                'title': post[1],
+                'content': post[2],
+                'display_name': post[3],
+                'date_posted': post[4],
+                'is_pinned': post[5],
+                'media_file': {'url': post[6]} if post[6] else None,
+                'image': {'url': post[7]} if post[7] else None,
+                'parent_post': post[8],
+                'anon_uuid': post[9],
+            }
+            
+            if post_dict['is_pinned']:
+                pinned_posts.append(post_dict)
+            else:
+                current_chunk.append(post_dict)
+                if len(current_chunk) >= 50:  # Smaller chunks
+                    compressed = lz4.compress(pickle.dumps(current_chunk))
+                    cache.set(f'posts_chunk_{chunk_count}', compressed, timeout=300)  # 5 min timeout
+                    chunk_count += 1
+                    current_chunk = []
+                    
+        # Handle remaining posts
+        if current_chunk:
+            compressed = lz4.compress(pickle.dumps(current_chunk))
+            cache.set(f'posts_chunk_{chunk_count}', compressed, timeout=300)
+            chunk_count += 1
 
         # Cache pinned posts
-        compressed_pinned = lz4.compress(pickle.dumps(pinned_posts))
-        cache.set('pinned_posts', compressed_pinned)
+        if pinned_posts:
+            compressed_pinned = lz4.compress(pickle.dumps(pinned_posts))
+            cache.set('pinned_posts', compressed_pinned, timeout=300)
+            
+        cache.set('posts_chunk_count', chunk_count, timeout=300)
+        logger.info(f"Cached {len(pinned_posts)} pinned posts and {chunk_count} chunks")
 
-        # Split regular posts into chunks of 1000
-        chunk_size = 1000
-        chunks = [regular_posts[i:i + chunk_size] for i in range(0, len(regular_posts), chunk_size)]
-        
-        # Cache each chunk separately
-        for i, chunk in enumerate(chunks):
-            compressed_chunk = lz4.compress(pickle.dumps(chunk))
-            cache.set(f'posts_chunk_{i}', compressed_chunk)
-        
-        # Store the number of chunks
-        cache.set('posts_chunk_count', len(chunks))
-
-        logger.info(f"Successfully cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks of regular posts")
-        
-        return {
-            'pinned_posts': pinned_posts,
-            'regular_posts': regular_posts
-        }
-        
     except Exception as e:
-        logger.error(f"Error caching posts data: {str(e)}", exc_info=True)
-        return None
+        logger.error(f"Error caching posts: {e}", exc_info=True)
 
 @shared_task
 def cache_page_html(view_name, page_number=None):

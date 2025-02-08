@@ -1,17 +1,20 @@
 <div id="post-{{post.id}}" class="post item">
-    <div class="preview" id="post-preview-{{post.id}}">
+    <div class="preview" id="post-preview-{{post.id}}"
+        {% if nested %}style="display: none;"{% endif %}>
         {% include 'blog/preview.html' with post=post %}
     </div>
-    <div class="detail" id="post-detail-{{ post.id }}" style="display: none;">
+    <div class="detail" id="post-detail-{{ post.id }}" 
+        {% if not nested %}style="display: none;"{% endif %}>
         {% include 'blog/detail.html' with post=post nested=True %}
     </div>
-    <div class="menu">
+    <div class="menu post-menu">
         <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}">Expand</a>
         <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
         <span id="copy-message" style="display: none;">Link copied!</span>
     </div>
 
-        <!-- Unique Comment Section for Each Post -->
+    {% if not nested %}
+    <!-- Unique Comment Section for Each Post -->
     <div id="comment-section-{{ post.id }}">
         <button id="toggle-comments-{{ post.id }}" 
                 class="toggle-comments" 
@@ -34,4 +37,13 @@
             {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form %}
         </div>
     </div>
+    {% endif %}
+
+    {% if hx_request %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            attachEventListeners();
+        });
+    </script>
+    {% endif %}
 </div>

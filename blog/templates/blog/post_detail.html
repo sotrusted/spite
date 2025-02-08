@@ -17,8 +17,7 @@
 
 {% block content %}
     <div class="detail mb-3 ml-3">
-        <a class="back" href="{% url 'home' %}">Back to Spite</a>
-        {% include 'blog/detail.html' with post=post nested=False %}
+        {% include 'blog/partials/post.html' with post=post nested=False %}
     </div>
 {% endblock %}
 

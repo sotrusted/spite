@@ -52,18 +52,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
         # Send the comment message to the WebSocket
         await self.send(text_data=json.dumps(event["message"]))
 
-def get_client_ip(self):
-    """Get real client IP, even behind proxy"""
-    # Try X-Forwarded-For header first
-    forwarded_for = self.scope.get('headers', {}).get(
-        b'x-forwarded-for', b''
-    ).decode().split(',')[0].strip()
-    
-    if forwarded_for:
-        return forwarded_for
-        
-    # Fall back to direct client IP
-    return self.scope['client'][0]
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -72,13 +60,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
     active_chats = {}   # Class variable to store active chat pairs
     online_users = set()  # Class variable to track all online users
 
-    client_ip = get_client_ip()
 
     storage = SecureIPStorage()
-    client_ip = storage.decrypt_ip(client_ip)
+
+    def get_client_ip(self):
+        # Convert headers list of tuples to a dict for easier lookup
+        headers = dict(self.scope['headers'])
+        
+        # Get X-Forwarded-For header, converting from bytes to string if it exists
+        forwarded_for = headers.get(b'x-forwarded-for', b'').decode()
+        if forwarded_for:
+            return forwarded_for.split(',')[0].strip()
+        
+        # If no X-Forwarded-For header, get client address from scope
+        return self.scope['client'][0] if self.scope.get('client') else None
 
     async def connect(self):
         self.user_id = str(uuid.uuid4())
+        client_ip = self.get_client_ip()
+        self.client_ip = self.storage.decrypt_ip(client_ip)
         logger.info(f"New chat connection: {self.user_id}")
         
         # Add user to online users set

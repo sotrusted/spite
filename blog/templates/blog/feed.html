@@ -120,7 +120,7 @@
         {% if posts %} 
             {% for post in posts %} 
                 {% if post.get_item_type == 'Post' %}
-                    {% include 'blog/partials/post.html' with post=post %}
+                    {% include 'blog/partials/post.html' with post=post nested=False %}
                 {% elif post.get_item_type == 'Comment' %}
                     {% include 'blog/partials/comment.html' with comment=post %}
                 {% endif %}

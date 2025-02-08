@@ -14,6 +14,7 @@ import os
 from blog.forms import PostSearchForm, CommentForm, PostForm
 from asgiref.sync import sync_to_async
 from django.urls import resolve
+from django.shortcuts import get_object_or_404
 from spite.utils import cache_large_data
 
 logger = logging.getLogger('spite')
@@ -47,35 +48,64 @@ def get_optimized_posts():
         'pinned_posts': pinned_posts,
     }
 
-def get_cached_posts():
+def get_cached_posts(request):
     try:
-        # Get pinned posts
+        # Get pinned posts (usually few)
         compressed_pinned = cache.get('pinned_posts')
         pinned_posts = []
         if compressed_pinned:
             pickled_pinned = lz4.decompress(compressed_pinned)
-            pinned_posts = pickle.loads(pickled_pinned)
+            pinned_posts = [DictToObject(post) for post in pickle.loads(pickled_pinned)]
 
-        # Get regular posts from chunks
-        regular_posts = []
+        # Get only needed chunks for current page
         chunk_count = cache.get('posts_chunk_count', 0)
-        
-        for i in range(chunk_count):
+        page = int(request.GET.get('page', 1))
+        chunks_needed = min(3, max(1, page))  # Load 1-3 chunks based on page
+
+        regular_posts = []
+        for i in range(chunks_needed):
             compressed_chunk = cache.get(f'posts_chunk_{i}')
             if compressed_chunk:
-                pickled_chunk = lz4.decompress(compressed_chunk)
-                chunk = pickle.loads(pickled_chunk)
-                regular_posts.extend(chunk)
+                try:
+                    chunk = pickle.loads(lz4.decompress(compressed_chunk))
+                    regular_posts.extend(DictToObject(post) for post in chunk)
+                except Exception as e:
+                    logger.error(f"Error loading chunk {i}: {e}")
+                    continue
 
-        return {
-            'posts': regular_posts,
-            'pinned_posts': pinned_posts
-        }
+        if pinned_posts or regular_posts:
+            return {
+                'posts': regular_posts,
+                'pinned_posts': pinned_posts,
+                'total_chunks': chunk_count
+            }
+
+        return get_optimized_posts()
+
     except Exception as e:
-        logger.error(f"Error loading cached posts: {e}")
-        return get_optimized_posts()  # Fallback to database query
+        logger.error(f"Cache error: {e}")
+        return get_optimized_posts()
 
+class DictToObject:
+    """Convert dictionary to object-like structure with support for FileField URLs"""
+    def __init__(self, data):
+        for key, value in data.items():
+            if key in ['media_file', 'image']:
+                # Create a FileField-like object with a url attribute
+                if value:
+                    setattr(self, key, FileFieldLike(value))
+                else:
+                    setattr(self, key, None)
+            else:
+                setattr(self, key, value)
+    
+    def get_item_type(self):
+        return "Post"
 
+class FileFieldLike:
+    """Mimics Django's FileField with url attribute"""
+    def __init__(self, url):
+        self.url = url
 
 def load_posts(request):
     # Check if this is a pagination request
@@ -95,7 +125,9 @@ def load_posts(request):
         return { 'is_loading': is_loading }
 
     # Try cache first, fallback to database
-    posts_data = get_cached_posts()
+    posts_data = get_cached_posts(request)
+
+
 
 
     # Add comments context
@@ -128,6 +160,8 @@ def load_posts(request):
     for item in page_obj.object_list:
         if item.get_item_type() == 'Post':
             post = item
+
+            post = get_object_or_404(Post, id=post.id)
             comments = Comment.objects.filter(post=post).order_by('-created_on')
             # Attach comments and total count directly to the post object
             post.comments_total = comments.count()
@@ -140,11 +174,11 @@ def load_posts(request):
             item.post_display_name = item.post.display_name
 
             if item.post.media_file:
-                item.post_media_file_url = item.post.media_file.url
+                item.post_media_file = item.post.media_file
                 item.post_is_video = item.post.is_video
                 item.post_is_image = item.post.is_image
             elif item.post.image:
-                item.post_image_url = item.post.image_url
+                item.post_image = item.post.image
 
             if item.has_parent_comment:
                 item.parent_comment_id = item.parent_comment.id

@@ -494,6 +494,15 @@ form {
     flex: 1;
 }
 
+.comment .parent-comment, .comment .parent-post {
+    background-color: #dfd1bf; 
+}
+
+.comment .parent-post.stacked {
+
+    background-color: #d5c9b6; 
+}
+
 .highlight {
     background-color: rgb(255, 255, 124);
     transition: background-color 1s ease-out;
@@ -719,9 +728,6 @@ main {
         font-size: 1.1em;
     }
 
-    .comment .blockquote {
-        font-size: 0.9em;
-    }
     .comment .blockquote .parent-content {
         color: rgb(28, 36, 28);
     }
@@ -739,7 +745,26 @@ main {
         padding: 0;
         margin: 0;
     }
+
+    .detail .image-content {
+        justify-content: left;
+        margin-left: 0;
+    }
     
+    .parent-comment,
+    .reply-to,
+    .parent-post .parent-content {
+        font-size: 1em;
+    }
+
+    .parent-post .post-title {
+        font-size: 1.1em;
+    }
+
+    .parent-comment,
+    .parent-post.preview {
+        padding: 10px;
+    }
 }
 
 @media only screen and (min-width: 940px) {
@@ -822,6 +847,7 @@ main {
     margin-left: 20px;
     border-left: 1px solid rgba(0, 100, 0, 0.3);
     padding-left: 10px;
+    font-size: 1.5em;
 
 }
 
@@ -1272,7 +1298,11 @@ main {
     }
 
     .image-thumbnail {
-        max-width: 25%
+        max-width: 100%;
+        height: auto;
+        max-height: 100px;
+        width: auto;
+        object-fit: contain;
     }
 
     /* Sticky video when scrolling */
@@ -1583,3 +1613,58 @@ video:focus {
         display: block;
     }
 }
+
+/* Parent comment styles */
+.parent-comment {
+    font-size: 1.1em;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #dfd1bf;
+}
+
+.parent-comment-content {
+    margin-bottom: 10px;
+}
+
+.reply-to {
+    font-size: 1.1em;
+    line-height: 1.4;
+    display: block;
+    padding: 5px 0;
+}
+
+/* Parent post styles */
+.parent-post.preview {
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.parent-post .post-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.parent-post .parent-content {
+    font-size: 1.1em;
+    line-height: 1.4;
+    margin: 10px 0;
+}
+
+/* Mobile adjustments */
+@media only screen and (max-width: 480px) {
+    .parent-comment,
+    .reply-to,
+    .parent-post .parent-content {
+        font-size: 1em;
+    }
+
+    .parent-post .post-title {
+        font-size: 1.1em;
+    }
+
+    .parent-comment,
+    .parent-post.preview {
+        padding: 10px;
+    }
+}
+

@@ -14,11 +14,13 @@ export function initAjaxPostForm() {
     }
 
     postForm.addEventListener('submit', function (e) {
+        console.log('Form submission started'); // Debug log
         e.preventDefault(); // Prevent the default form submission
         disableSubmitButton(postForm);
 
         const formData = new FormData(this); // Collect form data
         const url = this.action; // Get the form's action URL
+        console.log('Submitting to URL:', url); // Debug log
 
         // Perform AJAX request
         fetch(url, {
@@ -30,12 +32,14 @@ export function initAjaxPostForm() {
             body: formData,
         })
             .then(response => {
+                console.log('Response status:', response.status); // Debug log
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Response data:', data); // Debug log
                 if (data.success) {
                     postForm.reset(); // Clear the form
                     enableSubmitButton(postForm);
@@ -44,6 +48,7 @@ export function initAjaxPostForm() {
                     document.getElementById('post-error').style.display = 'none';
 
                     const post = data.post; 
+                    console.log('Adding post to page:', post); // Debug log
 
                     const newPost = addPostToPage(post);
 
@@ -64,13 +69,14 @@ export function initAjaxPostForm() {
                         console.log('Post was not added to page');
                     }
                 } else {
+                    console.log('Form submission failed:', data); // Debug log
                     // Display error message
                     document.getElementById('post-error').style.display = 'block';
                     document.getElementById('post-success').style.display = 'none';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error details:', error); // Debug log
                 document.getElementById('post-error').style.display = 'block';
                 document.getElementById('post-success').style.display = 'none';
                 enableSubmitButton();

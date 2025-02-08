@@ -86,6 +86,7 @@
 {% block tail %}
 
 <!-- Invisible bottom trigger -->
+<!--
 <div class="bottom-trigger"
      hx-get="{% url 'load-more-posts' %}?page=1"
      hx-target="#post-list"
@@ -93,7 +94,7 @@
      hx-trigger="intersect once"
      hx-indicator=".loading-indicator">
 </div>
-
+-->
 <!-- Loading indicator -->
 <div class="loading-indicator">
     <div class="loading-spinner"></div>

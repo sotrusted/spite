@@ -1,5 +1,5 @@
 import uuid
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import logging
 from django.db import models
 from django.utils import timezone
@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.conf import settings
 from django.core.cache import cache
-
 class SecureIPStorage:
     def __init__(self):
         self.fernet = Fernet(settings.IP_ENCRYPTION_KEY)
@@ -24,7 +23,12 @@ class SecureIPStorage:
         return self.fernet.encrypt(ip.encode()).decode()
     
     def decrypt_ip(self, encrypted_ip):
-        return self.fernet.decrypt(encrypted_ip.encode()).decode()
+        try:
+            # Try to decrypt if it's encrypted
+            return self.fernet.decrypt(encrypted_ip.encode()).decode()
+        except (InvalidToken, AttributeError):
+            # If decryption fails or IP isn't encrypted yet, return as-is
+            return encrypted_ip
 
 logger = logging.getLogger('spite')
 
@@ -251,6 +255,7 @@ class Comment(models.Model):
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)
     user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
     timestamp = models.DateTimeField(default=now)
 

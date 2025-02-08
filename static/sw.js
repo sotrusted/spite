@@ -149,8 +149,42 @@ self.addEventListener('fetch', event => {
     // Check if the request is for an audio file
     const isAudioFile = url.pathname.endsWith('.mp3');
     
-    // For audio files, just pass through to network
+    // For audio files, use cache-first strategy
     if (isAudioFile) {
+        event.respondWith(
+            caches.match(event.request)
+                .then(response => {
+                    if (response) {
+                        console.log('SW.JS: Returning cached audio:', url.pathname);
+                        return response;
+                    }
+                    
+                    console.log('SW.JS: Fetching audio from network:', url.pathname);
+                    return fetch(event.request)
+                        .then(networkResponse => {
+                            if (!networkResponse || !networkResponse.ok) {
+                                throw new Error('Network fetch failed');
+                            }
+                            
+                            // Cache the audio file for future use
+                            const responseToCache = networkResponse.clone();
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    console.log('SW.JS: Caching audio file:', url.pathname);
+                                    cache.put(event.request, responseToCache);
+                                });
+                                
+                            return networkResponse;
+                        })
+                        .catch(error => {
+                            console.error('SW.JS: Audio fetch failed:', error);
+                            return new Response('Audio file unavailable', {
+                                status: 503,
+                                headers: { 'Content-Type': 'text/plain' }
+                            });
+                        });
+                })
+        );
         return;
     }
 

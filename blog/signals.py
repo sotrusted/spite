@@ -28,9 +28,10 @@ def clear_cache_on_post_save(sender, instance, **kwargs):
         cache.delete(f'posts_chunk_{i}')
     cache.delete('posts_chunk_count')
     
-    # Trigger immediate cache rebuild
+    # Trigger async cache rebuild
     cache_posts_data.delay()
     
+    # Return immediately to not block post creation
     logger.info(f"Post caches cleared and rebuild triggered")
 
 

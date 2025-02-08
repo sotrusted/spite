@@ -66,8 +66,8 @@ function toggleDetailImage(postId) {
 function attachDetailToggleImages() {
     const detailToggleImages = document.querySelectorAll('.detail-toggle-image');
     detailToggleImages.forEach(detailToggleImage => {
+        const postId = detailToggleImage.getAttribute('data-post-id')
         detailToggleImage.addEventListener('click', function() {
-            const postId = detailToggleImage.getAttribute('data-post-id')
             toggleDetailImage(postId);
         });
     });
