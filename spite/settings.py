@@ -147,7 +147,7 @@ DATABASES = {
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST', default='localhost'),
+        'HOST': env('DB_HOST', default='db'),
         'PORT': env('DB_PORT', default='5432'),
         'CONN_MAX_AGE': 60,  # Keep connections alive for 60 seconds
         'OPTIONS': {
@@ -364,12 +364,14 @@ USE_TZ = True  # Enable timezone support
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'LOCATION': '127.0.0.1:11211',
+        'LOCATION': 'memcached:11211',
     }
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Example using Redis as broker
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # Example using Redis as broker
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -396,7 +398,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }

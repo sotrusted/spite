@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/spite
+      - static_volume:/spite/staticfiles
+      - media_volume:/spite/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+      - redis
+      - memcached
+
+  db:
+    image: postgres:14.15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    image: redis:7.4.1
+    ports:
+      - "6379:6379"
+
+  memcached:
+    image: memcached:1.6.14
+    ports:
+      - "11211:11211"
+
+  celery:
+    build: .
+    command: celery -A spite worker --loglevel=info --max-memory-per-child=40000
+    volumes:
+      - .:/spite
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  celery-beat:
+    build: .
+    command: celery -A spite beat --loglevel=info
+    volumes:
+      - .:/spite
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume: 

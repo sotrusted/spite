@@ -1,0 +1,5 @@
+Python 3.10.12
+5.4.0 (opalescent)
+redis-cli 7.4.1
+PostgreSQL 14.15 (Ubuntu 14.15-0ubuntu0.22.04.1)
+memcached 1.6.14

@@ -1,0 +1,48 @@
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2025-02-10 15:23:46 UTC; 42min ago
+       Docs: man:nginx(8)
+    Process: 134176 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 134178 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 134179 (nginx)
+      Tasks: 2 (limit: 2226)
+     Memory: 6.6M
+        CPU: 4.003s
+     CGroup: /system.slice/nginx.service
+             ├─134179 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             └─134180 "nginx: worker process" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+
+Feb 10 15:23:45 racknerd-596e4a7 systemd[1]: Starting A high performance web server and a reverse proxy server...
+Feb 10 15:23:46 racknerd-596e4a7 systemd[1]: Started A high performance web server and a reverse proxy server.
+● redis-server.service - Advanced key-value store
+     Loaded: loaded (/lib/systemd/system/redis-server.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2025-02-10 15:23:45 UTC; 42min ago
+       Docs: http://redis.io/documentation,
+             man:redis-server(1)
+   Main PID: 134145 (redis-server)
+     Status: "Ready to accept connections"
+      Tasks: 6 (limit: 2226)
+     Memory: 3.7M
+        CPU: 18.078s
+     CGroup: /system.slice/redis-server.service
+             └─134145 "/usr/bin/redis-server 127.0.0.1:6379" "" "" "" "" "" "" ""
+
+Feb 10 15:23:44 racknerd-596e4a7 systemd[1]: Stopped Advanced key-value store.
+Feb 10 15:23:44 racknerd-596e4a7 systemd[1]: redis-server.service: Consumed 27min 19.412s CPU time.
+Feb 10 15:23:44 racknerd-596e4a7 systemd[1]: Starting Advanced key-value store...
+Feb 10 15:23:45 racknerd-596e4a7 systemd[1]: Started Advanced key-value store.
+● memcached.service - memcached daemon
+     Loaded: loaded (/lib/systemd/system/memcached.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2025-02-10 15:23:41 UTC; 42min ago
+       Docs: man:memcached(1)
+   Main PID: 134043 (memcached)
+      Tasks: 10 (limit: 2226)
+     Memory: 8.1M
+        CPU: 7.053s
+     CGroup: /system.slice/memcached.service
+             └─134043 /usr/bin/memcached -m 64 -p 11211 -u memcache -l 127.0.0.1 -P /var/run/memcached/memcached.pid
+celery                           RUNNING   pid 138374, uptime 0:26:40
+celery_beat                      RUNNING   pid 134279, uptime 0:42:02
+serverinterface                  RUNNING   pid 134280, uptime 0:42:02
+spite                            RUNNING   pid 134281, uptime 0:42:02
+tbo                              RUNNING   pid 134282, uptime 0:42:02
