@@ -43,6 +43,7 @@ import pickle
 import time
 import requests
 from django.db import connection
+from contextlib import contextmanager
 
 logger = logging.getLogger('spite')
 
@@ -244,13 +245,15 @@ class PostCreateView(CreateView):
         logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
 
         # Check for spam before processing the form
+        '''
         is_spam, spam_message = self.check_spam(
             request, 
             request.POST.get('title', ''),
             request.POST.get('content', ''), 
             request.POST.get('display_name', '')
         )
-        
+        '''
+        '''
         if is_spam:
             logger.warning(f"Spam detected: {spam_message}")
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -261,7 +264,7 @@ class PostCreateView(CreateView):
             # For non-AJAX requests, add error to messages
             messages.error(request, spam_message)
             return self.form_invalid(self.get_form())
-
+        '''
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
@@ -920,47 +923,47 @@ def media_flow_standalone(request):
     return render(request, 'blog/partials/media_flow_standalone.html')
 
 
+@contextmanager
+def db_connection():
+    """Context manager for database connections"""
+    try:
+        yield
+    finally:
+        connection.close()
+
 def loading_screen(request):
-    """Loading screen view that periodically checks server status"""
+    """Loading screen view with proper connection management"""
     logger.info("Loading screen view called")
     target_url = request.GET.get('to', '/')
     
-    try:
-        # Try to fetch the target URL with a timeout
-        response = requests.get(
-            request.build_absolute_uri(target_url),
-            timeout=5,
-            headers={'X-Requested-With': 'XMLHttpRequest'}
-        )
-        
-        if response.status_code == 200:
-            logger.info("Server check successful, redirecting to target")
-            redirect_response = redirect(target_url)
-            # Set an explicit value and max_age
-            redirect_response.set_cookie(
-                'loading_complete', 
-                'true', 
-                path='/',
-                max_age=3600,  # 1 hour
-                httponly=True
+    with db_connection():
+        try:
+            response = requests.get(
+                request.build_absolute_uri(target_url),
+                timeout=5,
+                headers={'X-Requested-With': 'XMLHttpRequest'}
             )
-            # Reset retry count on success
-            request.session['loading_retry_count'] = 0
-            return redirect_response
             
-    except (requests.Timeout, requests.RequestException) as e:
-        logger.error(f"Request error during server check: {e}")
-        
-    finally:
-        # Clean up database connections
-        connection.close()
+            if response.status_code == 200:
+                logger.info("Server check successful")
+                redirect_response = redirect(target_url)
+                redirect_response.set_cookie(
+                    'loading_complete', 
+                    'true', 
+                    path='/',
+                    max_age=3600,
+                    httponly=True
+                )
+                request.session['loading_retry_count'] = 0
+                return redirect_response
+                
+        except requests.RequestException as e:
+            logger.error(f"Request error: {e}")
     
-    # Show loading screen with retry count
     retry_count = request.session.get('loading_retry_count', 0)
     return render(request, 'blog/loading.html', {
         'target_url': target_url,
-        'retry_count': retry_count,
-        'error_message': 'Server is starting up...' if retry_count < 3 else 'Taking longer than usual...'
+        'retry_count': retry_count
     })
 
 javascript_logger = logging.getLogger('javascript')

@@ -66,10 +66,17 @@ function toggleDetailImage(postId) {
 function attachDetailToggleImages() {
     const detailToggleImages = document.querySelectorAll('.detail-toggle-image');
     detailToggleImages.forEach(detailToggleImage => {
-        const postId = detailToggleImage.getAttribute('data-post-id')
-        detailToggleImage.addEventListener('click', function() {
-            toggleDetailImage(postId);
-        });
+        if (!detailToggleImage) {
+            log('Detail toggle image not found', 'error');
+            return;
+        }
+        if (!detailToggleImage.hasAttribute('data-listener-attached')) {
+            detailToggleImage.setAttribute('data-listener-attached', 'true');
+            const postId = detailToggleImage.getAttribute('data-post-id')
+            detailToggleImage.addEventListener('click', function() {
+                toggleDetailImage(postId);
+            });
+        }
     });
 
     const detailImageContainers = document.querySelectorAll('.detail-image-container');

@@ -14,11 +14,14 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
 from spite.tasks import summarize_posts
+from channels.exceptions import ChannelFull
+from redis.exceptions import ConnectionError
 
 logger = logging.getLogger('spite')
 
 @receiver(post_save, sender=Post)
-def clear_cache_on_post_save(sender, instance, **kwargs):
+def clear_cache_on_post_save(sender, instance, created, **kwargs):
+    """Ensure all cache keys are cleared consistently"""
     logger.info(f"Post {instance.id} saved. Clearing post caches")
     
     # Clear all post-related caches
@@ -77,31 +80,36 @@ def refresh_recent_comments(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Post)
 def broadcast_new_post(sender, instance, created, **kwargs):
     if created:  # Only broadcast new posts
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "posts",  # Group name for clients subscribed to post updates
-            {
-                "type": "post_message",
-                "message": {
-                    "id": instance.id,
-                    "title": instance.title,
-                    "content": instance.content,
-                    'date_posted': localtime(instance.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
-                    "anon_uuid": str(instance.anon_uuid),
-                    "parent_post": {
-                        "id": instance.parent_post.id,
-                        "title": instance.parent_post.title,
-                    } if instance.parent_post else None,
-                    "city": instance.city,
-                    "contact": instance.contact,
-                    "media_file": {"url": instance.media_file.url} if instance.media_file else None,
-                    "image": instance.image.url if instance.image else None,
-                    "is_image": instance.is_image(),
-                    "is_video": instance.is_video(),
-                    "display_name": instance.display_name,
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "posts",  # Group name for clients subscribed to post updates
+                {
+                    "type": "post_message",
+                    "message": {
+                        "id": instance.id,
+                        "title": instance.title,
+                        "content": instance.content,
+                        'date_posted': localtime(instance.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                        "anon_uuid": str(instance.anon_uuid),
+                        "parent_post": {
+                            "id": instance.parent_post.id,
+                            "title": instance.parent_post.title,
+                        } if instance.parent_post else None,
+                        "city": instance.city,
+                        "contact": instance.contact,
+                        "media_file": {"url": instance.media_file.url} if instance.media_file else None,
+                        "image": instance.image.url if instance.image else None,
+                        "is_image": instance.is_image(),
+                        "is_video": instance.is_video(),
+                        "display_name": instance.display_name,
+                    },
                 },
-            },
-        )
+            )
+        except (ConnectionError, ChannelFull):
+            logger.error("Failed to send post message to channel layer")
+            #Continue wo broadcasting
+            pass
 
 @receiver(post_save, sender=Comment)
 def broadcast_new_comment(sender, instance, created, **kwargs):

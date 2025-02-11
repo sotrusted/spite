@@ -6,36 +6,63 @@ from channels.db import database_sync_to_async
 from .models import ChatMessage
 from django.utils import timezone
 from .models import SecureIPStorage
+from weakref import WeakSet
+import asyncio
+from .utils import get_optimized_posts
 
 logger = logging.getLogger('spite')
 
 class PostConsumer(AsyncWebsocketConsumer):
+    # Track active connections
+    active_connections = WeakSet()
+    
     async def connect(self):
-        
-        # Add the user to a group for broadcasting
+        """Simple connection handler for live updates"""
+        self.active_connections.add(self)
         await self.channel_layer.group_add("posts", self.channel_name)
         await self.accept()
-
+        
+        # Set ping interval for connection health
+        self.ping_task = asyncio.create_task(self.ping_client())
+    
     async def disconnect(self, close_code):
-        # Remove the user from the group
+        """Clean disconnect"""
+        self.active_connections.discard(self)
         await self.channel_layer.group_discard("posts", self.channel_name)
-
+        self.ping_task.cancel()
+    
     async def receive(self, text_data):
-        # Handle incoming data from WebSocket (if needed)
-        data = json.loads(text_data)
-        await self.channel_layer.group_send(
-            "posts",
-            {
-                "type": "post_message",
-                "message": data["message"],
-            },
-        )
-
+        """Handle incoming post data"""
+        try:
+            data = json.loads(text_data)
+            # Broadcast new post to all connected clients
+            await self.channel_layer.group_send(
+                "posts",
+                {
+                    "type": "post_message",
+                    "message": data["message"]
+                }
+            )
+        except Exception as e:
+            logger.error(f"Error in post consumer receive: {e}")
+    
     async def post_message(self, event):
-        # Send the message to WebSocket
-        await self.send(text_data=json.dumps({
-            "message": event["message"]
-        }))
+        """Send new post to client"""
+        try:
+            await self.send(text_data=json.dumps({
+                "message": event["message"]
+            }))
+        except Exception as e:
+            logger.error(f"Error sending post message: {e}")
+    
+    async def ping_client(self):
+        """Keep connection alive"""
+        while True:
+            try:
+                await asyncio.sleep(30)
+                await self.send(text_data=json.dumps({"type": "ping"}))
+            except Exception:
+                break
 
 
 class CommentConsumer(AsyncWebsocketConsumer):

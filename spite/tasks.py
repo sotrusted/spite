@@ -10,6 +10,8 @@ from django.db.models import Q
 import logging
 from blog.models import PageView
 from spite.utils import cache_large_data
+from django.db.models import Prefetch
+from functools import lru_cache
 
 # Get the 'spite' logger
 logger = logging.getLogger('spite')
@@ -45,58 +47,55 @@ def process_post_chunk(posts_chunk):
 
 @shared_task
 def cache_posts_data():
+    """Cache posts with better memory management"""
     try:
-        # Use iterator and values_list for minimal memory usage
-        base_query = Post.objects.values_list(
+        # Use values() for minimal memory usage
+        posts = Post.objects.values(
             'id', 'title', 'content', 'display_name',
             'date_posted', 'is_pinned', 'media_file', 'image',
             'parent_post', 'anon_uuid'
-        ).iterator(chunk_size=50)  # Smaller chunk size
-
-        pinned_posts = []
-        chunk_count = 0
-        current_chunk = []
+        ).order_by('-date_posted')
         
-        for post in base_query:
-            post_dict = {
-                'id': post[0],
-                'title': post[1],
-                'content': post[2],
-                'display_name': post[3],
-                'date_posted': post[4],
-                'is_pinned': post[5],
-                'media_file': {'url': post[6]} if post[6] else None,
-                'image': {'url': post[7]} if post[7] else None,
-                'parent_post': post[8],
-                'anon_uuid': post[9],
-            }
-            
-            if post_dict['is_pinned']:
-                pinned_posts.append(post_dict)
+        # Process in smaller chunks
+        CHUNK_SIZE = 20
+        chunks = []
+        pinned_posts = []
+        
+        for post in posts:
+            if post['is_pinned']:
+                pinned_posts.append(post)
             else:
-                current_chunk.append(post_dict)
-                if len(current_chunk) >= 50:  # Smaller chunks
-                    compressed = lz4.compress(pickle.dumps(current_chunk))
-                    cache.set(f'posts_chunk_{chunk_count}', compressed, timeout=300)  # 5 min timeout
-                    chunk_count += 1
-                    current_chunk = []
-                    
-        # Handle remaining posts
-        if current_chunk:
-            compressed = lz4.compress(pickle.dumps(current_chunk))
-            cache.set(f'posts_chunk_{chunk_count}', compressed, timeout=300)
-            chunk_count += 1
-
-        # Cache pinned posts
+                if len(chunks) == 0 or len(chunks[-1]) >= CHUNK_SIZE:
+                    chunks.append([])
+                chunks[-1].append(post)
+        
+        # Cache with expiration
+        CACHE_TIMEOUT = 300  # 5 minutes
+        
+        # Clear old chunks first
+        old_chunk_count = cache.get('posts_chunk_count', 0)
+        for i in range(old_chunk_count):
+            cache.delete(f'posts_chunk_{i}')
+        
+        # Cache new chunks
+        for i, chunk in enumerate(chunks):
+            compressed = lz4.compress(pickle.dumps(chunk))
+            cache.set(f'posts_chunk_{i}', compressed, CACHE_TIMEOUT)
+        
+        # Cache pinned posts and chunk count
         if pinned_posts:
             compressed_pinned = lz4.compress(pickle.dumps(pinned_posts))
-            cache.set('pinned_posts', compressed_pinned, timeout=300)
-            
-        cache.set('posts_chunk_count', chunk_count, timeout=300)
-        logger.info(f"Cached {len(pinned_posts)} pinned posts and {chunk_count} chunks")
-
+            cache.set('pinned_posts', compressed_pinned, CACHE_TIMEOUT)
+        
+        cache.set('posts_chunk_count', len(chunks), CACHE_TIMEOUT)
+        
+        logger.info(f"Cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks")
+        
     except Exception as e:
-        logger.error(f"Error caching posts: {e}", exc_info=True)
+        logger.error(f"Error in cache_posts_data: {e}")
+        # Cleanup on error
+        cache.delete('posts_chunk_count')
+        cache.delete('pinned_posts')
 
 @shared_task
 def cache_page_html(view_name, page_number=None):
@@ -126,8 +125,6 @@ def cache_page_html(view_name, page_number=None):
         logger.error(f"Error caching HTML for {view_name} page {page_number}: {e}")
     return True
 
-
-
 @shared_task
 def test_task():
     print("Test task executed!")
@@ -139,7 +136,6 @@ def summarize_posts():
     # Fetch the latest 100 posts that haven't been summarized yet
     count = Post.objects.count()
     posts = Post.objects.order_by('-id')[:50]
-
 
     logger.info(f'Summarizing 50 posts ending at post number {count}')
 
@@ -174,7 +170,6 @@ def summarize_posts():
     # Generate summary using OpenAI
     logger.info(f'Prompt length in chars: {len(summary_prompt)}')
     summary_text = generate_summary(summary_prompt,)
-
 
     title=f'eTips report, post {count}'
 
@@ -215,3 +210,10 @@ def persist_pageview_count():
             
     except Exception as e:
         logger.error(f"Error persisting pageview count: {e}")
+
+@shared_task
+def cleanup_old_caches():
+    chunk_count = cache.get('posts_chunk_count', 0)
+    for i in range(chunk_count):
+        cache.delete(f'posts_chunk_{i}')
+    cache.delete('posts_chunk_count')

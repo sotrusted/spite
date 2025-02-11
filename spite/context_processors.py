@@ -4,7 +4,7 @@ import pickle
 from blog.models import Post, Comment
 import logging
 from spite.count_users import count_ips
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 import zlib
 from django.core.cache import cache
@@ -16,36 +16,31 @@ from asgiref.sync import sync_to_async
 from django.urls import resolve
 from django.shortcuts import get_object_or_404
 from spite.utils import cache_large_data
+from django.db.models import Prefetch
+from itertools import islice
 
 logger = logging.getLogger('spite')
 def get_optimized_posts():
-    # Remove author-related queries and only select needed fields
-    base_query = Post.objects.prefetch_related('comments')\
-        .only(
-            'id',
-            'title',
-            'content',
-            'display_name',
-            'date_posted',
-            'is_pinned',
-            'media_file',
-            'image'
-        ).defer(
-            'city',
-            'contact',
-            'description'
-        )
-
-    # Single query to get all posts
-    all_posts = base_query.order_by('-date_posted')
+    """Get posts with consistent cache strategy"""
+    # Check for pinned posts first
+    pinned_posts = cache.get('pinned_posts')
+    if pinned_posts:
+        pinned_posts = pickle.loads(lz4.decompress(pinned_posts))
     
-    # Split posts in memory
-    pinned_posts = [post for post in all_posts if post.is_pinned]
-    regular_posts = [post for post in all_posts if not post.is_pinned]
-
+    # Get chunk count
+    chunk_count = cache.get('posts_chunk_count', 0)
+    posts = []
+    
+    # Collect chunks
+    for i in range(chunk_count):
+        chunk = cache.get(f'posts_chunk_{i}')
+        if chunk:
+            posts.extend(pickle.loads(lz4.decompress(chunk)))
+    
     return {
-        'posts': regular_posts,
-        'pinned_posts': pinned_posts,
+        'posts': posts,
+        'pinned_posts': pinned_posts or [],
+        'has_more': len(posts) >= 20  # Assuming 20 per page
     }
 
 def get_cached_posts(request):
@@ -198,7 +193,7 @@ def load_posts(request):
         'postForm': PostForm(),
         'posts': page_obj,
         'pinned_posts': posts_data['pinned_posts'],
-        'spite': len(posts_data['posts']) + len(all_comments),
+        'spite': Post.objects.count() + Comment.objects.count(),
         'is_paginated': page_obj.has_other_pages(),
         'highlight_comments': highlight_comments,
         'is_loading': is_loading,
@@ -233,4 +228,24 @@ def get_posts():
         posts = posts_data['posts']
         pinned_posts = posts_data['pinned_posts']
     return posts_data, posts, pinned_posts
+
+def get_paginated_posts(page_number=1):
+    """Consistent pagination across all views"""
+    posts_data = get_optimized_posts()
+    
+    # Create paginator from cached data
+    paginator = Paginator(posts_data['posts'], 20)
+    
+    try:
+        current_page = paginator.page(page_number)
+    except (EmptyPage):
+        current_page = paginator.page(1)
+    
+    return {
+        'posts': current_page,
+        'pinned_posts': posts_data['pinned_posts'],
+        'has_more': current_page.has_next(),
+        'current_page': page_number,
+        'total_pages': paginator.num_pages
+    }
 

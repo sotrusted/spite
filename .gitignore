@@ -35,3 +35,18 @@ logs/django_debug.log
 config.json
 
 logs/
+
+spite_migration/
+
+*.gz
+*.log
+*.txt
+*.csv
+*.json
+*.yaml
+*.yml
+*.ini
+*.cfg
+*.conf
+*.md
+*.rst
