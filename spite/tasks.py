@@ -23,8 +23,8 @@ def process_post(post):
         'content': post.content,
         'display_name': post.display_name,
         'date_posted': post.date_posted,
-        'is_image': post.is_image(),
-        'is_video': post.is_video(),
+        'is_image': post.is_image,
+        'is_video': post.is_video,
         'anon_uuid': post.anon_uuid,
         'is_pinned': post.is_pinned,
         'media_file': {
@@ -51,9 +51,19 @@ def cache_posts_data():
     try:
         # Use values() for minimal memory usage
         posts = Post.objects.values(
-            'id', 'title', 'content', 'display_name',
-            'date_posted', 'is_pinned', 'media_file', 'image',
-            'parent_post', 'anon_uuid'
+            'id',
+            'title',
+            'content',
+            'display_name',
+            'date_posted',
+            'is_pinned',
+            'media_file',
+            'image',
+            'anon_uuid',
+            'parent_post', 
+            'anon_uuid',
+            'is_image',
+            'is_video',
         ).order_by('-date_posted')
         
         # Process in smaller chunks

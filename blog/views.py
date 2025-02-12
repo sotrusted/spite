@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from django.views.decorators.cache import cache_page
 import logging
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -302,8 +303,8 @@ class PostCreateView(CreateView):
                     } if post.media_file else None,
                     'display_name': post.display_name,
                     'image': post.image.url if post.image else None,
-                    'is_image': post.is_image(), 
-                    'is_video': post.is_video(),
+                    'is_image': post.is_image, 
+                    'is_video': post.is_video,
                 }
             })
         return super().form_valid(form)
@@ -444,6 +445,7 @@ def preview_pdf_template(request):
     # Render the posts into an HTML template
     return render(request, 'blog/pdf_template.html')
 
+from spite.context_processors import preprocess_post, preprocess_comment
 def search_results(request):
     query = request.GET.get('query', '')
     logger.info(f"Searching for: {query}")
@@ -475,6 +477,12 @@ def search_results(request):
             key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
             reverse=True
         )
+        
+        for item in combined_items:
+            if item.get_item_type() == 'Post':
+                item = preprocess_post(item)
+            elif item.get_item_type() == 'Comment':
+                item = preprocess_comment(item)
         
         # Paginate combined results
         paginator = Paginator(list(combined_items), 10)
@@ -567,6 +575,10 @@ def add_comment(request, post_id, post_type='Post'):
         post = parent_comment.post 
     else:
         raise IncorrectObjectTypeException()
+
+    if request.method == 'POST' and request.FILES:
+        # Force use of temporary file for large uploads
+        request.upload_handlers = [TemporaryFileUploadHandler(request)]
 
     if request.method == 'POST':
         form = CommentForm(request.POST, request.FILES)

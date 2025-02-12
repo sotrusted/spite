@@ -764,6 +764,12 @@ function submitCommentForm(formElement, postId) {
         submitButton.value = 'Submitting...';
     }
 
+    const progress = form.querySelector(`.upload-progress-${postId}`);
+    
+    if (progress) {
+        progress.style.display = 'block';
+    }
+
 
     const formData = new FormData(formElement); // Create a FormData object for the form
 
@@ -774,6 +780,7 @@ function submitCommentForm(formElement, postId) {
             "X-CSRFToken": getCookie('csrftoken'), // Include CSRF token for Django
             'X-Requested-With': 'XMLHttpRequest', 
         },
+        timeout: 60000,
     })
     .then(response => {
         if (!response.ok) {
@@ -795,13 +802,16 @@ function submitCommentForm(formElement, postId) {
         }
     })
     .catch(error => {
-        console.error("Error submitting comment:", error);
+        alert('Error uploading comment. Please try again.');
+        displayFormErrors(formElement, data.errors);
         logToBackend(`Error submitting comment: ${error.message}`, 'error');
     })
     .finally(() => {
         if (submitButton) {
             submitButton.disabled = false;
             submitButton.value = 'Submit';
+            progress.style.display = 'none';
+
         }
     });
 }

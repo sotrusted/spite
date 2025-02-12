@@ -36,12 +36,17 @@
                     Your browser does not support the video tag.
                 </video>
             {% elif post.media_file and post.is_image %}
-                <img class="image-thumbnail" src="{{ post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
+                <img class="image-thumbnail" src="{{post.media_file.url }}" alt="{{ post.title }}" loading="lazy">
             {% elif post.image %}
-                <img class="image-thumbnail" src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+                <img class="image-thumbnail" src="{{post.image.url }}" alt="{{ post.title }}" loading="lazy">
             {% endif %}
-            <a href="javascript:void(0);" class="detail-toggle-image" id="detail-
-                toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
+            <a href="javascript:void(0);" class="detail-toggle-image" id="detail-toggle-image-{{post.id}}" data-post-id="{{post.id}}">
+                {% if post.media_file %}
+                    {{post.media_file.name}}
+                {% else %}
+                    {{post.image.name}}
+                {% endif %}
+            </a>
 
         </div>
 

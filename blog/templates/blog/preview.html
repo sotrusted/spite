@@ -48,7 +48,7 @@
                 preload="metadata"
                 data-post-id="{{ post.id }}"
             >
-                <source src="{{ post.media_file.url }}" type="video/mp4">
+                <source src="{{post.media_file.url}}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         {% elif post.media_file and post.is_image %}
@@ -67,4 +67,11 @@
 <span class="like-count">{{ post.like_count }}</span>
 -->
 
+<script>
+    console.log("{{ post.id }}")
+    console.log("Media File: {{ post.media_file }}")
+    console.log("Is Image: {{ post.is_image }}")
+    console.log("Is Video: {{ post.is_video }}")
+</script>
 </div>
+

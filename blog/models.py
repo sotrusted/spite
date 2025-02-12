@@ -85,6 +85,9 @@ class Post(models.Model):
         # Encrypted IP storage
     encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
 
+    is_image = models.BooleanField(default=False)
+    is_video = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f'{self.id} - {self.title}'
@@ -122,9 +125,11 @@ class Post(models.Model):
         return reverse('post-detail', kwargs={'pk' : self.pk})
 
     def save(self, *args, **kwargs):
+        self.is_image = self.check_is_image()
+        self.is_video = self.check_is_video()
         super(Post, self).save(*args, **kwargs)
     
-    def is_image(self):
+    def check_is_image(self):
         """Check if the media_file is an image."""
         if self.image: 
             return True
@@ -138,7 +143,7 @@ class Post(models.Model):
 
         return mime_type and mime_type.startswith('image/')
 
-    def is_video(self):
+    def check_is_video(self):
         """Check if the media_file is a video."""
         if self.image:
             return False

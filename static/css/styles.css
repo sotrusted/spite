@@ -596,9 +596,10 @@ form {
 
 .detail .image-container img, 
 .detail .image-container video {
+	max-height: 500px;
+    width: auto;
 	max-width: 100%;
 	height: auto;
-	max-height: 500px;
 	display: block; 
     object-fit: contain;
 }
@@ -1289,6 +1290,14 @@ main {
     max-width: 200px;
     margin: 10px 0;
 }
+
+.image-thumbnail {
+    max-height: 200px;
+    object-fit: contain;
+    cursor: pointer;
+    margin-left: 0;
+}
+
 
 /* Mobile optimizations */
 @media (max-width: 768px) {

@@ -19,6 +19,42 @@ from spite.utils import cache_large_data
 from django.db.models import Prefetch
 from itertools import islice
 
+def preprocess_post(post):
+    post = get_object_or_404(Post, id=post.id)
+    comments = Comment.objects.filter(post=post).order_by('-created_on')
+    # Attach comments and total count directly to the post object
+    post.comments_total = comments.count()
+    post.recent_comments = comments
+    return post
+
+def preprocess_comment(item):
+    item.post_id = item.post.id
+    item.post_title = item.post.title
+    item.post_content = item.post.content
+    item.post_date_posted = item.post.date_posted
+    item.post_display_name = item.post.display_name
+
+    if item.post.media_file:
+        item.post_media_file = item.post.media_file
+        item.post_is_video = item.post.is_video
+        item.post_is_image = item.post.is_image
+    elif item.post.image:
+        item.post_image = item.post.image
+
+    if item.has_parent_comment:
+        item.parent_comment_id = item.parent_comment.id
+        item.parent_comment_name = item.parent_comment.name
+        item.parent_comment_content = item.parent_comment.content
+        item.parent_comment_created_on = item.parent_comment.created_on
+        if item.parent_comment.media_file:
+            item.parent_comment_media_file = item.parent_comment.media_file
+            item.parent_comment_media_file_url = item.parent_comment.media_file.url
+            item.parent_comment_is_video = item.parent_comment.is_video
+            item.parent_comment_is_image = item.parent_comment.is_image
+    return item
+
+
+
 logger = logging.getLogger('spite')
 def get_optimized_posts():
     """Get posts with consistent cache strategy"""
@@ -45,6 +81,15 @@ def get_optimized_posts():
 
 def get_cached_posts(request):
     try:
+        # Check cache freshness
+        last_update = cache.get('last_cache_update')
+        current_time = datetime.now().timestamp()
+        
+        # If cache is older than 1 minute or missing, force refresh
+        if not last_update or (current_time - last_update) > 60:
+            logger.info("Cache stale or missing, forcing refresh")
+            cache_posts_data()  # Direct call for immediate refresh
+            
         # Get pinned posts (usually few)
         compressed_pinned = cache.get('pinned_posts')
         pinned_posts = []
@@ -58,7 +103,8 @@ def get_cached_posts(request):
         chunks_needed = min(3, max(1, page))  # Load 1-3 chunks based on page
 
         regular_posts = []
-        for i in range(chunks_needed):
+        # Load all chunks instead of just the first few
+        for i in range(chunk_count):
             compressed_chunk = cache.get(f'posts_chunk_{i}')
             if compressed_chunk:
                 try:
@@ -100,7 +146,11 @@ class DictToObject:
 class FileFieldLike:
     """Mimics Django's FileField with url attribute"""
     def __init__(self, url):
-        self.url = url
+        if url and not url.startswith(settings.MEDIA_URL):  # Ensure MEDIA_URL is prefixed
+            self.name = url.split('/')[-1] 
+            self.url = f"{settings.MEDIA_URL}{url.lstrip('/')}"
+        else:
+            self.url = url  # Already correctly formatted
 
 def load_posts(request):
     # Check if this is a pagination request
@@ -154,38 +204,9 @@ def load_posts(request):
 
     for item in page_obj.object_list:
         if item.get_item_type() == 'Post':
-            post = item
-
-            post = get_object_or_404(Post, id=post.id)
-            comments = Comment.objects.filter(post=post).order_by('-created_on')
-            # Attach comments and total count directly to the post object
-            post.comments_total = comments.count()
-            post.recent_comments = comments
+            post = preprocess_post(item)
         elif item.get_item_type() == 'Comment':
-            item.post_id = item.post.id
-            item.post_title = item.post.title
-            item.post_content = item.post.content
-            item.post_date_posted = item.post.date_posted
-            item.post_display_name = item.post.display_name
-
-            if item.post.media_file:
-                item.post_media_file = item.post.media_file
-                item.post_is_video = item.post.is_video
-                item.post_is_image = item.post.is_image
-            elif item.post.image:
-                item.post_image = item.post.image
-
-            if item.has_parent_comment:
-                item.parent_comment_id = item.parent_comment.id
-                item.parent_comment_name = item.parent_comment.name
-                item.parent_comment_content = item.parent_comment.content
-                item.parent_comment_created_on = item.parent_comment.created_on
-                if item.parent_comment.media_file:
-                    item.parent_comment_media_file = item.parent_comment.media_file
-                    item.parent_comment_media_file_url = item.parent_comment.media_file.url
-                    item.parent_comment_is_video = item.parent_comment.is_video
-                    item.parent_comment_is_image = item.parent_comment.is_image
-
+            comment = preprocess_comment(item)
     return {
         'days_since_launch': days_since_launch(),
         'comment_form': CommentForm(),
