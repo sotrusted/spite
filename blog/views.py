@@ -245,6 +245,8 @@ class PostCreateView(CreateView):
         logger.info(f"CSRF token in POST data: {csrf_token_post}")
         logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
 
+        self.request = request
+
         # Check for spam before processing the form
         '''
         is_spam, spam_message = self.check_spam(
@@ -269,48 +271,71 @@ class PostCreateView(CreateView):
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
+
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
         logger.info(f"Form data: {form.cleaned_data}")
         
-        # Save the form and get the post instance
-        post = form.save(commit=False)
-        
-        # Add IP address to the post
-        post.ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
-                         self.request.META.get('REMOTE_ADDR')
-        
-        post.save()
-        logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, "
-                   f"media file: {post.media_file}, display name {post.display_name}")
-        
-        post = get_object_or_404(Post, pk=post.id)
-        
-        # Return JSON response for AJAX requests
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True, 
-                'post': {
-                    'id': post.id,
-                    'title': post.title,
-                    'content': post.content,
-                    'date_posted': localtime(post.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
-                    'anon_uuid': post.anon_uuid,
-                    'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
-                    'city': post.city,
-                    'contact': post.contact,
-                    'media_file': {
-                        'url': post.media_file.url if post.media_file else None,
-                    } if post.media_file else None,
-                    'display_name': post.display_name,
-                    'image': post.image.url if post.image else None,
-                    'is_image': post.is_image, 
-                    'is_video': post.is_video,
-                }
+        try:
+            # Save the form and get the post instance
+            post = form.save(commit=False)
+            
+            # Add IP address to the post
+            post.ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+                            self.request.META.get('REMOTE_ADDR')
+            
+            post.save()
+            logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, "
+                    f"media file: {post.media_file}, display name {post.display_name}")
+            
+
+            context = {
+                'post': post,
+                'is_new': True,
+            }
+            htmx = True
+            response = render(self.request, 'blog/partials/post_list.html', context=context)
+            response['HX-Trigger'] = json.dumps({
+                'postCreated': True,
+                'showMessage': 'Post created successfully!'
             })
-        return super().form_valid(form)
+
+            if htmx:
+                return response
+            
+            # Return JSON response for AJAX requests
+            if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True, 
+                    'post': {
+                        'id': post.id,
+                        'title': post.title,
+                        'content': post.content,
+                        'date_posted': localtime(post.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                        'anon_uuid': post.anon_uuid,
+                        'parent_post': {'id': post.parent_post.id, 'title': post.parent_post.title} if post.parent_post else None,
+                        'city': post.city,
+                        'contact': post.contact,
+                        'media_file': {
+                            'url': post.media_file.url if post.media_file else None,
+                        } if post.media_file else None,
+                        'display_name': post.display_name,
+                        'image': post.image.url if post.image else None,
+                        'is_image': post.is_image, 
+                        'is_video': post.is_video,
+                    }
+                })
+            return super().form_valid(form)
+        except Exception as e:
+            logger.error(f"Error in form_valid: {e}")
+            return super().form_invalid(form)
 
     def form_invalid(self, form):
         logger.error("Form errors: %s", form.errors)
+        return HttpResponse(
+            "<div class='alert alert-danger'>Error creating post</div>",
+            status=500
+        )
+
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
