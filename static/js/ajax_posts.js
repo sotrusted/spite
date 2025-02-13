@@ -25,6 +25,7 @@ export function initAjaxPostForm() {
         // Perform AJAX request
         fetch(url, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest', // Mark it as an AJAX request
                 'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
@@ -77,9 +78,30 @@ export function initAjaxPostForm() {
             })
             .catch(error => {
                 console.error('Error details:', error); // Debug log
+
+                // Log more details about the error
+                if (error.message) {
+                    console.error('Error message:', error.message);
+                }
+                if (error.stack) {
+                    console.error('Error stack:', error.stack);
+                }
+
                 document.getElementById('post-error').style.display = 'block';
                 document.getElementById('post-success').style.display = 'none';
                 enableSubmitButton();
             });
     });
+}
+
+// Add this debug function
+function logFormData(formData) {
+    console.log('Form data contents:');
+    for (let pair of formData.entries()) {
+        if (pair[1] instanceof File) {
+            console.log(pair[0], 'File:', pair[1].name, 'Size:', pair[1].size, 'Type:', pair[1].type);
+        } else {
+            console.log(pair[0], pair[1]);
+        }
+    }
 }
