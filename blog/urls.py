@@ -12,7 +12,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
                     loading_screen, log_javascript, resume, update_online_status,
-                    remove_user, hx_get_parent_post)
+                    remove_user, hx_get_parent_post, hx_get_comment, hx_get_comment_reply_form_html)
 
 
 from django.conf.urls.static import static
@@ -61,6 +61,8 @@ urlpatterns = [
     path('api/online-count/', update_online_status, name='online_count'),
     path('api/remove-user/', remove_user, name='remove_user'),
     path('hx/parent-post/<int:post_id>/', hx_get_parent_post, name='hx-get-parent-post'),
+    path('hx/get-comment/<int:comment_id>/', hx_get_comment, name='hx-get-comment'),
+    path('hx/get-reply-form-html/<int:post_id>/', hx_get_comment_reply_form_html, name='hx-get-reply-form-html'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -26,10 +26,7 @@
             class="comments-container" style="display: none;">
             <div id="comments-list-{{ post.id }}">
                 {% for comment in post.recent_comments %}
-                    <div class="comment">
-                        <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
-                        <p><em>{{ comment.created_on }}</em></p>
-                    </div>
+                    {% include 'blog/partials/inline_comment.html' with comment=comment %}
                 {% endfor %}
             </div>
 

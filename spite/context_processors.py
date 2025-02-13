@@ -28,29 +28,6 @@ def preprocess_post(post):
     return post
 
 def preprocess_comment(item):
-    item.post_id = item.post.id
-    item.post_title = item.post.title
-    item.post_content = item.post.content
-    item.post_date_posted = item.post.date_posted
-    item.post_display_name = item.post.display_name
-
-    if item.post.media_file:
-        item.post_media_file = item.post.media_file
-        item.post_is_video = item.post.is_video
-        item.post_is_image = item.post.is_image
-    elif item.post.image:
-        item.post_image = item.post.image
-
-    if item.has_parent_comment:
-        item.parent_comment_id = item.parent_comment.id
-        item.parent_comment_name = item.parent_comment.name
-        item.parent_comment_content = item.parent_comment.content
-        item.parent_comment_created_on = item.parent_comment.created_on
-        if item.parent_comment.media_file:
-            item.parent_comment_media_file = item.parent_comment.media_file
-            item.parent_comment_media_file_url = item.parent_comment.media_file.url
-            item.parent_comment_is_video = item.parent_comment.is_video
-            item.parent_comment_is_image = item.parent_comment.is_image
     return item
 
 
@@ -61,7 +38,7 @@ def get_optimized_posts():
     # Check for pinned posts first
     pinned_posts = cache.get('pinned_posts')
     if pinned_posts:
-        pinned_posts = pickle.loads(lz4.decompress(pinned_posts))
+        pinned_posts = [DictToObject(post) for post in pickle.loads(lz4.decompress(pinned_posts))]  
     
     # Get chunk count
     chunk_count = cache.get('posts_chunk_count', 0)
@@ -71,7 +48,7 @@ def get_optimized_posts():
     for i in range(chunk_count):
         chunk = cache.get(f'posts_chunk_{i}')
         if chunk:
-            posts.extend(pickle.loads(lz4.decompress(chunk)))
+            posts.extend([DictToObject(post) for post in pickle.loads(lz4.decompress(chunk))])
     
     return {
         'posts': posts,

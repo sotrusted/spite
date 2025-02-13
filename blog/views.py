@@ -293,7 +293,7 @@ class PostCreateView(CreateView):
                 'is_new': True,
             }
             htmx = True
-            response = render(self.request, 'blog/partials/post_list.html', context=context)
+            response = render(self.request, 'blog/partials/post.html', context=context)
             response['HX-Trigger'] = json.dumps({
                 'postCreated': True,
                 'showMessage': 'Post created successfully!'
@@ -590,6 +590,17 @@ def reply_comment(request, comment_id):
 
     return JsonResponse({'success': False}, status=400)
 
+def hx_get_comment(request, comment_id, inline=False):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if inline:
+        response = render(request, 'blog/partials/inline_comment.html', context={'comment': comment})
+    else:
+        response = render(request, 'blog/partials/comment.html', context={'comment': comment})
+    response['HX-Trigger'] = json.dumps({
+        'commentLoaded': True,
+    })
+
+    return response
 
 def add_comment(request, post_id, post_type='Post'):
     if post_type == 'Post':
@@ -601,9 +612,6 @@ def add_comment(request, post_id, post_type='Post'):
     else:
         raise IncorrectObjectTypeException()
 
-    if request.method == 'POST' and request.FILES:
-        # Force use of temporary file for large uploads
-        request.upload_handlers = [TemporaryFileUploadHandler(request)]
 
     if request.method == 'POST':
         form = CommentForm(request.POST, request.FILES)
@@ -621,6 +629,14 @@ def add_comment(request, post_id, post_type='Post'):
                 comment.ip_address = get_client_ip(request)
 
                 comment.save()
+
+                if request.headers.get('HX-Request'):
+                    target = request.headers.get('HX-Target')
+                    if target == f'comments-list-{post.id}':
+                        return hx_get_comment(request, comment.id, inline=True)
+                    elif target == f'post-list':
+                        return hx_get_comment(request, comment.id, inline=False)
+
 
                 # Prepare consistent comment data structure
                 comment_data = {
@@ -721,6 +737,16 @@ def get_comment_reply_form_html(request, comment_id):
     except Exception as e:
         logger.error(f"Error in get_comment_reply_form_html: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def hx_get_comment_reply_form_html(request, post_id):
+    comment = Comment.objects.select_related('post').get(id=post_id)
+    if not comment:
+        return render(request, 'blog/partials/error.html', {'error': 'Comment not found'})
+    
+    comment_form = CommentForm()
+    return render(request, 'blog/partials/comment_form.html', {'comment_form': comment_form, 'post_id': comment.post.id})
+
 
 
 
@@ -1066,7 +1092,7 @@ def update_online_status(request):
     # Return just the number for HTMX to update the span content
     return HttpResponse(str(len(online_users)))
 
-def hx_get_parent_post(request, post_id):
+def hx_get_parent_post(request, post_id, inline=False):
     post = get_object_or_404(Post, id=post_id)
     logger.info(f"HX GET Parent Post: {post}")
     response = render(request, 'blog/partials/post.html', 

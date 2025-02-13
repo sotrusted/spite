@@ -201,6 +201,87 @@ class Comment(models.Model):
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
+    @property
+    def post_id(self):
+        return self.post.id if self.post else None
+    
+    @property
+    def post_display_name(self):
+        return self.post.display_name if self.post and self.post.display_name else None
+    
+    @property
+    def post_date_posted(self):
+        return self.post.date_posted if self.post and self.post.date_posted else ''
+    
+    @property
+    def post_media_file(self):
+        return self.post.media_file if self.post and self.post.media_file else None
+
+    @property
+    def post_title(self):
+        return self.post.title if self.post else ''
+
+    @property
+    def post_content(self):
+        return self.post.content if self.post and self.post.content else ''
+
+    @property
+    def parent_comment_id(self):
+        return self.parent_comment.id if self.parent_comment else None
+
+    @property
+    def parent_comment_content(self):
+        return self.parent_comment.content if self.parent_comment and self.parent_comment.content else ''
+
+    @property
+    def parent_comment_name(self):
+        return self.parent_comment.name if self.parent_comment and self.parent_comment.name else ''
+
+    @property
+    def parent_comment_media_file(self):
+        return self.parent_comment.media_file if self.parent_comment and self.parent_comment.media_file else None   
+
+    @property
+    def parent_comment_is_image(self):
+        return self.parent_comment.is_image if self.parent_comment and self.parent_comment.media_file else None
+
+    @property
+    def parent_comment_is_video(self):
+        return self.parent_comment.is_video if self.parent_comment and self.parent_comment.media_file else None
+    
+    @property
+    def parent_comment_media_file(self):
+        return self.parent_comment.media_file if self.parent_comment and self.parent_comment.media_file else None
+
+    @property
+    def parent_comment_media_file_url(self):
+        return self.parent_comment.media_file.url if self.parent_comment and self.parent_comment.media_file else ''
+
+    @property
+    def parent_comment_created_on(self):
+        return self.parent_comment.created_on if self.parent_comment and self.parent_comment.created_on else ''
+
+    @property 
+    def post_image(self):
+        return self.post.image if self.post and self.post.image else None
+    
+    @property
+    def post_image_url(self):
+        return self.post.image.url if self.post and self.post.image else ''
+
+    @property
+    def post_is_image(self):
+        return self.post.is_image if self.post and (self.post.media_file or self.post.image) else None
+
+    @property
+    def post_is_video(self):
+        return self.post.is_video if self.post and self.post.media_file else None
+
+    @property
+    def post_media_file_url(self):
+        return self.post.media_file.url if self.post and self.post.media_file else ''
+
+
     def __str__(self):
         return f'{self.name or "Anonymous"}: \"{self.content}\" on {self.post.title}'
 

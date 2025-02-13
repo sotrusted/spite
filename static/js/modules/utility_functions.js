@@ -144,7 +144,7 @@ function attachToggleReplyButtons() {
             a.setAttribute('data-listener-attached', 'true');
             const commentId = a.id.split('-').pop();
             log(`Attaching click listener to reply button for comment ${commentId}`);
-            
+        
             a.addEventListener('click', function() {
                 log(`Reply button clicked for comment ${commentId}`);
                 const commentReplyForm = document.querySelector(`div[id^=reply-form-${commentId}]`);
@@ -347,8 +347,8 @@ export function attachEventListeners() {
     log('Toggle reply buttons attached');
 
 
-    handleCommentFormSubmit();
-    log('Comment form submit listener attached');
+    // handleCommentFormSubmit();
+    // log('Comment form submit listener attached');
 
     handleReplyFormSubmit();
     log('Reply form submit listener attached');
@@ -584,7 +584,7 @@ export function addPostToPage(post) {
 function createCommentElement(comment, isInline = false) {
     const element = document.createElement('div');
     element.classList.add('comment');
-    
+
     if (isInline) {
         element.id = `comment-${comment.id}-inline`;
         // Match detail.html inline comment format
@@ -608,6 +608,7 @@ function createCommentElement(comment, isInline = false) {
         // Match comment.html format for feed view
         element.classList.add('item');
         element.id = `comment-${comment.id}`;
+        /*
         element.innerHTML = `
             <h2>
                 Re: <a href="/post/${comment.post_id}">
@@ -638,9 +639,25 @@ function createCommentElement(comment, isInline = false) {
                 <p><em>${comment.created_on}</em></p>
                 <a href="javascript:void(0);" id="toggle-reply-${comment.id}" class="toggle-reply">Reply</a>
             </div>
-            <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+            <div id="reply-form-${comment.id}" 
+                 class="reply-form"
+                 hx-get="/api/get-reply-form-html/${comment.id}"
+                 hx-target="#reply-form-${comment.id}"
+                 hx-trigger="revealed"
+                 style="display: none;">
             </div>
         `;
+        */
+        
+        element.innerHTML = `
+            <p class="comment-skeleton" 
+                 hx-get="/hx/get-comment/${comment.id}"
+                 hx-trigger="revealed"
+                 hx-target="#comment-${comment.id}"
+                 hx-swap="innerHTML">
+                Loading comment...
+            </p>
+        `
     }
 
     return element;
@@ -704,8 +721,11 @@ function loadCommentForm(postId) {
 
                     // Add an event listener to handle submission
                     formElement.addEventListener('submit', function (e) {
+                        console.log("Form submitted");
+                        /*
                         e.preventDefault();
                         submitCommentForm(formElement, postId);
+                        */
                     });
                 }
             } else {
@@ -739,11 +759,14 @@ function loadReplyForm(commentId, postId) {
             // Add event listener to the new form
             const formElement = formContainer.querySelector('form');
             if (formElement) {
+                console.log("Form element found");
+                /*
                 formElement.setAttribute('action', data.action_url);
                 formElement.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitCommentForm(formElement, postId);
                 });
+                */
             }
         }
     })

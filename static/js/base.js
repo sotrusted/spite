@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     attachEventListeners();
     logToBackend("Event listeners attached", 'info');
 
-    initAjaxPostForm();
+    // initAjaxPostForm();
     logToBackend("Post form submitted", 'info');
 
     initPostWebsocketUpdates();

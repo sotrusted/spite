@@ -66,7 +66,11 @@
             <div class="image-content">
                 {% if post.post_media_file_url or post.post_image_url %}
                     <div class="image-container">
-                        <a href="{% url 'post-detail' post.post_id %}">
+                        <a href="{% url 'post-detail' post.post_id %}"
+                           hx-get="{% url 'hx-get-parent-post' post.post_id %}" 
+                           hx-target="#parent-post-{{post.post_id}}" 
+                           hx-swap="outerHTML"
+                           hx-trigger="click">
                             {% if post.post_image %}
                                 <img src="{{ post.post_image_url }}" alt="{{ post.post_title }}" loading="lazy">
                             {% elif post.post_media_file_url and post.post_is_video %}
@@ -88,17 +92,14 @@
         <p><em>{{ post.created_on }}</em></p>
         <a href="javascript:void(0);" id="toggle-reply-{{post.id}}" class="toggle-reply">Reply</a>
     </div>
-    <div id="reply-form-{{post.id}}" class="reply-form" style="display: none;">
-        <form id="comment-form-{{ post.id }}" method="post" action="{% url 'reply-comment' post.id %}">
-            {% csrf_token %}
-            {{ comment_form|crispy }}
-            <button type="submit">Submit</button>
-        </form>
+        <div id="reply-form-{{post.id}}" class="reply-form" style="display: none;">
+            <p class="reply-form-skeleton"
+               id="reply-form-skeleton-{{post.id}}"
+               hx-get="/hx/get-reply-form-html/{{post.id}}"
+               hx-target="#reply-form-{{post.id}}"
+               hx-trigger="revealed"
+               hx-swap="innerHTML">
+                Loading reply form...
+            </p>
     </div>
 </div>
-
-<script>
-    console.log(`Comment {{post.id}} ({{post.content}}) has post media file url: {{post.post_media_file_url}}`)
-
-
-</script>
