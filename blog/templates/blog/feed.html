@@ -98,6 +98,15 @@
         This is not a group reading of the work of specific writers, but the reading of a single text (<a href="#">SPITE Magazine</a>) by multiple readers, like that Gertrude Stein thing from a while ago.</p><p>
       </p>
       <em>Please direct any inquiries to the SPITE Magazine Instagram account.</em>
+
+      <div class="flyer image-container">
+        <a href="https://partiful.com/e/A9RKOA75vB4LsxD4xiIS" target="_blank">
+            <img src="{% static 'media/spite-reading-2-flyer.png' %}" alt="SPITE Reading 2 Flyer">
+        </a>
+        <a href="https://partiful.com/e/A9RKOA75vB4LsxD4xiIS" target="_blank">
+            RSVP
+        </a>
+      </div>
       
       <style>
         @media (max-width: 900px) {
@@ -117,6 +126,11 @@
 
 
     <div class="posts" id="post-list">
+        {% if is_search and query and count %}
+            <p>{{ count }} posts matching "{{ query }}"</p>
+        {% elif count %}
+            <p>{{ count }} posts</p>
+        {% endif %}
         {% if posts %} 
             {% for post in posts %} 
                 {% if post.get_item_type == 'Post' %}
@@ -141,6 +155,9 @@
             {% if posts.has_previous %}
                 <a href="?page=1">« first</a>
                 <a href="?page={{ posts.previous_page_number }}">previous</a>
+            {% elif post.has_previous and is_search and query %}
+                <a href="?query={{ query }}&page=1">« first</a>
+                <a href="?query={{ query }}&page={{ posts.previous_page_number }}">&laquo; Previous</a>
             {% endif %}
 
             <span class="current">
@@ -150,6 +167,9 @@
             {% if posts.has_next %}
                 <a href="?page={{ posts.next_page_number }}">next</a>
                 <a href="?page={{ posts.paginator.num_pages }}">last »</a>
+            {% elif post.has_next and is_search and query %}
+                <a href="?query={{ query }}&page={{ posts.next_page_number }}">next</a>
+                <a href="?query={{ query }}&page={{ posts.paginator.num_pages }}">last »</a>
             {% endif %}
         </span>
     </div>

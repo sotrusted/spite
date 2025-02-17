@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from asgiref.sync import async_to_sync
 from django.contrib.sessions.models import Session
 from spite.tasks import cache_posts_data
@@ -6,7 +6,7 @@ from django.dispatch import receiver
 import logging 
 from django.core.cache import cache
 from django.utils.timezone import localtime
-from .models import Post, Comment
+from .models import Post, Comment, BlockedIP
 from django.conf import settings 
 import requests
 from django.core.serializers.json import DjangoJSONEncoder
@@ -141,3 +141,8 @@ def trigger_summary(sender, instance, **kwargs):
     post_count = Post.objects.count()
     if post_count % 100 == 0:  # Trigger after every 100th post
         summarize_posts.delay()
+    
+
+@receiver([post_save, post_delete], sender=BlockedIP)
+def clear_blocked_ips_cache(sender, **kwargs):
+    cache.delete('blocked_ips')

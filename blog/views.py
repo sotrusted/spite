@@ -271,7 +271,6 @@ class PostCreateView(CreateView):
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
-
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
         logger.info(f"Form data: {form.cleaned_data}")
         
@@ -470,12 +469,12 @@ def preview_pdf_template(request):
     # Render the posts into an HTML template
     return render(request, 'blog/pdf_template.html')
 
-from spite.context_processors import preprocess_post, preprocess_comment
 def search_results(request):
     query = request.GET.get('query', '')
     logger.info(f"Searching for: {query}")
     
     if query:
+        count = 0 
         # Search in posts with optimized queries
         post_results = Post.objects.filter(
             Q(title__icontains=query) |
@@ -488,6 +487,8 @@ def search_results(request):
                 to_attr='recent_comments'
             )
         ).distinct()
+
+        count += post_results.count()
         
         # Search in comments with optimized queries
         comment_results = Comment.objects.filter(
@@ -495,6 +496,8 @@ def search_results(request):
             Q(name__icontains=query) |
             Q(post__title__icontains=query)
         ).select_related('post').distinct()
+
+        count += comment_results.count()
         
         # Combine and sort results
         combined_items = sorted(
@@ -503,11 +506,6 @@ def search_results(request):
             reverse=True
         )
         
-        for item in combined_items:
-            if item.get_item_type() == 'Post':
-                item = preprocess_post(item)
-            elif item.get_item_type() == 'Comment':
-                item = preprocess_comment(item)
         
         # Paginate combined results
         paginator = Paginator(list(combined_items), 10)
@@ -518,12 +516,17 @@ def search_results(request):
         
         context = {
             'query': query,
-            'posts': page_obj,  # This matches your feed.html template's expectation
-            'search_query': query,  # Keep the original query for the template
+            'posts': page_obj,
+            'search_query': query,
+            'count': count,
+            'is_paginated': page_obj.has_other_pages(),
         }
-
     else:
-        context = {'query': query}
+        context = {
+            'query': query, 
+            'count': 0,
+            'is_paginated': False,
+        }
     
     return render(request, 'blog/search_results.html', context)
 
@@ -557,7 +560,15 @@ def reply_comment(request, comment_id):
             comment.save()
 
             # Return json response for ajax requests
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            if request.headers.get('HX-Request'):
+                target = request.headers.get('HX-Target')
+                if target == f'comments-list-{post.id}':
+                    return hx_get_comment(request, comment, inline=True)
+                elif target == f'post-list':
+                    return hx_get_comment(request, comment, inline=False)
+                
+
+            elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
                     'comment': {
@@ -590,12 +601,14 @@ def reply_comment(request, comment_id):
 
     return JsonResponse({'success': False}, status=400)
 
-def hx_get_comment(request, comment_id, inline=False):
-    comment = get_object_or_404(Comment, id=comment_id)
-    if inline:
-        response = render(request, 'blog/partials/inline_comment.html', context={'comment': comment})
-    else:
-        response = render(request, 'blog/partials/comment.html', context={'comment': comment})
+def hx_get_comment(request, comment=None, inline=False, comment_id=None):
+    if comment_id and not comment:
+        comment = get_object_or_404(Comment, id=comment_id)
+
+    template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment.html'
+
+    response = render(request, template_name, {'comment': comment})
+
     response['HX-Trigger'] = json.dumps({
         'commentLoaded': True,
     })
@@ -633,9 +646,9 @@ def add_comment(request, post_id, post_type='Post'):
                 if request.headers.get('HX-Request'):
                     target = request.headers.get('HX-Target')
                     if target == f'comments-list-{post.id}':
-                        return hx_get_comment(request, comment.id, inline=True)
+                        return hx_get_comment(request, comment, inline=True)
                     elif target == f'post-list':
-                        return hx_get_comment(request, comment.id, inline=False)
+                        return hx_get_comment(request, comment, inline=False)
 
 
                 # Prepare consistent comment data structure
@@ -720,7 +733,8 @@ def get_comment_reply_form_html(request, comment_id):
             'form': form,
             'comment_id': comment_id,
             'post_id': comment.post.id,
-            'parent_comment': comment
+            'parent_comment': comment,
+            'post_type': 'Comment',
         }
 
         form_html = render_to_string('blog/partials/comment_form.html',
@@ -739,13 +753,21 @@ def get_comment_reply_form_html(request, comment_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-def hx_get_comment_reply_form_html(request, post_id):
-    comment = Comment.objects.select_related('post').get(id=post_id)
+def hx_get_comment_reply_form_html(request, comment_id):
+    # get the comment and its post
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment_post = comment.post
+    post_id = comment_post.id
     if not comment:
         return render(request, 'blog/partials/error.html', {'error': 'Comment not found'})
     
     comment_form = CommentForm()
-    return render(request, 'blog/partials/comment_form.html', {'comment_form': comment_form, 'post_id': comment.post.id})
+    return render(request, 'blog/partials/comment_form.html', 
+        {'comment_form': comment_form, 
+         'post_id': post_id, 
+         'comment_id': comment_id,
+         'post_type': 'Comment',
+        })
 
 
 

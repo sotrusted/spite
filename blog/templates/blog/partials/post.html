@@ -31,7 +31,7 @@
             </div>
 
             <!-- Comment Form -->
-            {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form %}
+            {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
         </div>
     </div>
     {% endif %}

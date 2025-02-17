@@ -427,8 +427,10 @@ class ChatMessage(models.Model):
     def __str__(self):
         return (f'[Chat {self.chat_session}] User {self.sender_id}@{self.ip_address}: {self.message}')
 
+import ipaddress
 class BlockedIP(models.Model):
-    ip_address = models.GenericIPAddressField(unique=True)
+    ip_address = models.GenericIPAddressField(unique=True, null=True, blank=True)
+    ip_range = models.CharField(max_length=255, null=True, blank=True)
     reason = models.TextField(blank=True)
     date_blocked = models.DateTimeField(default=timezone.now)
     is_permanent = models.BooleanField(default=False)
@@ -444,6 +446,26 @@ class BlockedIP(models.Model):
         if self.expires and timezone.now() > self.expires:
             return False
         return True
+
+    def is_ip_in_range(self, ip_address):
+        if not self.ip_range:
+            return False
+        ip_range = ipaddress.ip_network(self.ip_range, strict=False)
+        return ip_address in ip_range
+    
+    def is_ip_blocked(self, ip):
+        ip = ipaddress.ip_address(ip)
+        try:
+            if self.ip_address:
+                blocked_ip_obj = ipaddress.ip_address(self.ip_address)
+                return ip == blocked_ip_obj
+            elif self.ip_range:
+                return self.is_ip_in_range(ip)
+            return False
+        except Exception as e:
+            logger.error(f"Error checking if IP {ip} is blocked: {e}")
+            return False
+
 
     class Meta:
         db_table = 'blocked_ips'

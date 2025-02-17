@@ -6,5 +6,5 @@
 {% endblock %}
 
 {% block feed %}
-    {% include 'blog/feed.html' with home=False posts=posts %}
+    {% include 'blog/feed.html' with home=False posts=posts count=count query=query is_search=True %}
 {% endblock %}
