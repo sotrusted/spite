@@ -53,8 +53,11 @@
         <div class="parent-post preview {% if post.parent_comment %}stacked{% endif %}" id="parent-post-{{post.post_id}}">
             <div class="text-content">
                 <h2 class="post-title">
-                Re:<a href="{% url 'post-detail' post.post_id %}"
+                Re:<a 
+                    {% if post.post_id %}
+                      href="{% url 'post-detail' post.post_id %}"
                       hx-get="{% url 'hx-get-parent-post' post.post_id %}" 
+                    {% endif %}
                       hx-target="#parent-post-{{post.post_id}}" 
                       hx-swap="outerHTML"
                       hx-trigger="click">

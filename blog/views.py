@@ -563,9 +563,9 @@ def reply_comment(request, comment_id):
             if request.headers.get('HX-Request'):
                 target = request.headers.get('HX-Target')
                 if target == f'comments-list-{post.id}':
-                    return hx_get_comment(request, comment, inline=True)
+                    return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=True)
                 elif target == f'post-list':
-                    return hx_get_comment(request, comment, inline=False)
+                    return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
                 
 
             elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -601,13 +601,22 @@ def reply_comment(request, comment_id):
 
     return JsonResponse({'success': False}, status=400)
 
-def hx_get_comment(request, comment=None, inline=False, comment_id=None):
+def hx_get_comment(request, comment_id=None, comment=None, inline=False):
+    logger.info(f"hx_get_comment called with comment_id: {comment_id}, inline: {inline}")
+    
     if comment_id and not comment:
+        logger.info(f"Fetching comment with id: {comment_id}")
         comment = get_object_or_404(Comment, id=comment_id)
+        logger.info(f"Found comment: {comment}")
+    elif not comment and not comment_id:
+        logger.error("Neither comment nor comment_id provided")
+        return HttpResponse("Comment not found", status=404)
 
     template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment.html'
+    logger.info(f"Using template: {template_name}")
 
     response = render(request, template_name, {'comment': comment})
+    logger.info("Rendered response successfully")
 
     response['HX-Trigger'] = json.dumps({
         'commentLoaded': True,
@@ -646,9 +655,9 @@ def add_comment(request, post_id, post_type='Post'):
                 if request.headers.get('HX-Request'):
                     target = request.headers.get('HX-Target')
                     if target == f'comments-list-{post.id}':
-                        return hx_get_comment(request, comment, inline=True)
+                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=True)
                     elif target == f'post-list':
-                        return hx_get_comment(request, comment, inline=False)
+                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
 
 
                 # Prepare consistent comment data structure

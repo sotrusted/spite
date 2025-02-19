@@ -61,7 +61,8 @@ urlpatterns = [
     path('api/online-count/', update_online_status, name='online_count'),
     path('api/remove-user/', remove_user, name='remove_user'),
     path('hx/parent-post/<int:post_id>/', hx_get_parent_post, name='hx-get-parent-post'),
-    path('hx/get-comment/<int:comment_id>/', hx_get_comment, name='hx-get-comment'),
+    path('hx/get-comment/', hx_get_comment, name='hx-get-comment'),
+    path('hx/get-comment/<int:comment_id>/', hx_get_comment, name='hx-get-comment-by-id'),
     path('hx/get-reply-form-html/<int:comment_id>/', hx_get_comment_reply_form_html, name='hx-get-reply-form-html'),
 ]
 if settings.DEBUG:
