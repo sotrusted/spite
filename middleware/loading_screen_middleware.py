@@ -28,8 +28,10 @@ class LoadingScreenMiddleware:
             'page' in request.GET,
             request.path.startswith('/static/'),
             request.path.startswith('/media/'),
+            request.path.startswith('/hx/'),
             request.path == reverse('loading-screen'),
             request.headers.get('x-requested-with') == 'XMLHttpRequest',
+            request.headers.get('HX-Request') == 'true',
             request.path.startswith('/api/'),
             'query' in request.GET,
             request.COOKIES.get('loading_complete') == 'true'  # Be explicit about the value
