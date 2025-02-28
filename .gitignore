@@ -4,7 +4,7 @@
 /.spite/
 /staticfiles/
 db.sqlite3
-*.sqlite3
+*.sqlite
 __pycache__/
 
 # PostgreSQL-related files
@@ -12,6 +12,9 @@ __pycache__/
 # Ignore PostgreSQL data directory (if running locally)
 pgdata/
 data/
+
+# Ignore media files
+media/
 
 # Ignore PostgreSQL dumps or backup files
 *.sql
