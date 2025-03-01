@@ -332,6 +332,32 @@
                 }
             }
         });
+        document.addEventListener('htmx:beforeRequest', function(event) {
+            console.log('HTMX Request:', {
+                url: event.detail.requestConfig.path,
+                method: event.detail.requestConfig.verb,
+                target: event.detail.target ? event.detail.target.id : 'no-target',
+                formData: Object.fromEntries(event.detail.requestConfig.parameters)
+            });
+        });
+        
+        document.addEventListener('htmx:responseError', function(event) {
+            console.error('HTMX Response Error:', {
+                status: event.detail.xhr.status,
+                statusText: event.detail.xhr.statusText,
+                responseText: event.detail.xhr.responseText,
+                url: event.detail.requestConfig.path
+            });
+        });
+        
+        document.addEventListener('htmx:afterRequest', function(event) {
+            console.log('HTMX After Request:', {
+                successful: event.detail.successful,
+                status: event.detail.xhr.status,
+                responseText: event.detail.xhr.responseText.substring(0, 100) + '...'
+            });
+        });
+
     </script>
 </body>
 </html>

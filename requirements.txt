@@ -38,7 +38,7 @@ cryptography==43.0.3
 cssselect2==0.7.0
 daphne==4.1.2
 distro==1.9.0
-Django==4.2.17
+Django==4.2.19
 django-appconf==1.0.6
 django-axes==6.5.1
 django-block-ip==0.2.0
@@ -101,7 +101,7 @@ pillow==10.3.0
 promise==2.3
 prompt_toolkit==3.0.47
 propcache==0.2.0
-psycopg2==2.9.9
+psycopg2-binary>=2.9.9
 py-vapid==1.9.2
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
