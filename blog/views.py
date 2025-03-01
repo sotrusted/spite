@@ -634,7 +634,7 @@ def hx_get_comment(request, comment_id=None, comment=None, inline=False):
         
         # Prepare context with all necessary data
         context = {
-            'post': comment,
+            'comment': comment,
         }
 
         template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment_content.html'
