@@ -8,7 +8,7 @@ from django.utils import timezone
 from .models import SecureIPStorage
 from weakref import WeakSet
 import asyncio
-from .utils import get_optimized_posts
+from spite.context_processors import get_optimized_posts
 
 logger = logging.getLogger('spite')
 
@@ -36,6 +36,14 @@ class PostConsumer(AsyncWebsocketConsumer):
         try:
             data = json.loads(text_data)
             # Broadcast new post to all connected clients
+
+            if data.get("type") == "ping" or data.get("type") == "pong":
+                return
+        
+            if "message" not in data:
+                logger.error(f"No message in data: {data}")
+                return
+
             await self.channel_layer.group_send(
                 "posts",
                 {
@@ -43,8 +51,10 @@ class PostConsumer(AsyncWebsocketConsumer):
                     "message": data["message"]
                 }
             )
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON received: {data}")
         except Exception as e:
-            logger.error(f"Error in post consumer receive: {e}")
+            logger.error(f"Error in post consumer receive: {str(e)}", exc_info=True)
     
     async def post_message(self, event):
         """Send new post to client"""

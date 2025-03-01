@@ -48,7 +48,10 @@ DEBUG = False
 
 
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 'testserver', '192-3-30-202-host.colocrossing.com']
+ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 
+                 'testserver', '192-3-30-202-host.colocrossing.com', 
+                 'sotrusted.net', 'www.sotrusted.net',] 
+
 
 
 # Application definition
@@ -365,6 +368,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': 'localhost:11211',
+        'SERIALIZER': 'django.core.cache.serializers.msgpack.MSGPackSerializer',
     }
 }
 
@@ -388,7 +392,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr']
+CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr', 'https://sotrusted.net', 'https://www.sotrusted.net']
 
 
 PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
@@ -472,7 +476,6 @@ if DEBUG:
 
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-ALLOWED_HOSTS = ['spite.fr', 'www.spite.fr', 'localhost', '127.0.0.1', '192.3.30.202', '69.48.163.194']
 
 CELERY_WORKER_MAX_MEMORY_PER_CHILD = 40000  # 40MB
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 10  # Restart worker more frequently

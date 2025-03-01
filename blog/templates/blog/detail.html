@@ -26,8 +26,8 @@
             {% elif post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
             {% endif %}
-            <a href="javascript:void(0);" class="detail-toggle-image" id="detail-
-                toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
+            <a href="javascript:void(0);" class="detail-toggle-image" 
+            id="detail-toggle-image-{{post.id}}" data-post-id="{{post.id}}">{{post.media_file.name}}</a>
         </div>
         <div class="image-thumbnail detail-thumbnail" id="image-thumbnail-{{post.id}}" style="display: block;">
             {% if post.media_file and post.is_video %}

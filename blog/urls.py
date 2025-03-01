@@ -12,7 +12,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     SaveListView, get_word_cloud, download_posts_as_html_stream,
                     get_media_features, media_flow, media_flow_standalone,
                     loading_screen, log_javascript, resume, update_online_status,
-                    remove_user, hx_get_parent_post, hx_get_comment, hx_get_comment_reply_form_html)
+                    remove_user, hx_get_parent_post, hx_get_comment,
+                    hx_get_comment_by_id, hx_get_comment_reply_form_html)
 
 
 from django.conf.urls.static import static
@@ -28,11 +29,11 @@ sitemaps = {
 
 urlpatterns = [
     path('', home, name='home'),
-    path('post/new', PostCreateView.as_view(), name='post-create'),
+    path('post/new/', PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
     path('like/<int:pk>/', like_post, name='like_post'),
-    path('all-posts', PostListView.as_view(), name='post-list'),
-    path('catalog', all_posts, name='catalog'),
+    path('all-posts/', PostListView.as_view(), name='post-list'),
+    path('catalog/', all_posts, name='catalog'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
     path('load-more/', load_more_posts, name='load-more-posts'),
     path('reading/', reading_flyer, name='reading'),
@@ -41,12 +42,12 @@ urlpatterns = [
     path('search/', search_results, name='search_results'),
     path('shop/', store_page, name='shop'),
     path('add-comment/<int:post_id>/', add_comment, name='add-comment'),
-    path('add-comment/comment/<int:comment_id>', reply_comment, name='reply-comment'),
+    path('add-comment/comment/<int:comment_id>/', reply_comment, name='reply-comment'),
     path('get-csrf-token/', get_csrf_token, name='get_csrf_token'), 
     path("graphql/", GraphQLView.as_view(graphiql=True, schema=schema)),
     path('offline/', offline_view, name='offline'),
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    path('sitemap.xml.gz', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
+    path('sitemap.xml/', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('sitemap.xml.gz/', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap_gz'),
     path('api/get-comment-form-html/<int:post_id>/', get_comment_form_html, name='get_comment_form_html'),
     path('api/get-reply-form-html/<int:comment_id>/', get_comment_reply_form_html, name='get_comment_reply_form'),
     path('api/save-list/', SaveListView.as_view(), name='save_list'),
@@ -62,7 +63,7 @@ urlpatterns = [
     path('api/remove-user/', remove_user, name='remove_user'),
     path('hx/parent-post/<int:post_id>/', hx_get_parent_post, name='hx-get-parent-post'),
     path('hx/get-comment/', hx_get_comment, name='hx-get-comment'),
-    path('hx/get-comment/<int:comment_id>/', hx_get_comment, name='hx-get-comment-by-id'),
+    path('hx/get-comment/<int:comment_id>/', hx_get_comment_by_id, name='hx-get-comment-by-id'),
     path('hx/get-reply-form-html/<int:comment_id>/', hx_get_comment_reply_form_html, name='hx-get-reply-form-html'),
 ]
 if settings.DEBUG:

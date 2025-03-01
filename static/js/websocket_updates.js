@@ -16,10 +16,28 @@ export function initPostWebsocketUpdates() {
 
     postSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        console.log(data);
-        const post = data.post || data.message;
+        console.log('Received WebSocket data:', data);  // Debug log
 
-        // Check if the post already exists in the DOM
+        if (data.type === 'ping') {
+            // Optionally send pong response
+            postSocket.send(JSON.stringify({ type: 'pong' }));
+            return;
+        }
+ 
+        // Check if data exists and has the expected structure
+        if (!data) {
+            console.error('Received empty data from WebSocket');
+            return;
+        }
+
+        // Get post data from either data.post or data.message
+        const post = data.post || (typeof data.message === 'object' ? data.message : null);
+        
+        if (!post || !post.id) {
+            console.error('Invalid post data received:', data);
+            return;
+        }
+    // Check if the post already exists in the DOM
         if (!document.getElementById(`post-${post.id}`)) {
             // Post doesn't exist; add it to the page
 

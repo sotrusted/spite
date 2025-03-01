@@ -651,7 +651,7 @@ function createCommentElement(comment, isInline = false) {
         
         element.innerHTML = `
             <p class="comment-skeleton" 
-                 hx-get="/hx/get-comment/${comment.id}"
+                 hx-get="/hx/get-comment/${comment.id}/"
                  hx-trigger="revealed"
                  hx-target="#comment-${comment.id}"
                  hx-swap="innerHTML">

@@ -544,28 +544,39 @@ class IncorrectObjectTypeException(Exception):
 
 
 def reply_comment(request, comment_id):
-    parent_comment = get_object_or_404(Comment, id=comment_id)
-    post = parent_comment.post
+    logger.info(f"Received reply to comment {comment_id}")
+    try:
+        parent_comment = get_object_or_404(Comment, id=comment_id)
+        post = parent_comment.post
+        logger.info(f"Found parent comment {parent_comment.id} for post {post.id}")
 
-    if request.method == 'POST':
-        form = CommentForm(request.POST, request.FILES)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-
-            if parent_comment:
-                comment.parent_comment = parent_comment
+        if request.method == 'POST':
+            logger.info(f"POST data: {request.POST}")
+            logger.info(f"FILES: {request.FILES}")
             
-            comment.ip_address = get_client_ip(request)
-            comment.save()
+            form = CommentForm(request.POST, request.FILES)
+            if form.is_valid():
+                logger.info("Form is valid")
+                comment = form.save(commit=False)
+                comment.post = post
 
-            # Return json response for ajax requests
-            if request.headers.get('HX-Request'):
-                target = request.headers.get('HX-Target')
-                if target == f'comments-list-{post.id}':
-                    return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=True)
-                elif target == f'post-list':
-                    return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
+                if parent_comment:
+                    comment.parent_comment = parent_comment
+                
+                comment.ip_address = get_client_ip(request)
+                comment.save()
+                logger.info(f"Saved comment with ID {comment.id}")
+
+                # Return json response for ajax requests
+                if request.headers.get('HX-Request'):
+                    # Get target from headers, removing the '#' if present
+                    target = request.headers.get('HX-Target', '')
+                    target = target.lstrip('#')
+                    if target == f'comments-list-{post.id}':
+                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=True)
+                    else:
+                        # Default to non-inline for post-list or any other target
+                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
                 
 
             elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -598,31 +609,49 @@ def reply_comment(request, comment_id):
 
             # Non-AJAX fallback
             return redirect('post-detail', pk=post.id)
+    except Exception as e:
+        logger.error(f"Error in reply_comment: {e}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return JsonResponse({'success': False}, status=400)
 
 def hx_get_comment(request, comment_id=None, comment=None, inline=False):
+    """HTMX endpoint to get a single comment"""
     logger.info(f"hx_get_comment called with comment_id: {comment_id}, inline: {inline}")
     
-    if comment_id and not comment:
-        logger.info(f"Fetching comment with id: {comment_id}")
-        comment = get_object_or_404(Comment, id=comment_id)
-        logger.info(f"Found comment: {comment}")
-    elif not comment and not comment_id:
-        logger.error("Neither comment nor comment_id provided")
-        return HttpResponse("Comment not found", status=404)
+    try:
+        # Get comment with related post data
+        if comment_id and not comment:
+            comment = get_object_or_404(
+                Comment.objects.select_related('post'), 
+                id=comment_id
+            )
+        elif not comment and not comment_id:
+            logger.error("No comment or comment_id provided")
+            return HttpResponse("Comment not found", status=404)
 
-    template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment.html'
-    logger.info(f"Using template: {template_name}")
+        logger.info(f"Rendering comment {comment.id} with inline={inline}")
+        
+        # Prepare context with all necessary data
+        context = {
+            'post': comment,
+        }
 
-    response = render(request, template_name, {'comment': comment})
-    logger.info("Rendered response successfully")
+        template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment_content.html'
+        logger.info(f"Using template: {template_name}")
+        
+        response = render(request, template_name, context)
+        logger.info(f"Rendered response with status {response.status_code}")
+        
+        return response
 
-    response['HX-Trigger'] = json.dumps({
-        'commentLoaded': True,
-    })
+    except Exception as e:
+        logger.exception(f"Error in hx_get_comment: {str(e)}")
+        return HttpResponse(f"Error loading comment: {str(e)}", status=500)
 
-    return response
+def hx_get_comment_by_id(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
 
 def add_comment(request, post_id, post_type='Post'):
     if post_type == 'Post':
@@ -765,6 +794,7 @@ def get_comment_reply_form_html(request, comment_id):
 def hx_get_comment_reply_form_html(request, comment_id):
     # get the comment and its post
     comment = get_object_or_404(Comment, id=comment_id)
+    comment_id = comment.id
     comment_post = comment.post
     post_id = comment_post.id
     if not comment:
