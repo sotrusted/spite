@@ -1,6 +1,6 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
-import { attachEventListeners } from './modules/utility_functions.js';
-import { initAjaxPostForm } from './ajax_posts.js';
+import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing } from './modules/utility_functions.js';
+// import { initAjaxPostForm } from './ajax_posts.js';
 import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
 
 logToBackend("Base.js initialized", 'info');
@@ -40,5 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     }
+
+    setupHtmxProcessing();
+
+
 
 });

@@ -542,21 +542,25 @@ class IncorrectObjectTypeException(Exception):
     def __str__(self):
         return "Incorrect object type, must be \'Post\' or \'Comment\'"
 
-
+from django.views.decorators.http import require_http_methods
+@require_http_methods(["POST", "OPTIONS"])
 def reply_comment(request, comment_id):
-    logger.info(f"Received reply to comment {comment_id}")
+    logger.info(f"reply_comment: Received reply to comment {comment_id}")
     try:
         parent_comment = get_object_or_404(Comment, id=comment_id)
+        if not parent_comment:
+            return redirect('post-detail', pk=post.id)
+
         post = parent_comment.post
-        logger.info(f"Found parent comment {parent_comment.id} for post {post.id}")
+        logger.info(f"reply_comment: Found parent comment {parent_comment.id} for post {post.id}")
 
         if request.method == 'POST':
-            logger.info(f"POST data: {request.POST}")
-            logger.info(f"FILES: {request.FILES}")
+            logger.info(f"reply_comment: POST data: {request.POST}")
+            logger.info(f"reply_comment: FILES: {request.FILES}")
             
             form = CommentForm(request.POST, request.FILES)
             if form.is_valid():
-                logger.info("Form is valid")
+                logger.info("reply_comment: Form is valid")
                 comment = form.save(commit=False)
                 comment.post = post
 
@@ -565,19 +569,20 @@ def reply_comment(request, comment_id):
                 
                 comment.ip_address = get_client_ip(request)
                 comment.save()
-                logger.info(f"Saved comment with ID {comment.id}")
+                logger.info(f"reply_comment: Saved comment with ID {comment.id}")
 
                 # Return json response for ajax requests
                 if request.headers.get('HX-Request'):
-                    # Get target from headers, removing the '#' if present
-                    target = request.headers.get('HX-Target', '')
-                    target = target.lstrip('#')
-                    if target == f'comments-list-{post.id}':
-                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=True)
-                    else:
-                        # Default to non-inline for post-list or any other target
-                        return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
-                
+                    context = {
+                        'post': comment,
+                    }
+                    response = render(request, 'blog/partials/comment.html', context=context)
+                    # Add debug headers
+                    response['Access-Control-Allow-Origin'] = '*'
+                    response['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+                    response['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, X-CSRFToken'
+
+                    return response
 
             elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -611,13 +616,18 @@ def reply_comment(request, comment_id):
             return redirect('post-detail', pk=post.id)
     except Exception as e:
         logger.error(f"Error in reply_comment: {e}")
+        if request.headers.get('HX-Request'):
+            return HttpResponse(
+                f"<div class='alert alert-danger'>Error in reply_comment: {e}</div>",
+                status=500
+            )
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    return JsonResponse({'success': False}, status=400)
+    return redirect('post-detail', pk=post.id)
 
 def hx_get_comment(request, comment_id=None, comment=None, inline=False):
     """HTMX endpoint to get a single comment"""
-    logger.info(f"hx_get_comment called with comment_id: {comment_id}, inline: {inline}")
+    logger.info(f"hx_get_comment: called with comment_id: {comment_id}, inline: {inline}")
     
     try:
         # Get comment with related post data
@@ -627,10 +637,10 @@ def hx_get_comment(request, comment_id=None, comment=None, inline=False):
                 id=comment_id
             )
         elif not comment and not comment_id:
-            logger.error("No comment or comment_id provided")
+            logger.error("hx_get_comment: No comment or comment_id provided")
             return HttpResponse("Comment not found", status=404)
 
-        logger.info(f"Rendering comment {comment.id} with inline={inline}")
+        logger.info(f"hx_get_comment: Rendering comment {comment.id} with inline={inline}")
         
         # Prepare context with all necessary data
         context = {
@@ -638,15 +648,15 @@ def hx_get_comment(request, comment_id=None, comment=None, inline=False):
         }
 
         template_name = 'blog/partials/inline_comment.html' if inline else 'blog/partials/comment_content.html'
-        logger.info(f"Using template: {template_name}")
+        logger.info(f"hx_get_comment: Using template: {template_name}")
         
         response = render(request, template_name, context)
-        logger.info(f"Rendered response with status {response.status_code}")
+        logger.info(f"hx_get_comment: Rendered response with status {response.status_code}")
         
         return response
 
     except Exception as e:
-        logger.exception(f"Error in hx_get_comment: {str(e)}")
+        logger.exception(f"hx_get_comment: Error in hx_get_comment: {str(e)}")
         return HttpResponse(f"Error loading comment: {str(e)}", status=500)
 
 def hx_get_comment_by_id(request, comment_id):
@@ -654,6 +664,7 @@ def hx_get_comment_by_id(request, comment_id):
     return hx_get_comment(request, comment_id=comment.id, comment=comment, inline=False)
 
 def add_comment(request, post_id, post_type='Post'):
+    logger.info(f"add_comment: Received add_comment request for post_id: {post_id}, post_type: {post_type}")
     if post_type == 'Post':
         post = get_object_or_404(Post, id=post_id)
         parent_comment = None
@@ -792,22 +803,33 @@ def get_comment_reply_form_html(request, comment_id):
 
 
 def hx_get_comment_reply_form_html(request, comment_id):
-    # get the comment and its post
-    comment = get_object_or_404(Comment, id=comment_id)
-    comment_id = comment.id
-    comment_post = comment.post
-    post_id = comment_post.id
-    if not comment:
-        return render(request, 'blog/partials/error.html', {'error': 'Comment not found'})
-    
-    comment_form = CommentForm()
-    return render(request, 'blog/partials/comment_form.html', 
-        {'comment_form': comment_form, 
-         'post_id': post_id, 
-         'comment_id': comment_id,
-         'post_type': 'Comment',
+    try:
+        comment = get_object_or_404(Comment, id=comment_id)
+        comment_form = CommentForm()
+        
+        context = {
+            'comment_form': comment_form,
+            'comment_id': comment_id,
+            'post_id': comment.post.id,
+            'post_type': 'Comment'
+        }
+        
+        html = render_to_string('blog/partials/comment_form.html', context, request=request)
+        
+        # For HTMX requests
+        if request.headers.get('HX-Request'):
+            return HttpResponse(html)
+        
+        # For AJAX requests
+        return JsonResponse({
+            'form': html,
+            'action_url': f'/add-comment/comment/{comment_id}/'
         })
-
+    except Exception as e:
+        logger.exception(f"Error in hx_get_comment_reply_form_html: {e}")
+        if request.headers.get('HX-Request'):
+            return HttpResponse(f"Error: {str(e)}", status=500)
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 

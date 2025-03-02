@@ -121,6 +121,30 @@ document.addEventListener('htmx:afterRequest', function(evt) {
     }
 });
 
+document.body.addEventListener('htmx:xhr:progress', function(evt) {
+    if (evt.detail.loaded && evt.detail.total) {
+        // Calculate percentage
+        const percent = Math.round((evt.detail.loaded / evt.detail.total) * 100);
+        
+        // Find the progress bar in the indicator
+        const indicator = document.querySelector(evt.detail.requestConfig.indicatorSelector);
+        if (indicator) {
+            const progressBar = indicator.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+            }
+            
+            // Update text if needed
+            const progressText = indicator.querySelector('.progress-text');
+            if (progressText) {
+                progressText.textContent = `Uploading... ${percent}%`;
+            }
+        }
+    }
+});
+
+
 </script>
 
 {% endblock %}

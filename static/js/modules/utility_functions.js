@@ -246,6 +246,7 @@ function attachToggleCommentsButtons() {
 }
 
 // Handle regular comment forms
+
 function handleCommentFormSubmit(form) {
     const commentForms = document.querySelectorAll('form[id^="comment-form-"]');
     log(`Found ${commentForms.length} comment forms`);
@@ -350,8 +351,8 @@ export function attachEventListeners() {
     // handleCommentFormSubmit();
     // log('Comment form submit listener attached');
 
-    handleReplyFormSubmit();
-    log('Reply form submit listener attached');
+    // handleReplyFormSubmit();
+    // log('Reply form submit listener attached');
 
     document.querySelectorAll('#feed-scroller').forEach(a => {
         a.addEventListener('click', () => scrollToElementById('recent-posts'));
@@ -571,11 +572,11 @@ export function addPostToPage(post) {
     attachToggleReplyButtons();
     log('Toggle reply buttons attached');
 
-    handleCommentFormSubmit();
-    log('Comment form submit listener attached');
+    // handleCommentFormSubmit();
+    // log('Comment form submit listener attached');
 
-    handleReplyFormSubmit();
-    log('Reply form submit listener attached');
+    //    handleReplyFormSubmit();
+    //log('Reply form submit listener attached');
 
     
     return newPost;
@@ -667,6 +668,10 @@ export function addCommentToPage(comment) {
     const postList = document.getElementById('post-list');
     const newComment = createCommentElement(comment);
     postList.insertBefore(newComment, postList.firstChild);
+
+    // Process the new comment
+    htmx.process(newComment);
+    htmx.trigger(newComment, 'revealed');
 
     // Load reply form for the new comment
     const replyFormContainer = document.getElementById(`reply-form-${comment.id}`);
@@ -836,5 +841,49 @@ function submitCommentForm(formElement, postId) {
             progress.style.display = 'none';
 
         }
+    });
+}
+
+// Process HTMX triggers on dynamically added elements
+export function processHtmxOnNewElements() {
+    // Find all elements with hx-trigger="revealed" that haven't been processed
+    const unprocessedElements = document.querySelectorAll('[hx-trigger="revealed"]:not([data-processed="true"])');
+    
+    unprocessedElements.forEach(element => {
+        // Mark as processed to avoid reprocessing
+        element.setAttribute('data-processed', 'true');
+        
+        // Process HTMX on this element
+        htmx.process(element);
+        
+        // Force the revealed event if the element is in the viewport
+        if (isElementInViewport(element)) {
+            htmx.trigger(element, 'revealed');
+        }
+    });
+}
+
+// Check if an element is in the viewport
+function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
+// Call this periodically to process new elements
+export function setupHtmxProcessing() {
+    // Process immediately
+    processHtmxOnNewElements();
+    
+    // Then set up an interval to check for new elements
+    setInterval(processHtmxOnNewElements, 1000);
+    
+    // Also process on scroll events
+    window.addEventListener('scroll', function() {
+        processHtmxOnNewElements();
     });
 }

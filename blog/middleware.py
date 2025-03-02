@@ -42,3 +42,29 @@ class BlockIPMiddleware:
         return self.get_response(request) 
 
 
+
+import traceback
+
+
+class HtmxDebugMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Log HTMX request details
+        if request.headers.get('HX-Request'):
+            logger.info(f"HTMX Request: {request.method} {request.path}")
+            logger.info(f"HTMX Headers: {dict([(k, v) for k, v in request.headers.items() if k.startswith('HX-')])}")
+        
+        try:
+            response = self.get_response(request)
+            
+            # Log HTMX response details
+            if request.headers.get('HX-Request'):
+                logger.info(f"HTMX Response: {response.status_code}")
+            
+            return response
+        except Exception as e:
+            logger.error(f"Exception in request {request.path}: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise

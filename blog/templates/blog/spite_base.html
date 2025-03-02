@@ -273,6 +273,12 @@
 </div>
 
     <script>
+        htmx.logger = function(elt, event, data) {
+            if (console) {
+                console.log(event, elt, data);
+            }
+        };
+
         window.addEventListener('beforeunload', (e) => {
             // Get the target URL from the navigation
             const targetUrl = window.location.href;
@@ -357,6 +363,19 @@
                 responseText: event.detail.xhr.responseText.substring(0, 100) + '...'
             });
         });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('#comment-form-4504');
+            if (form) {
+              form.addEventListener('submit', function(event) {
+                console.log('Form submit event fired');
+                // Don't prevent default - we want to see if other handlers are doing this
+              });
+            } else {
+              console.log('Form not found');
+            }
+          });
 
     </script>
 </body>

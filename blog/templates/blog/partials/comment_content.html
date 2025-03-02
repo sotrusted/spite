@@ -29,9 +29,10 @@
     data-parent-id="{{comment.parent_comment.id}}"
 {% endif %}>
     {% if comment.parent_comment %}
-        <div class="parent-comment">
+        <div class="parent-comment" style="margin-left: 10px;">
             <div class="parent-comment-content">
-                <span class="reply-to">Re: {{ comment.parent_comment_content }} -- <strong>{{ comment.parent_comment_name|default:"Anonymous" }}</strong></span>
+                <span class="reply-to"><strong>{{ comment.parent_comment_name|default:"Anonymous" }}</strong></span>
+                <p class="parent-comment-content">{{ comment.parent_comment_content }}</p>
             </div>
             {% if comment.parent_comment_media_file %}
                 {% if comment.parent_comment_is_video %}

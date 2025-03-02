@@ -499,6 +499,7 @@ form {
 }
 
 .comment .parent-post.stacked {
+    margin-left: 30px;
 
     background-color: #d5c9b6; 
 }
@@ -534,7 +535,6 @@ form {
 
 .parent-post {
     max-width: 80%;
-    margin-left: 30px;
 }
 
 .preview .text-content {
@@ -734,6 +734,16 @@ main {
         font-size: 1.1em;
     }
 
+    .comment .post-content .comment-name,
+    .comment .post-content .comment-content {
+        font-size: 1.2em;
+    }
+
+    .comment .post-content .comment-content {
+        margin-bottom: 0 !important;
+    }
+
+
     .comment .blockquote .parent-content {
         color: rgb(28, 36, 28);
     }
@@ -755,6 +765,11 @@ main {
     .detail .image-content {
         justify-content: left;
         margin-left: 0;
+    }
+
+    .parent-post {
+        margin: 0 auto !important;
+        max-width: 90%;
     }
     
     .parent-comment,
@@ -1632,7 +1647,7 @@ video:focus {
 .parent-comment {
     font-size: 1.1em;
     padding: 10px;
-    margin: 10px 0;
+    margin: 15px 0;
     background-color: #dfd1bf;
 }
 
@@ -1648,6 +1663,10 @@ video:focus {
 }
 
 /* Parent post styles */
+.parent-post {
+    margin-left: 30px;
+}
+
 .parent-post.preview {
     padding: 15px;
     margin: 10px 0;
@@ -1682,3 +1701,28 @@ video:focus {
     }
 }
 
+
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: block;
+}
+.htmx-request.htmx-indicator {
+    display: block;
+}
+
+/* Animation for the progress bar */
+@keyframes progress-bar-stripes {
+    from { background-position: 1rem 0; }
+    to { background-position: 0 0; }
+}
+
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+.progress-bar-striped {
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+}

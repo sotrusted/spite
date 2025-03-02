@@ -50,7 +50,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'localhost', 
                  'testserver', '192-3-30-202-host.colocrossing.com', 
-                 'sotrusted.net', 'www.sotrusted.net',] 
+                 'sotrusted.net', 'www.sotrusted.net', '107.173.0.195', '107.173.0.196'] 
 
 
 
@@ -59,6 +59,7 @@ ALLOWED_HOSTS = ['127.0.0.1', '192.3.30.202', '69.48.163.194', 'spite.fr', 'loca
 
 
 INSTALLED_APPS = [
+    'corsheaders',
     'daphne', 
     'axes',
     'django.contrib.admin',
@@ -76,7 +77,6 @@ INSTALLED_APPS = [
     'filer',
     'crispy_bootstrap4',
     'channels',
-    'corsheaders',
     'graphene_django',
     'pwa',
     'meta',
@@ -90,16 +90,41 @@ CORS_ALLOWED_ORIGINS = [
     'https://127.0.0.1',
     'https://192.3.30.202',
     'https://69.48.163.194',
+    'https://sotrusted.net',
+    'https://www.sotrusted.net',
+    'https://107.173.0.195',
+    'https://107.173.0.196',
 ]
 
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'OPTIONS',
-]
-
+# Allow credentials (cookies, authorization headers)
 CORS_ALLOW_CREDENTIALS = True
 
+# Allow specific HTTP methods
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+# Allow specific HTTP headers
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "hx-request",
+    "hx-trigger",
+    "hx-target",
+    "hx-current-url",
+]
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -116,6 +141,7 @@ MIDDLEWARE = [
     'middleware.page_view_middleware.PageViewMiddleware',
     'middleware.loading_screen_middleware.LoadingScreenMiddleware',
     'blog.middleware.BlockIPMiddleware',
+    'blog.middleware.HtmxDebugMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
