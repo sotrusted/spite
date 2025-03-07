@@ -44,7 +44,7 @@
             href="{% static 'media/anon.webp' %}" 
             type="image/webp"
             fetchpriority="high">
-        <script src="https://unpkg.com/htmx.org@2.0.4" integrity="HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+”" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/htmx.org@2.0.4" crossorigin="anonymous"></script>
 
     {% endblock %}
     {% block stylesheets %}        
@@ -111,8 +111,9 @@
         <div id="new-comment-notification">
             New comment on <span id="new-comment-post"></span>
         </div>
-        <audio id="notification-sound" src="{% static 'sounds/harp.mp3' %}" hidden></audio>
-        <audio id="new-comment-sound" src="{% static 'sounds/harp-flourish.mp3' %}" hidden></audio>
+        
+        <audio id="notification-sound" src="{% static 'sounds/harp.mp3' %}" paused="false" hidden></audio>
+        <audio id="new-comment-sound" src="{% static 'sounds/harp-flourish.mp3' %}" paused="false" hidden></audio>
     {% endblock %}
 
     {% block header %}
@@ -187,7 +188,7 @@
                 <div class="chat-title">
                     <img src="{% static 'media/spite-logo.webp' %}" alt="" class="chat-logo">
                     <span class="spite-text">SPITE CHAT</span>
-                    <button class="sound-toggle" aria-label="Toggle Sound">🔊</button>
+                    <button class="chat-sound-toggle" aria-label="Toggle Sound">🔊</button>
                 </div>
             </div>
             <div class="chat-controls">
@@ -262,9 +263,7 @@
         <script type="module" src="{% static 'js/chat_sounds.js' %}" defer></script>
         <script type="module" src="{% static 'js/base.js' %}"></script>
         <script type="module" src="{% static 'js/chat.js' %}"></script>
-        {% compress js %}
-            <script src="{% static 'js/snow.js' %}" defer></script>
-        {% endcompress %}
+        <script src="{% static 'js/snow.js' %}"></script>
     {% endblock %}
 
     {% block page_scripts %} 

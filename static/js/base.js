@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupHtmxProcessing();
 
-
-
+    const writeButton = document.getElementById('write-button');
+    writeButton.addEventListener('click', function() {
+        scrollToElementById('post-form');
+    });
+    
 });

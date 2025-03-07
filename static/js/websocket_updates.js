@@ -41,8 +41,12 @@ export function initPostWebsocketUpdates() {
         if (!document.getElementById(`post-${post.id}`)) {
             // Post doesn't exist; add it to the page
 
-            // Play the notification sound
-            notificationSound.play();
+            // Play the notification sound only if enabled
+            const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
+            if (soundEnabled && !notificationSound.paused) {
+                notificationSound.play();
+            }
+
 
             // Increment SPITE COUNTER
             updateSpiteCounter();
@@ -53,7 +57,7 @@ export function initPostWebsocketUpdates() {
             // Add the post to the DOM
             addPostToPage(post);
 
-            attachEventListeners();
+            attachEventListeners(post.id);
             const button = document.getElementById(`toggle-comments-${post.id}`);
             button.addEventListener('click', function() {
                 const commentsContainer = document.getElementById(`comments-container-${post.id}`);
@@ -100,7 +104,7 @@ export function initCommentWebsocketUpdates() {
             addCommentToPage(comment);
 
             // Attach event listeners
-            attachEventListeners();
+            attachEventListeners(comment.id);
 
         } else {
             console.log(`Comment with ID ${comment.id} already exists.`);

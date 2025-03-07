@@ -127,7 +127,7 @@ document.body.addEventListener('htmx:xhr:progress', function(evt) {
         const percent = Math.round((evt.detail.loaded / evt.detail.total) * 100);
         
         // Find the progress bar in the indicator
-        const indicator = document.querySelector(evt.detail.requestConfig.indicatorSelector);
+        const indicator = evt.detail.indicator;
         if (indicator) {
             const progressBar = indicator.querySelector('.progress-bar');
             if (progressBar) {

@@ -1,0 +1,28 @@
+<div class="pagination">
+    <span class="step-links">
+        {% if posts.has_previous %}
+            {% if posts.has_previous and is_search and query %}
+                <a href="?query={{ query }}&page=1">« first</a>
+                <a href="?query={{ query }}&page={{ posts.previous_page_number }}">&laquo; Previous</a>
+            {% else %}
+                <a href="?page=1">« first</a>
+                <a href="?page={{ posts.previous_page_number }}">previous</a>
+            {% endif %}
+        {% endif %}
+
+        <span class="current">
+            Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+        </span>
+
+        {% if posts.has_next %}
+            {% if posts.has_next and is_search and query %}
+                <a href="?query={{ query }}&page={{ posts.next_page_number }}">next</a>
+                <a href="?query={{ query }}&page={{ posts.paginator.num_pages }}">last »</a>
+            {% else %}
+                <a href="?page={{ posts.next_page_number }}">next</a>
+                <a href="?page={{ posts.paginator.num_pages }}">last »</a>
+            {% endif %}
+        {% endif %}
+
+    </span>
+</div>

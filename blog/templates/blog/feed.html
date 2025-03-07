@@ -57,7 +57,7 @@
     </div>
 
     <h2 class="section-header">recent posts</h2> 
-    <div class="highlight post detail" style="margin: auto; text-align: center; margin-top: 30px; max-width: 900px; padding-top: 10px; border: 5px solid black; hyphens: none; margin: auto; padding: 40px; font-size: 1.2em;">
+        <div class="highlight post detail" style="margin: auto; text-align: center; margin-top: 30px; max-width: 900px; padding-top: 10px; border: 5px solid black; hyphens: none; margin: auto; padding: 40px; font-size: 1.2em;">
         <div class="title-box" style="border-bottom: 2px solid black; margin-top: 30px; margin-bottom: 50px;">
           <h1 class="post-title" style="padding-bottom:10px;">SPITE Magazine</h1>
           <h1 class="post-title" style="padding-bottom:10px;">New York City</h1>
@@ -124,25 +124,7 @@
     </div>
 
 
-
-    <div class="posts" id="post-list">
-        {% if is_search and query and count %}
-            <p>{{ count }} posts matching "{{ query }}"</p>
-        {% elif count %}
-            <p>{{ count }} posts</p>
-        {% endif %}
-        {% if posts %} 
-            {% for post in posts %} 
-                {% if post.get_item_type == 'Post' %}
-                    {% include 'blog/partials/post.html' with post=post nested=False %}
-                {% elif post.get_item_type == 'Comment' %}
-                    {% include 'blog/partials/comment.html' with comment=post %}
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            <p class="oops">No one seems to have posted yet! Click below to post!</p>
-        {% endif %}
-    </div>
+    {% include 'blog/partials/posts_list.html' with posts=posts is_search=is_search query=query count=count %}
 
     <div class="cta">
         <div class="post-button">
@@ -150,29 +132,7 @@
         </div>
     </div>
 
-    <div class="pagination">
-        <span class="step-links">
-            {% if posts.has_previous %}
-                <a href="?page=1">« first</a>
-                <a href="?page={{ posts.previous_page_number }}">previous</a>
-            {% elif post.has_previous and is_search and query %}
-                <a href="?query={{ query }}&page=1">« first</a>
-                <a href="?query={{ query }}&page={{ posts.previous_page_number }}">&laquo; Previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
-            </span>
-
-            {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}">next</a>
-                <a href="?page={{ posts.paginator.num_pages }}">last »</a>
-            {% elif post.has_next and is_search and query %}
-                <a href="?query={{ query }}&page={{ posts.next_page_number }}">next</a>
-                <a href="?query={{ query }}&page={{ posts.paginator.num_pages }}">last »</a>
-            {% endif %}
-        </span>
-    </div>
+    {% include 'blog/partials/pagination.html' with posts=posts is_search=is_search query=query %}
 
 </div>
 

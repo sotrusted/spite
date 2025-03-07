@@ -63,8 +63,14 @@ function toggleDetailImage(postId) {
 }
 
 
-function attachDetailToggleImages() {
-    const detailToggleImages = document.querySelectorAll('.detail-toggle-image');
+function attachDetailToggleImages(id=null) {
+    let detailToggleImages;
+    if (id) {
+        detailToggleImages = document.querySelectorAll(`a[id^="detail-toggle-image-${id}"]`);
+    } else {
+        detailToggleImages = document.querySelectorAll('.detail-toggle-image');
+    }
+
     detailToggleImages.forEach(detailToggleImage => {
         if (!detailToggleImage) {
             log('Detail toggle image not found', 'error');
@@ -97,9 +103,15 @@ function attachDetailToggleImages() {
 }
 
 
-function attachToggleContentButtons() {
+function attachToggleContentButtons(id=null) {
     log("Attaching toggle content buttons");
-    const toggleContentButtons = document.querySelectorAll('a[id^="toggle-link-"]');
+    let toggleContentButtons;
+    if (id) {
+        toggleContentButtons = document.querySelectorAll(`a[id^="toggle-link-${id}"]`);   
+    } else {
+        toggleContentButtons = document.querySelectorAll('a[id^="toggle-link-"]');
+    }
+
     log(`Found ${toggleContentButtons.length} toggle content buttons`);
     
     toggleContentButtons.forEach(a => {
@@ -129,9 +141,14 @@ function attachToggleContentButtons() {
 }
 
 
-function attachToggleReplyButtons() {
+function attachToggleReplyButtons(id=null) {
     log("Attaching toggle reply buttons");
-    const toggleReplyButtons = document.querySelectorAll('a[id^="toggle-reply-"]');
+    let toggleReplyButtons;
+    if (id) {
+        toggleReplyButtons = document.querySelectorAll(`a[id^="toggle-reply-${id}"]`);
+    } else {
+        toggleReplyButtons = document.querySelectorAll('a[id^="toggle-reply-"]');
+    }
     log(`Found ${toggleReplyButtons.length} toggle reply buttons`);
 
     if (toggleReplyButtons.length === 0) {
@@ -163,9 +180,15 @@ function attachToggleReplyButtons() {
 
 
 // Function to attach event listeners to copy links
-function attachCopyLinks() {
+function attachCopyLinks(id=null) {
     log("Attaching copy links");
-    const copyLinks = document.querySelectorAll('a[id^="copy-link-"]');
+    let copyLinks;
+    if (id) {
+        copyLinks = document.querySelectorAll(`a[id^="copy-link-${id}"]`);
+    } else {
+        copyLinks = document.querySelectorAll('a[id^="copy-link-"]');
+    }
+
     log(`Found ${copyLinks.length} copy links`);
     if (copyLinks.length === 0) {
         log("No copy links found", 'warning');
@@ -204,16 +227,22 @@ function attachCopyLinks() {
     });
 }
 
-function attachToggleCommentsButtons() {
+function attachToggleCommentsButtons(id=null) {
     log('Attaching toggle comments buttons');
-    const buttons = document.querySelectorAll('[id^="toggle-comments-"]');
-    
-    if (buttons.length === 0) {
+    // Update the selector to match your actual button structure
+    let toggleCommentsButtons;
+    if (id) {
+        toggleCommentsButtons = document.querySelectorAll(`button[id^="toggle-comments-${id}"]`);
+    } else {
+        toggleCommentsButtons = document.querySelectorAll('button[id^="toggle-comments-"]');
+    }
+ 
+    if (toggleCommentsButtons.length === 0) {
         log('No toggle comments buttons found', 'warning');
         return;
     }
 
-    buttons.forEach(button => {
+    toggleCommentsButtons.forEach(button => {
         if (!button.hasAttribute('data-listener-attached')) {
             button.setAttribute('data-listener-attached', 'true');
             
@@ -326,27 +355,45 @@ function handleReplyFormSubmit() {
 
 
 // Attach submit event to all comment forms
-export function attachEventListeners() {
+export function attachEventListeners(id=null) {
     log('Attaching event listeners');
 
-    setWriteLinksScrollers();
-    log('Write links scrollers attached');
+    if (!id) {
+        setWriteLinksScrollers();
+        log('Write links scrollers attached');
 
-    attachToggleContentButtons();
-    log('Toggle content buttons attached');
+        attachToggleContentButtons();
+        log('Toggle content buttons attached');
 
-    attachCopyLinks();
-    log('Copy links attached');
+        attachCopyLinks();
+        log('Copy links attached');
 
-    attachToggleCommentsButtons();
-    log('Toggle comments buttons attached');
+        attachToggleCommentsButtons();
+        log('Toggle comments buttons attached');
 
-    attachDetailToggleImages();
-    log('Detail toggle images attached');
+        attachDetailToggleImages();
+        log('Detail toggle images attached');
 
-    attachToggleReplyButtons();
-    log('Toggle reply buttons attached');
+        attachToggleReplyButtons();
+        log('Toggle reply buttons attached');
+    }
 
+    if (id) {
+        attachToggleContentButtons(id);
+        log('Toggle content buttons attached for post ${id}');
+
+        attachCopyLinks(id);
+        log('Copy links attached for post ${id}');
+
+        attachToggleCommentsButtons(id);
+        log('Toggle comments buttons attached for post ${id}');
+
+        attachDetailToggleImages(id);
+        log('Detail toggle images attached for post ${id}');
+
+        attachToggleReplyButtons(id);
+        log('Toggle reply buttons attached for post ${id}');
+    }
 
     // handleCommentFormSubmit();
     // log('Comment form submit listener attached');
@@ -560,16 +607,16 @@ export function addPostToPage(post) {
 
 
 
-    attachToggleContentButtons();
+    attachToggleContentButtons(id=postId);
     log('Toggle content buttons attached');
 
-    attachCopyLinks();
+    attachCopyLinks(id=postId);
     log('Copy links attached');
 
-    attachToggleCommentsButtons();
+    attachToggleCommentsButtons(id=postId);
     log('Toggle comments buttons attached');
 
-    attachToggleReplyButtons();
+    attachToggleReplyButtons(id=postId);
     log('Toggle reply buttons attached');
 
     // handleCommentFormSubmit();
@@ -655,8 +702,14 @@ function createCommentElement(comment, isInline = false) {
                  hx-get="/hx/get-comment/${comment.id}/"
                  hx-trigger="revealed"
                  hx-target="#comment-${comment.id}"
-                 hx-swap="innerHTML">
+                 hx-swap="innerHTML"
+                hx-indicator="#comment-indicator-${comment.id}">
                 Loading comment...
+                <span id="comment-indicator-${comment.id}" class="htmx-indicator">
+                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </span>
             </p>
         `
     }

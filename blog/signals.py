@@ -143,6 +143,8 @@ def trigger_summary(sender, instance, **kwargs):
         summarize_posts.delay()
     
 
-@receiver([post_save, post_delete], sender=BlockedIP)
-def clear_blocked_ips_cache(sender, **kwargs):
+
+@receiver(post_save, sender=BlockedIP)
+@receiver(post_delete, sender=BlockedIP)
+def invalidate_blocked_ip_cache(sender, **kwargs):
     cache.delete('blocked_ips')

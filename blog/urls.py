@@ -13,7 +13,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     get_media_features, media_flow, media_flow_standalone,
                     loading_screen, log_javascript, resume, update_online_status,
                     remove_user, hx_get_parent_post, hx_get_comment,
-                    hx_get_comment_by_id, hx_get_comment_reply_form_html)
+                    hx_get_comment_by_id, hx_get_comment_reply_form_html,
+                    hx_scroll_to_post_form)
 
 
 from django.conf.urls.static import static
@@ -65,6 +66,7 @@ urlpatterns = [
     path('hx/get-comment/', hx_get_comment, name='hx-get-comment'),
     path('hx/get-comment/<int:comment_id>/', hx_get_comment_by_id, name='hx-get-comment-by-id'),
     path('hx/get-reply-form-html/<int:comment_id>/', hx_get_comment_reply_form_html, name='hx-get-reply-form-html'),
+    path('hx/scroll-to-post-form/', hx_scroll_to_post_form, name='hx-scroll-to-post-form'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

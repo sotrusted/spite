@@ -52,6 +52,73 @@ class Heart {
     }
 }
 
+class Clover {
+    constructor() {
+        this.x = Math.random() * window.innerWidth;
+        this.y = -10;
+        this.size = Math.random() * 15 + 5; // Size between 5-20px
+        this.speedY = Math.random() * 1 + 0.5; // Fall speed
+        this.speedX = Math.random() * 2 - 1; // Sideways movement
+        this.swing = Math.random() * 3; // Swinging amplitude
+        this.phase = Math.random() * Math.PI * 2; // Random starting phase
+        this.rotation = Math.random() * 360; // Random rotation
+    }
+
+    update() {
+        this.y += this.speedY;
+        // Add gentle swinging motion
+        this.x += Math.sin(this.y / 50 + this.phase) * this.swing * 0.1;
+        this.x += this.speedX * 0.1;
+        this.rotation += 0.2; // Slowly rotate the clover
+
+        // Reset if clover goes off screen
+        if (this.y > window.innerHeight) {
+            this.y = -10;
+            this.x = Math.random() * window.innerWidth;
+        }
+        if (this.x > window.innerWidth) {
+            this.x = 0;
+        }
+        if (this.x < 0) {
+            this.x = window.innerWidth;
+        }
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        
+        // Draw four-leaf clover
+        const leafSize = this.size / 2;
+        
+        ctx.fillStyle = '#009E60';
+       
+
+        
+        // Draw four circles for the leaves
+        for (let i = 0; i < 4; i++) {
+            ctx.beginPath();
+            const angle = (i * Math.PI / 2);
+            const leafX = Math.cos(angle) * (leafSize * 0.7);
+            const leafY = Math.sin(angle) * (leafSize * 0.7);
+            
+            ctx.arc(leafX, leafY, leafSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Draw stem
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, this.size);
+        ctx.lineWidth = this.size / 10;
+        ctx.strokeStyle = '#006600';
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+}
+
 class HeartAnimation {
     constructor() {
         this.canvas = document.createElement('canvas');
@@ -66,13 +133,21 @@ class HeartAnimation {
         this.canvas.style.pointerEvents = 'none';
         this.canvas.style.zIndex = '1000';
         
+        // Create button container for all fixed buttons
+        this.buttonContainer = document.createElement('div');
+        this.buttonContainer.className = 'fixed-button-container';
+        this.buttonContainer.style.position = 'fixed';
+        this.buttonContainer.style.left = '10px';
+        this.buttonContainer.style.bottom = '10px';
+        this.buttonContainer.style.zIndex = '1001';
+        this.buttonContainer.style.display = 'flex';
+        this.buttonContainer.style.flexDirection = 'column';
+        this.buttonContainer.style.gap = '10px';
+
         // Create toggle button
         this.toggleButton = document.createElement('button');
-        this.toggleButton.innerHTML = '💝';
+        this.toggleButton.innerHTML = '🍀';
         this.toggleButton.className = 'heart-toggle';
-        this.toggleButton.style.position = 'fixed';
-        this.toggleButton.style.left = '10px';
-        this.toggleButton.style.bottom = '10px';
         this.toggleButton.style.zIndex = '1001';
         this.toggleButton.style.padding = '8px';
         this.toggleButton.style.borderRadius = '50%';
@@ -81,38 +156,74 @@ class HeartAnimation {
         this.toggleButton.style.cursor = 'pointer';
         this.toggleButton.style.fontSize = '20px';
         
+        // Create sound toggle button
+        this.soundToggleButton = document.createElement('button');
+        this.soundToggleButton.innerHTML = '🎵';
+        this.soundToggleButton.className = 'sound-toggle fixed-button';
+        this.soundToggleButton.style.padding = '8px';
+        this.soundToggleButton.style.borderRadius = '50%';
+        this.soundToggleButton.style.border = 'none';
+        this.soundToggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
+        this.soundToggleButton.style.cursor = 'pointer';
+        this.soundToggleButton.style.fontSize = '20px';
+        
+        // Create write button
+        this.writeButton = document.createElement('button');
+        this.writeButton.innerHTML = '✏️';
+        this.writeButton.className = 'write-button fixed-button';
+        this.writeButton.id = 'write-button';
+        this.writeButton.style.padding = '8px';
+        this.writeButton.style.borderRadius = '50%';
+        this.writeButton.style.border = 'none';
+        this.writeButton.style.background = 'rgba(255, 255, 255, 0.7)';
+        this.writeButton.style.cursor = 'pointer';
+        this.writeButton.style.fontSize = '20px';
+        
         // Add media query for mobile
         const mediaQuery = window.matchMedia('(max-width: 768px)');
         const adjustForMobile = (e) => {
             if (e.matches) {
-                this.toggleButton.style.left = '10px';
-                this.toggleButton.style.bottom = '60px'; // Move up to avoid clash with chat
-                this.toggleButton.style.transform = 'scale(0.8)';
+                this.buttonContainer.style.left = '10px';
+                this.buttonContainer.style.bottom = '60px'; // Move up to avoid clash with chat
+                this.buttonContainer.style.transform = 'scale(0.8)';
             } else {
-                this.toggleButton.style.left = '10px';
-                this.toggleButton.style.bottom = '10px';
-                this.toggleButton.style.transform = 'scale(1)';
+                this.buttonContainer.style.left = '10px';
+                this.buttonContainer.style.bottom = '10px';
+                this.buttonContainer.style.transform = 'scale(1)';
             }
         };
-        mediaQuery.addListener(adjustForMobile);
-        adjustForMobile(mediaQuery);
+        mediaQuery.addEventListener('change', adjustForMobile);   
         
         this.init();
+
     }
 
     init() {
         // Add elements to DOM
         document.body.appendChild(this.canvas);
-        document.body.appendChild(this.toggleButton);
+
+        // Add buttons to container
+        this.buttonContainer.appendChild(this.toggleButton);
+        this.buttonContainer.appendChild(this.soundToggleButton);
+        this.buttonContainer.appendChild(this.writeButton);
+        
+        // Add container to DOM
+        document.body.appendChild(this.buttonContainer);
+
         
         // Initialize hearts
         for (let i = 0; i < 50; i++) {
-            this.hearts.push(new Heart());
+            this.hearts.push(new Clover());
         }
         
         // Event listeners
         this.toggleButton.addEventListener('click', () => this.toggle());
         window.addEventListener('resize', () => this.resize());
+        
+        // Sound toggle event listener
+        this.soundToggleButton.addEventListener('click', () => this.toggleSound());
+
+        // Write button event listener is set in the base.js file
         
         // Initial resize
         this.resize();
@@ -122,7 +233,31 @@ class HeartAnimation {
         if (savedState === null || savedState === 'true') {
             this.start();
         }
+
+        // Check sound state
+        const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+        if (soundEnabled === 'false') {
+            this.soundToggleButton.innerHTML = '🔇';
+            this.soundToggleButton.style.background = 'rgba(200, 200, 200, 0.7)';
+        }
+
     }
+
+    toggleSound() {
+        const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
+        localStorage.setItem('notificationSoundEnabled', !soundEnabled);
+        
+        if (soundEnabled) {
+            // Sound is currently enabled, disable it
+            this.soundToggleButton.innerHTML = '🔕';
+            this.soundToggleButton.style.background = 'rgba(200, 200, 200, 0.7)';
+        } else {
+            // Sound is currently disabled, enable it
+            this.soundToggleButton.innerHTML = '🎵';
+            this.soundToggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
+        }
+    }
+
 
     resize() {
         this.canvas.width = window.innerWidth;

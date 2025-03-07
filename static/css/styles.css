@@ -207,7 +207,7 @@ body.modal-active {
 .content {
     padding: 0 15px;
     background-color: antiquewhite;
-    background-color: pink; 
+    background-color: #009E60;
     color:  black;
 }
 
@@ -730,6 +730,9 @@ main {
 	    width: 100%;
     }
 
+    .post .post-title {
+        font-size: 1.5em;
+    }
     .comment .post-content {
         font-size: 1.1em;
     }
@@ -1373,7 +1376,12 @@ main {
 
 
     .comment .post-content {
+        margin-left: 0;
+    }
+
+    .comment .comment-content.blockquote {
         align-items: center;
+   
     }
 }
 
@@ -1725,4 +1733,37 @@ video:focus {
 .progress-bar-striped {
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-size: 1rem 1rem;
+}
+
+.fixed-button-container {
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fixed-button {
+    padding: 8px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.fixed-button:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 768px) {
+    .fixed-button-container {
+        left: 10px;
+        bottom: 60px;
+        transform: scale(0.8);
+    }
 }

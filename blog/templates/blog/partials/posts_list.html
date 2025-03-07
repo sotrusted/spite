@@ -1,0 +1,19 @@
+<div class="posts" id="post-list">
+    {% if is_search and query and count %}
+        <p>{{ count }} posts matching "{{ query }}"</p>
+    {% elif count %}
+        <p>{{ count }} posts</p>
+    {% endif %}
+    {% if posts %} 
+        {% for post in posts %} 
+            {% if post.get_item_type == 'Post' %}
+                {% include 'blog/partials/post.html' with post=post nested=False %}
+            {% elif post.get_item_type == 'Comment' %}
+                {% include 'blog/partials/comment.html' with comment=post %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p class="oops">No one seems to have posted yet! Click below to post!</p>
+    {% endif %}
+</div>
+

@@ -1182,3 +1182,11 @@ def hx_get_parent_post(request, post_id, inline=False):
                     {'post': post, 'nested': True})
     logger.info(f"HX GET Parent Post Response: {response}")
     return response
+
+def hx_scroll_to_post_form(request):
+    """HTMX endpoint to scroll to the post form"""
+    response = HttpResponse()
+    response['HX-Trigger'] = json.dumps({
+        'scrollToPostForm': True
+    })
+    return response

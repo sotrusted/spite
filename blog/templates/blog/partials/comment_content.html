@@ -50,58 +50,61 @@
             {% endif %}
         </div>
     {% endif %}
-    <div class="parent-post preview {% if comment.parent_comment %}stacked{% endif %}" id="parent-post-{{comment.post_id}}">
-        <div class="text-content">
-            <h2 class="post-title">
-            Re:<a 
-                {% if comment.post_id %}
-                    href="{% url 'post-detail' comment.post_id %}"
-                    hx-get="{% url 'hx-get-parent-post' comment.post_id %}" 
-                {% endif %}
-                    hx-target="#parent-post-{{comment.post_id}}" 
-                    hx-swap="outerHTML"
-                    hx-trigger="click">
-                {{ comment.post_title }}
-            </a>
-            </h2>
-            <p class="parent-content">{{comment.post_content|truncatewords:30}}</p>
-        </div>
-        <div class="image-content">
-            {% if comment.post_media_file_url or comment.post_image_url %}
-                <div class="image-container">
-                    <a href="{% url 'post-detail' comment.post_id %}"
-                        hx-get="{% url 'hx-get-parent-post' comment.post_id %}" 
-                        hx-target="#parent-post-{{comment.post_id}}" 
-                        hx-swap="outerHTML"
-                        hx-trigger="click">
-                        {% if comment.post_image %}
-                            <img src="{{ comment.post_image_url }}" alt="{{ comment.post_title }}" loading="lazy">
-                        {% elif comment.post_media_file_url and comment.post_is_video %}
-                            <video controls autoplay muted loop playsinline>
-                                <source src="{{ comment.post_media_file_url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        {% elif comment.post_media_file_url and comment.post_is_image %}
-                            <img src="{{ comment.post_media_file_url }}" alt="{{ comment.post_title }}" loading="lazy">
-                        {% endif %}
-                    </a>
-                </div>
+    <div class="text-content">
+        <h2 class="post-title">
+        Re:<a 
+            {% if comment.post_id %}
+                href="{% url 'post-detail' comment.post_id %}"
+                hx-get="{% url 'hx-get-parent-post' comment.post_id %}" 
+                hx-target="#parent-post-{{comment.post_id}}-{{comment.id}}" 
+                hx-swap="outerHTML"
+                hx-trigger="click once">
             {% endif %}
-        </div>
-    </div>  
-</div>
+            <span class="post-title">{{ comment.post_title }}</span>
+        </a>
+        </h2>
+        <p class="parent-content">{{comment.post_content|truncatewords:30}}</p>
+    </div>
+    <div class="image-content">
+        {% if comment.post_media_file_url or comment.post_image_url %}
+            <div class="image-container">
+                <a href="{% url 'post-detail' comment.post_id %}"
+                    hx-get="{% url 'hx-get-parent-post' comment.post_id %}" 
+                    hx-target="#parent-post-{{comment.post_id}}-{{comment.id}}" 
+                    hx-swap="outerHTML"
+                    hx-trigger="click once">
+                    {% if comment.post_image %}
+                        <img src="{{ comment.post_image_url }}" alt="{{ comment.post_title }}" loading="lazy">
+                    {% elif comment.post_media_file_url and comment.post_is_video %}
+                        <video controls autoplay muted loop playsinline>
+                            <source src="{{ comment.post_media_file_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% elif comment.post_media_file_url and comment.post_is_image %}
+                        <img src="{{ comment.post_media_file_url }}" alt="{{ comment.post_title }}" loading="lazy">
+                    {% endif %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>  
 
 <div class="menu">
     <p><em>{{ comment.created_on }}</em></p>
-    <a href="javascript:void(0);" id="toggle-reply-{{comment.id}}" class="toggle-reply">Reply</a>
+    <a href="javascript:void(0);" 
+       id="toggle-reply-{{comment.id}}" 
+       class="toggle-reply"
+       hx-get="/hx/get-reply-form-html/{{comment.id}}"
+       hx-target="#reply-form-{{comment.id}}"
+       hx-swap="innerHTML"
+       hx-trigger="click once"
+       hx-indicator="#reply-indicator-{{comment.id}}">Reply</a>
 </div>
-    <div id="reply-form-{{comment.id}}" class="reply-form" style="display: none;">
-        <p class="reply-form-skeleton"
-            id="reply-form-skeleton-{{comment.id}}"
-            hx-get="/hx/get-reply-form-html/{{comment.id}}"
-            hx-target="#reply-form-{{comment.id}}"
-            hx-trigger="revealed"
-            hx-swap="innerHTML">
-            Loading reply form...
-        </p>
+
+<div id="reply-form-{{comment.id}}" class="reply-form" style="display: none;">
+    <div id="reply-indicator-{{comment.id}}" class="htmx-indicator">
+        <div class="spinner-border spinner-border-sm text-secondary" role="status">
+            <span class="visually-hidden">Loading reply form...</span>
+        </div>
+    </div>
 </div>
