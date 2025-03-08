@@ -625,6 +625,15 @@ def reply_comment(request, comment_id):
 
     return redirect('post-detail', pk=post.id)
 
+def hx_get_post(request, post_id):
+    logger.info(f"hx_get_post: called with post_id: {post_id}")
+    try:
+        post = get_object_or_404(Post, id=post_id)
+        return render(request, 'blog/partials/post.html', {'post': post})
+    except Exception as e:
+        logger.exception(f"hx_get_post: Error in hx_get_post: {str(e)}")
+        return HttpResponse(f"Error loading post: {str(e)}", status=500)
+
 def hx_get_comment(request, comment_id=None, comment=None, inline=False):
     """HTMX endpoint to get a single comment"""
     logger.info(f"hx_get_comment: called with comment_id: {comment_id}, inline: {inline}")

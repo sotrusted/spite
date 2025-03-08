@@ -441,15 +441,9 @@ export function showNewPostNotification(message) {
 
     // Scroll to the post when the button is clicked
     notificationButton.onclick = function () {
-        const newPostElement = document.getElementById(`post-${message.id}`);
+        const newPostElement = document.getElementById(`post-${message.id}`) || document.getElementById(`post-skeleton-${message.id}`);
         if (newPostElement) {
-            // Scroll slightly above the newly added post
-            const newPostPosition = newPostElement.getBoundingClientRect().top + window.scrollY;
-            const offset = 100; // Adjust this value for desired spacing
-            window.scrollTo({
-                top: newPostPosition - offset,
-                behavior: 'smooth'
-            });
+            scrollToElementById(newPostElement.id);
             // Hide the notification after clicking
             notificationButton.style.display = "none";
         };
@@ -498,8 +492,37 @@ function setWriteLinksScrollers() {
     });
 }
 
+function createPostElement(post) {
+    const newPost = document.createElement('div');
+    newPost.classList.add('item');
+    newPost.classList.add('post');
+    newPost.id = `post-skeleton-${post.id}`;
+    
+    // The key change is here - make the div itself have the HTMX attributes
+    // instead of a paragraph inside it
+    newPost.setAttribute('hx-get', `/hx/get-post/${post.id}/`);
+    newPost.setAttribute('hx-trigger', 'revealed');
+    newPost.setAttribute('hx-swap', 'outerHTML'); // Use outerHTML to replace the entire element
+    
+    newPost.innerHTML = `
+        <p class="post-skeleton">
+            Loading post #${post.id}...
+            <span id="post-indicator-${post.id}" class="htmx-indicator">
+                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+            </span>
+        </p>`;
+    
+    return newPost;
+}
 
 export function addPostToPage(post) {
+    if (!post || !post.id) {
+        console.error('Invalid post data:', post);
+        return null;
+    }
+
     const postId = post.id;
     const postList = document.getElementById('post-list');
 
@@ -509,96 +532,13 @@ export function addPostToPage(post) {
         return null;
     }
 
-    const newPost = document.createElement('div');
-    newPost.classList.add('item');
-    newPost.classList.add('post');
+    const newPost = createPostElement(post);
+    console.log("New post created:", newPost);
 
-    newPost.id = `post-${postId}`;
-
-    newPost.innerHTML = `
-        <div class="preview" id="post-preview-${postId}">
-            <div class="post flexbox">
-                <div class="text-content">
-                    <div class="new-post-badge">
-                        new
-                    </div>
-                    <h2 class="post-title">
-                        <a href="/post/${postId}/">
-                            ${post.title}
-                        </a>
-                    </h2>
-                    ${post.parent_post ? `<p>Replying to: <a href="/post/${post.parent_post.id}/">${post.parent_post.title}</a></p>` : ''}
-                    <div class="post-content">
-                        ${post.content ? `<p>${post.content}</p>` : ''}
-                    </div>
-                    <div class="menu">
-                        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}">Expand</a>
-                        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-                    </div>
-                    ${post.display_name ? `<p class="post-author">by ${post.display_name}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
-                    <p class="post-date">${post.date_posted}</p>
-                    ${post.city || post.contact ? `
-                        <p class="post-info">
-                            ${post.city ? post.city : ''}${post.city && post.contact ? ' / ' : ''}${post.contact ? post.contact : ''}
-                        </p>` : ''}
-                </div>
-                ${post.media_file || post.image ? `
-                <div class="image-content">
-                    <div class="image-container">
-                        <a href="/post/${postId}/">
-                            ${post.media_file && post.is_video ? `
-                                <video autoplay muted loop playsinline>
-                                    <source src="${post.media_file.url}" type="video/mp4">
-                                </video>` : ''}
-                            ${post.media_file && post.is_image ? `<img src="${post.media_file.url}" alt="${post.title}" loading="lazy">` : ''}
-                            ${post.image ? `<img src="${post.image.url}" alt="${post.title}" loading="lazy">` : ''}
-                        </a>
-                    </div>
-                </div>` : ''}
-            </div>
-        </div>
-        <div class="detail" id="post-detail-${postId}" style="display: none;">
-            <div class="post flexbox">
-                ${post.media_file || post.image ? `
-                <div class="image-content">
-                    <div class="image-container">
-                        ${post.media_file && post.is_video ? `
-                            <video controls muted autoplay playsinline>
-                                <source src="${post.media_file.url}" type="video/mp4">
-                            </video>` : ''}
-                        ${post.media_file && post.is_image ? `<img src="${post.media_file.url}" alt="${post.title}" loading="lazy">` : ''}
-                        ${post.image ? `<img src="${post.image.url}" alt="${post.title}" loading="lazy">` : ''}
-                    </div>
-                </div>` : ''}
-                <div class="text-content">
-                    <h1 class="post-title">${post.title}</h1>
-                    ${post.parent_post ? `<p>Replying to: <a href="/post/${post.parent_post.id}/">${post.parent_post.title}</a></p>` : ''}
-                    <div class="post-content">
-                        <p>${post.content}</p>
-                    </div>
-                    ${post.display_name ? `<p class="post-author">by ${post.display_name}</p>` : `<p class="post-author">by Anonymous ${post.anon_uuid}</p>`}
-                    <p class="post-date">${post.date_posted}</p>
-                </div>
-                <div class="menu">
-                    <a href="javascript:void(0);" class="toggle-link" id="toggle-link-${postId}">Expand</a>
-                    <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-                </div>
-            </div>
-        </div>
-        <div id="comment-section-${postId}">
-            <button id="toggle-comments-${postId}" class="toggle-comments" post-id="${postId}">
-                Comments (0)
-            </button>
-            <div id="comments-container-${postId}" class="comments-container" style="display: none;">
-                <div id="comments-list-${postId}">
-                    <p>No comments yet.</p>
-                </div>
-                <div id="comment-form-container-${postId}">
-                </div>
-            </div>
-        </div>
-    `;
     postList.prepend(newPost); // Add the new post to the top of the list
+
+    htmx.process(newPost);
+    htmx.trigger(newPost, 'revealed');
 
     loadCommentForm(postId);
 
@@ -607,16 +547,16 @@ export function addPostToPage(post) {
 
 
 
-    attachToggleContentButtons(id=postId);
+    attachToggleContentButtons(postId);
     log('Toggle content buttons attached');
 
-    attachCopyLinks(id=postId);
+    attachCopyLinks(postId);
     log('Copy links attached');
 
-    attachToggleCommentsButtons(id=postId);
+    attachToggleCommentsButtons(postId);
     log('Toggle comments buttons attached');
 
-    attachToggleReplyButtons(id=postId);
+    attachToggleReplyButtons(postId);
     log('Toggle reply buttons attached');
 
     // handleCommentFormSubmit();
@@ -656,55 +596,15 @@ function createCommentElement(comment, isInline = false) {
         // Match comment.html format for feed view
         element.classList.add('item');
         element.id = `comment-${comment.id}`;
-        /*
+
         element.innerHTML = `
-            <h2>
-                Re: <a href="/post/${comment.post_id}">
-                    ${comment.post_title}
-                </a>
-            </h2>
-            <div class="post-content">
-                <strong>${comment.name || 'Anonymous'}</strong>: ${comment.content}
-                ${comment.media_file || comment.image ? `
-                    <div class="image-container">
-                        ${comment.media_file && comment.is_video ? `
-                            <div class="video-container">
-                                <video controls>
-                                    <source src="${comment.media_file.url}" type="video/mp4">
-                                </video>
-                            </div>` : ''}
-                        ${comment.media_file && comment.is_image ? `
-                            <div class="image-container">
-                                <img src="${comment.media_file.url}" alt="Comment image">
-                            </div>` : ''}
-                        ${comment.image ? `
-                            <div class="image-container">
-                                <img src="${comment.image.url}" alt="Comment image">
-                            </div>` : ''}
-                    </div>` : ''}
-            </div>
-            <div class="menu">
-                <p><em>${comment.created_on}</em></p>
-                <a href="javascript:void(0);" id="toggle-reply-${comment.id}" class="toggle-reply">Reply</a>
-            </div>
-            <div id="reply-form-${comment.id}" 
-                 class="reply-form"
-                 hx-get="/api/get-reply-form-html/${comment.id}"
-                 hx-target="#reply-form-${comment.id}"
-                 hx-trigger="revealed"
-                 style="display: none;">
-            </div>
-        `;
-        */
-        
-        element.innerHTML = `
-            <p class="comment-skeleton" 
+            <p class="comment-skeleton"
                  hx-get="/hx/get-comment/${comment.id}/"
                  hx-trigger="revealed"
                  hx-target="#comment-${comment.id}"
                  hx-swap="innerHTML"
                 hx-indicator="#comment-indicator-${comment.id}">
-                Loading comment...
+                Loading comment #${comment.id}...
                 <span id="comment-indicator-${comment.id}" class="htmx-indicator">
                     <div class="spinner-border spinner-border-sm text-secondary" role="status">
                         <span class="visually-hidden">Loading...</span>

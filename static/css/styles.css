@@ -207,7 +207,7 @@ body.modal-active {
 .content {
     padding: 0 15px;
     background-color: antiquewhite;
-    background-color: #009E60;
+    background-color:  #169B62;
     color:  black;
 }
 
@@ -514,6 +514,11 @@ form {
     margin: 0;
 }
 
+.post.nested {
+    border-top: none !important;
+    background-color: transparent !important;
+}
+
 .post-author {
     font-style: italic;
 }
@@ -572,6 +577,10 @@ form {
     background-color: antiquewhite;
 }
 
+.detail.nested {
+    background-color: #c9bcac;
+}
+
 .detail .flexbox {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -617,9 +626,24 @@ form {
 
 .menu {
     display: flex;
-    justify-content: left; /* Center the content horizontally */
     width: 100%; /* Ensure the menu takes the full width */
     margin-top: auto; /* Push the menu to the bottom */
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu.post-menu .left-links {
+    display: flex;
+    gap: 20px;
+}
+
+.menu.post-menu .toggle-comments {
+    margin-left: auto;
+}
+
+.menu .right-links {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .menu a {
@@ -821,7 +845,6 @@ main {
 
 .comment-section {
     margin-top: 15px;
-    margin-left: 20px;
 }
 
 .snowflake {
@@ -1782,10 +1805,6 @@ video:focus {
   }
   
   /* These classes will be toggled by our HTMX response */
-  .v1-mode .comments-container,
-  .v1-mode .toggle-comments,
-  .v1-mode #comment-form,
-  .v1-mode [id^="comment-form-"],
   .v1-mode .comment.item {
     display: none !important;
   }

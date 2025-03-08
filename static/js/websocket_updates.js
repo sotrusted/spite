@@ -57,15 +57,6 @@ export function initPostWebsocketUpdates() {
             // Add the post to the DOM
             addPostToPage(post);
 
-            attachEventListeners(post.id);
-            const button = document.getElementById(`toggle-comments-${post.id}`);
-            button.addEventListener('click', function() {
-                const commentsContainer = document.getElementById(`comments-container-${post.id}`);
-                if (commentsContainer) {
-                    commentsContainer.style.display = 
-                        commentsContainer.style.display === 'none' ? 'block' : 'none';
-                }
-            });
         } else {
             console.log(`Post with ID ${post.id} already exists.`);
         }

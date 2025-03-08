@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<div class="post flexbox">
+<div class="post flexbox {% if nested %}nested{% endif %}">
     <div class="text-content">
         <h1 class="post-title">
             {{ post.title }}

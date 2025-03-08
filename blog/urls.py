@@ -14,7 +14,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     loading_screen, log_javascript, resume, update_online_status,
                     remove_user, hx_get_parent_post, hx_get_comment,
                     hx_get_comment_by_id, hx_get_comment_reply_form_html,
-                    hx_scroll_to_post_form, toggle_version)
+                    hx_scroll_to_post_form, toggle_version, hx_get_post)
 
 
 from django.conf.urls.static import static
@@ -68,6 +68,7 @@ urlpatterns = [
     path('hx/get-reply-form-html/<int:comment_id>/', hx_get_comment_reply_form_html, name='hx-get-reply-form-html'),
     path('hx/scroll-to-post-form/', hx_scroll_to_post_form, name='hx-scroll-to-post-form'),
     path('toggle-version/', toggle_version, name='toggle_version'),
+    path('hx/get-post/<int:post_id>/', hx_get_post, name='hx-get-post'),
 
 ]
 if settings.DEBUG:

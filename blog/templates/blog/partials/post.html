@@ -1,26 +1,31 @@
-<div id="post-{{post.id}}" class="post item">
+<div id="post-{{post.id}}" class="post item {% if nested %}nested{% endif %}">
+    {% if not nested %}
     <div class="preview" id="post-preview-{{post.id}}"
         {% if nested %}style="display: none;"{% endif %}>
         {% include 'blog/preview.html' with post=post %}
     </div>
-    <div class="detail" id="post-detail-{{ post.id }}" 
+    {% endif %}
+    <div class="detail {% if nested %}nested{% endif %}" id="post-detail-{{ post.id }}" 
         {% if not nested %}style="display: none;"{% endif %}>
         {% include 'blog/detail.html' with post=post nested=True %}
     </div>
-    <div class="menu post-menu">
-        <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}">Expand</a>
-        <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
-        <span id="copy-message" style="display: none;">Link copied!</span>
-    </div>
 
     {% if not nested %}
-    <!-- Unique Comment Section for Each Post -->
-    <div id="comment-section-{{ post.id }}" class="comment-section">
+    <div class="menu post-menu">
+        <div class="left-links">
+            <a href="javascript:void(0);" class="toggle-link" id="toggle-link-{{post.id}}">Expand</a>
+            <a href="javascript:void(0);" id="copy-link-{{post.id}}" class="share-btn copy-link">Copy Link</a>
+            <span id="copy-message" style="display: none;">Link copied!</span>
+        </div>
         <button id="toggle-comments-{{ post.id }}" 
                 class="toggle-comments" 
                 data-post-id="{{ post.id }}">
             ↩ ({{ post.comments_total|default:0 }})
         </button>
+    </div>
+
+    <!-- Unique Comment Section for Each Post -->
+    <div id="comment-section-{{ post.id }}" class="comment-section">
         <div id="comments-container-{{ post.id }}" 
             data-has-comments="{{ post.has_comments }}" 
             class="comments-container" style="display: none;">
