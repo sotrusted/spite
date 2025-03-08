@@ -258,14 +258,33 @@ function attachToggleCommentsButtons(id=null) {
                 }
                 
                 log(`Comments button clicked for post ${postId}`);
-                
-                const commentsContainer = document.getElementById(`comments-container-${postId}`);
-                if (commentsContainer) {
-                    const isHidden = commentsContainer.style.display === 'none';
-                    commentsContainer.style.display = isHidden ? 'block' : 'none';
-                    log(`Comments container for post ${postId} ${isHidden ? 'shown' : 'hidden'}`);
+
+                const commentSection = document.getElementById(`comments-section-${postId}`);
+                if (!commentSection) {
+                    console.error(`Comment section for post ${postId} not found`);
+                    return;
+                }
+
+
+                if (!commentSection.querySelector('.comments-container')) {
+                    console.log(`Loading comments container for post ${postId}`);
+                    htmx.process(commentSection);
+                    htmx.trigger(commentSection, 'revealed');
+
+                    // Add a loading indicator
+                    commentSection.innerHTML = `
+                        <div class="comments-loading">
+                            <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                <span class="visually-hidden">Loading comments...</span>
+                            </div>
+                            <span>Loading comments...</span>
+                        </div>
+                    `;
+
                 } else {
-                    log(`Comments container for post ${postId} not found`, 'error');
+                    const commentsContainer = commentSection.querySelector('.comments-container');
+                    commentsContainer.style.display = 
+                        commentsContainer.style.display === 'none' ? 'block' : 'none';
                 }
             });
         } else {
@@ -537,34 +556,61 @@ export function addPostToPage(post) {
 
     postList.prepend(newPost); // Add the new post to the top of the list
 
+
+    // Create a promise that resolves when the post is fully loaded
+    const postLoadedPromise = new Promise((resolve) => {
+        // Set up a mutation observer to watch for when HTMX replaces the skeleton
+        const observer = new MutationObserver((mutations, obs) => {
+            // Look for the actual post element
+            const loadedPost = document.getElementById(`post-${postId}`);
+            if (loadedPost) {
+                // Post has been loaded, stop observing
+                obs.disconnect();
+                resolve(loadedPost);
+            }
+        });
+        
+        // Start observing the post list for changes
+        observer.observe(postList, { 
+            childList: true,
+            subtree: true 
+        });
+        
+        // Set a timeout to resolve anyway after 5 seconds
+        setTimeout(() => {
+            observer.disconnect();
+            resolve(document.getElementById(`post-${postId}`));
+        }, 5000);
+    });
+
+    // Process with HTMX
     htmx.process(newPost);
     htmx.trigger(newPost, 'revealed');
 
-    loadCommentForm(postId);
+    // Wait for the post to be fully loaded before attaching event handlers
+    postLoadedPromise.then((loadedPost) => {
+        if (!loadedPost) {
+            console.warn(`Post ${postId} was not properly loaded`);
+            return;
+        }
+        
+        // Add highlight effect
+        loadedPost.classList.add("highlight");
+        setTimeout(() => loadedPost.classList.remove("highlight"), 3000);
 
-    newPost.classList.add("highlight");
-    setTimeout(() => newPost.classList.remove("highlight"), 3000); // Remove after 3 seconds
+        // Attach all event listeners
+        attachToggleContentButtons(postId);
+        log('Toggle content buttons attached');
 
+        attachCopyLinks(postId);
+        log('Copy links attached');
 
+        attachToggleCommentsButtons(postId);
+        log('Toggle comments buttons attached');
 
-    attachToggleContentButtons(postId);
-    log('Toggle content buttons attached');
-
-    attachCopyLinks(postId);
-    log('Copy links attached');
-
-    attachToggleCommentsButtons(postId);
-    log('Toggle comments buttons attached');
-
-    attachToggleReplyButtons(postId);
-    log('Toggle reply buttons attached');
-
-    // handleCommentFormSubmit();
-    // log('Comment form submit listener attached');
-
-    //    handleReplyFormSubmit();
-    //log('Reply form submit listener attached');
-
+        attachToggleReplyButtons(postId);
+        log('Toggle reply buttons attached');
+    });
     
     return newPost;
 }

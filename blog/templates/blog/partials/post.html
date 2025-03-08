@@ -19,11 +19,29 @@
         </div>
         <button id="toggle-comments-{{ post.id }}" 
                 class="toggle-comments" 
-                data-post-id="{{ post.id }}">
+                data-post-id="{{ post.id }}"
+                {% if htmx %}
+                {% endif %}
+                >
             ↩ ({{ post.comments_total|default:0 }})
         </button>
     </div>
+    {% endif %}
 
+    {% if htmx %}
+        <div id="comment-section-{{ post.id }}" class="comment-section"
+            hx-get="/hx/get-post-comment-section/{{ post.id }}/"
+            hx-trigger="revealed"
+            hx-target="#comment-section-{{ post.id }}"
+            hx-swap="innerHTML"
+        >
+            <span id="comment-section-indicator-${post.id}" class="htmx-indicator">
+                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+            </span>
+        </div>
+    {% else %}
     <!-- Unique Comment Section for Each Post -->
     <div id="comment-section-{{ post.id }}" class="comment-section">
         <div id="comments-container-{{ post.id }}" 

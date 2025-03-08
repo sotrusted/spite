@@ -13,6 +13,15 @@ export function initPostWebsocketUpdates() {
     // Reference the notification sound element
     const notificationSound = document.getElementById("notification-sound");
 
+    // Preload the sound
+    if (notificationSound) {
+        notificationSound.load();
+        console.log("Notification sound loaded:", notificationSound.src);
+    } else {
+        console.warn("Notification sound element not found");
+    }
+
+
 
     postSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
@@ -56,6 +65,7 @@ export function initPostWebsocketUpdates() {
 
             // Add the post to the DOM
             addPostToPage(post);
+            attachEventListeners(post.id);
 
         } else {
             console.log(`Post with ID ${post.id} already exists.`);

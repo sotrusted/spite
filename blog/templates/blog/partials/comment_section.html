@@ -1,0 +1,12 @@
+<div id="comments-container-{{ post.id }}" 
+    data-has-comments="{{ post.has_comments }}" 
+    class="comments-container" style="display: block;">
+    <div id="comments-list-{{ post.id }}">
+        {% for comment in post.recent_comments %}
+            {% include 'blog/partials/inline_comment.html' with comment=comment %}
+        {% endfor %}
+
+        <!-- Comment Form -->
+        {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
+    </div>
+</div>
