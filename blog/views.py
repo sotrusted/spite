@@ -35,7 +35,7 @@ from weasyprint import HTML
 import cv2
 import numpy as np
 from django.conf import settings
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from difflib import SequenceMatcher
 import hashlib
@@ -1189,4 +1189,28 @@ def hx_scroll_to_post_form(request):
     response['HX-Trigger'] = json.dumps({
         'scrollToPostForm': True
     })
+    return response
+
+
+@require_GET
+def toggle_version(request):
+    # Get current version from session or default to 2.0
+    current_version = request.session.get('site_version', '2.0')
+    
+    # Toggle version
+    new_version = '1.0' if current_version == '2.0' else '2.0'
+    
+    # Save to session
+    request.session['site_version'] = new_version
+    
+    # Set response with new version
+    response = HttpResponse(new_version)
+    
+    # Add header to trigger JS event
+    response['HX-Trigger'] = json.dumps({
+        'versionChanged': {
+            'version': new_version
+        }
+    })
+    
     return response

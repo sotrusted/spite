@@ -820,7 +820,8 @@ main {
 }
 
 .comment-section {
-    margin-top: 5px;
+    margin-top: 15px;
+    margin-left: 20px;
 }
 
 .snowflake {
@@ -1767,3 +1768,24 @@ video:focus {
         transform: scale(0.8);
     }
 }
+
+.version-toggle-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .version-toggle-button.v1 {
+    background-color: #ffe0e0;
+  }
+  
+  .version-toggle-button.v2 {
+    background-color: #e0ffe0;
+  }
+  
+  /* These classes will be toggled by our HTMX response */
+  .v1-mode .comments-container,
+  .v1-mode .toggle-comments,
+  .v1-mode #comment-form,
+  .v1-mode [id^="comment-form-"],
+  .v1-mode .comment.item {
+    display: none !important;
+  }

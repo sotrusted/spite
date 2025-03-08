@@ -72,7 +72,7 @@
     {% endblock %}
 
 </head>
-<body>
+<body data-version="{{ request.session.site_version|default:'2.0' }}">
 {% block submission %}
 {% if not ip_has_submitted %}
 <!--
@@ -263,7 +263,10 @@
         <script type="module" src="{% static 'js/chat_sounds.js' %}" defer></script>
         <script type="module" src="{% static 'js/base.js' %}"></script>
         <script type="module" src="{% static 'js/chat.js' %}"></script>
-        <script src="{% static 'js/snow.js' %}"></script>
+        {% compress js %}
+            <script src="{% static 'js/snow.js' %}" defer></script>
+            <script src="{% static 'js/version_control.js' %}" defer></script>
+        {% endcompress %}
     {% endblock %}
 
     {% block page_scripts %} 
@@ -375,6 +378,13 @@
               console.log('Form not found');
             }
           });
+
+          const writeButton = document.getElementById('write-button');
+          if (writeButton) {
+              writeButton.addEventListener('click', function() {
+                  scrollToElementById('post-form');
+              });
+          }
 
     </script>
 </body>

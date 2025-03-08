@@ -9,3 +9,4 @@ function scrollToElementById(id) {
 }
 
 export { scrollToElementById };
+window.scrollToElementById = scrollToElementById;

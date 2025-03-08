@@ -29,39 +29,75 @@ class Heart {
     }
 
     draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        
+        // Draw shamrock (three heart-shaped leaves)
+        ctx.fillStyle = this.color;
+        
+        // Draw three heart-shaped leaves that connect at the center
+        for (let i = 0; i < 3; i++) {
+            const angle = (i * Math.PI * 2 / 3);
+            const leafX = Math.cos(angle) * (this.size * 0.3); // Reduced distance to center
+            const leafY = Math.sin(angle) * (this.size * 0.3); // Reduced distance to center
+            
+            // Draw heart shape for each leaf
+            ctx.save();
+            ctx.translate(leafX, leafY);
+            ctx.rotate(angle + Math.PI); // Rotate to point outward
+            
+            // Draw heart-shaped leaf
+            const leafSize = this.size * 0.7; // Larger leaf size
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            // Left curve
+            ctx.bezierCurveTo(
+                -leafSize/2, -leafSize/4,
+                -leafSize/2, -leafSize,
+                0, -leafSize
+            );
+            // Right curve
+            ctx.bezierCurveTo(
+                leafSize/2, -leafSize,
+                leafSize/2, -leafSize/4,
+                0, 0
+            );
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // Draw a small circle in the center to connect the leaves
         ctx.beginPath();
-        const topCurveHeight = this.size * 0.3;
-        
-        // Draw heart shape
-        ctx.moveTo(this.x, this.y + topCurveHeight);
-        // Left curve
-        ctx.bezierCurveTo(
-            this.x - this.size/2, this.y, 
-            this.x - this.size/2, this.y - this.size/2,
-            this.x, this.y - this.size/2
-        );
-        // Right curve
-        ctx.bezierCurveTo(
-            this.x + this.size/2, this.y - this.size/2,
-            this.x + this.size/2, this.y,
-            this.x, this.y + topCurveHeight
-        );
-        
-        ctx.fillStyle = 'rgba(255, 105, 180, 0.8)'; // Pink hearts
+        ctx.arc(0, 0, this.size * 0.15, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
         ctx.fill();
+        
+        // Draw stem
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, this.size * 1.2);
+        ctx.lineWidth = this.size / 10;
+        ctx.strokeStyle = '#0D6B1E';
+        ctx.stroke();
+        
+        ctx.restore();
     }
+
 }
 
 class Clover {
     constructor() {
         this.x = Math.random() * window.innerWidth;
         this.y = -10;
-        this.size = Math.random() * 15 + 5; // Size between 5-20px
+        this.size = Math.random() * 15 + 15; // Size between 15-30px
         this.speedY = Math.random() * 1 + 0.5; // Fall speed
         this.speedX = Math.random() * 2 - 1; // Sideways movement
         this.swing = Math.random() * 3; // Swinging amplitude
         this.phase = Math.random() * Math.PI * 2; // Random starting phase
         this.rotation = Math.random() * 360; // Random rotation
+        this.color = Math.random() > 0.3 ? '#1D9E36' : '#0D8C24'; // Two shades of green
+        this.symbol = '☘'; // Shamrock Unicode symbol
     }
 
     update() {
@@ -89,34 +125,18 @@ class Clover {
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation * Math.PI / 180);
         
-        // Draw four-leaf clover
-        const leafSize = this.size / 2;
+        // Set text properties
+        ctx.font = `${this.size}px Arial`;
+        ctx.fillStyle = this.color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         
-        ctx.fillStyle = '#009E60';
-       
-
-        
-        // Draw four circles for the leaves
-        for (let i = 0; i < 4; i++) {
-            ctx.beginPath();
-            const angle = (i * Math.PI / 2);
-            const leafX = Math.cos(angle) * (leafSize * 0.7);
-            const leafY = Math.sin(angle) * (leafSize * 0.7);
-            
-            ctx.arc(leafX, leafY, leafSize, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // Draw stem
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, this.size);
-        ctx.lineWidth = this.size / 10;
-        ctx.strokeStyle = '#006600';
-        ctx.stroke();
+        // Draw the shamrock symbol
+        ctx.fillText(this.symbol, 0, 0);
         
         ctx.restore();
     }
+
 }
 
 class HeartAnimation {
@@ -178,6 +198,23 @@ class HeartAnimation {
         this.writeButton.style.background = 'rgba(255, 255, 255, 0.7)';
         this.writeButton.style.cursor = 'pointer';
         this.writeButton.style.fontSize = '20px';
+
+        // Create version toggle button
+        this.versionToggleButton = document.createElement('button');
+        this.versionToggleButton.innerHTML = '2.0';
+        this.versionToggleButton.className = 'version-toggle-button fixed-button';
+        this.versionToggleButton.id = 'version-toggle';
+
+        //style the version toggle button
+        this.versionToggleButton.style.padding = '8px';
+        this.versionToggleButton.style.borderRadius = '50%';
+        this.versionToggleButton.style.border = 'none';
+        this.versionToggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
+        this.versionToggleButton.style.fontFamily = 'monospace';
+        this.versionToggleButton.style.cursor = 'pointer';
+        this.versionToggleButton.style.fontSize = '20px';
+        this.versionToggleButton.style.fontWeight = 'bold';
+        this.versionToggleButton.style.transition = 'background-color 0.3s ease';
         
         // Add media query for mobile
         const mediaQuery = window.matchMedia('(max-width: 768px)');
@@ -206,6 +243,7 @@ class HeartAnimation {
         this.buttonContainer.appendChild(this.toggleButton);
         this.buttonContainer.appendChild(this.soundToggleButton);
         this.buttonContainer.appendChild(this.writeButton);
+        this.buttonContainer.appendChild(this.versionToggleButton);
         
         // Add container to DOM
         document.body.appendChild(this.buttonContainer);

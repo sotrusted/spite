@@ -8,7 +8,7 @@ export class SpiteChat {
         this._connected = false;
         logToBackend('SpiteChat instance created', 'info');
 
-        const soundToggle = document.querySelector('.sound-toggle');
+        const soundToggle = document.querySelector('.chat-sound-toggle');
         let soundEnabled = true;
 
         soundToggle.addEventListener('click', function() {

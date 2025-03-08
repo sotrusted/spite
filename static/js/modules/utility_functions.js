@@ -940,3 +940,5 @@ export function setupHtmxProcessing() {
         processHtmxOnNewElements();
     });
 }
+
+window.scrollToElementById = scrollToElementById;
