@@ -1,5 +1,5 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
-import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing } from './modules/utility_functions.js';
+import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing, initSkeletonCleanup } from './modules/utility_functions.js';
 // import { initAjaxPostForm } from './ajax_posts.js';
 import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
 
@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     setupHtmxProcessing();
+    initSkeletonCleanup();
 
     
 });

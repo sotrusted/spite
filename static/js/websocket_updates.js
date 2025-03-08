@@ -1,6 +1,6 @@
 // websocket_updates.pyww
 import { addPostToPage, showNewPostNotification, updateSpiteCounter, 
-    attachEventListeners, showNewCommentNotification, addCommentToPage } from './modules/utility_functions.js';
+    attachEventListeners, showNewCommentNotification, addCommentToPage, attachToggleReplyButtons } from './modules/utility_functions.js';
 import { logToBackend } from './modules/load_document_functions.js';
 import { SpiteChat } from './chat.js';
 
@@ -52,8 +52,15 @@ export function initPostWebsocketUpdates() {
 
             // Play the notification sound only if enabled
             const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
+            console.log('Sound enabled:', soundEnabled);
             if (soundEnabled && !notificationSound.paused) {
-                notificationSound.play();
+                if (notificationSound) {
+                    notificationSound.currentTime = 0;
+                    notificationSound.play().catch(err => {
+                        console.warn("Could not play notification sound:", err);
+                    });
+                }
+
             }
 
 
@@ -104,8 +111,6 @@ export function initCommentWebsocketUpdates() {
             // Add the post to the DOM
             addCommentToPage(comment);
 
-            // Attach event listeners
-            attachEventListeners(comment.id);
 
         } else {
             console.log(`Comment with ID ${comment.id} already exists.`);

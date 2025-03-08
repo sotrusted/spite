@@ -23,7 +23,7 @@
                 {% if htmx %}
                 {% endif %}
                 >
-            ↩ ({{ post.comments_total|default:0 }})
+            ↩ <span class="comment-count">({{ post.comments_total|default:0 }})</span>
         </button>
     </div>
     {% endif %}

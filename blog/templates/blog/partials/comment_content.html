@@ -99,14 +99,9 @@
        hx-get="/hx/get-reply-form-html/{{comment.id}}"
        hx-target="#reply-form-{{comment.id}}"
        hx-swap="innerHTML"
-       hx-trigger="click once"
-       hx-indicator="#reply-indicator-{{comment.id}}">Reply</a>
+       hx-trigger="click">Reply</a>
 </div>
 
 <div id="reply-form-{{comment.id}}" class="reply-form" style="display: none;">
-    <div id="reply-indicator-{{comment.id}}" class="htmx-indicator">
-        <div class="spinner-border spinner-border-sm text-secondary" role="status">
-            <span class="visually-hidden">Loading reply form...</span>
-        </div>
-    </div>
+    <!-- We'll add the indicator dynamically in JavaScript -->
 </div>

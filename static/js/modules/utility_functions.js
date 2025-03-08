@@ -141,7 +141,7 @@ function attachToggleContentButtons(id=null) {
 }
 
 
-function attachToggleReplyButtons(id=null) {
+export function attachToggleReplyButtons(id=null) {
     log("Attaching toggle reply buttons");
     let toggleReplyButtons;
     if (id) {
@@ -164,18 +164,70 @@ function attachToggleReplyButtons(id=null) {
         
             a.addEventListener('click', function() {
                 log(`Reply button clicked for comment ${commentId}`);
-                const commentReplyForm = document.querySelector(`div[id^=reply-form-${commentId}]`);
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
                 
-                if (commentReplyForm) {
-                    const isHidden = commentReplyForm.style.display === 'none';
-                    commentReplyForm.style.display = isHidden ? 'block' : 'none';
-                    log(`Reply form for comment ${commentId} ${isHidden ? 'shown' : 'hidden'}`);
+                if (replyForm) {
+                    // Toggle the form visibility
+                    if (replyForm.style.display === 'none' || replyForm.style.display === '') {
+                        replyForm.style.display = 'block';
+                        
+                        // Add loading indicator if it doesn't exist
+                        if (!document.getElementById(`reply-indicator-${commentId}`)) {
+                            const indicator = document.createElement('div');
+                            indicator.id = `reply-indicator-${commentId}`;
+                            indicator.className = 'htmx-indicator';
+                            indicator.innerHTML = `
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                    <span class="visually-hidden">Loading reply form...</span>
+                                </div>
+                                <span class="ms-2">Loading...</span>
+                            `;
+                            replyForm.appendChild(indicator);
+                            
+                            // Update the HTMX attributes to use the indicator
+                            a.setAttribute('hx-indicator', `#reply-indicator-${commentId}`);
+                        }
+                        
+                        // Add a close button after the form is loaded
+                        document.addEventListener('htmx:afterSwap', function(event) {
+                            if (event.detail.target.id === `reply-form-${commentId}`) {
+                                const formContainer = document.getElementById(`comment-form-container-${commentId}`);
+                                if (formContainer) {
+                                    formContainer.style.display = 'block';
+                                    
+                                    // Add close button if it doesn't exist
+                                    if (!document.getElementById(`close-reply-${commentId}`)) {
+                                        const closeButton = document.createElement('button');
+                                        closeButton.id = `close-reply-${commentId}`;
+                                        closeButton.className = 'close-reply-btn';
+                                        closeButton.innerHTML = '×';
+                                        closeButton.onclick = function(e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            replyForm.style.display = 'none';
+                                        };
+                                        
+                                        // Insert at the beginning of the form container
+                                        if (formContainer.firstChild) {
+                                            formContainer.insertBefore(closeButton, formContainer.firstChild);
+                                        } else {
+                                            formContainer.appendChild(closeButton);
+                                        }
+                                    }
+                                }
+                            }
+                        }, { once: true });
+                    } else {
+                        replyForm.style.display = 'none';
+                    }
                 } else {
                     log(`Reply form for comment ${commentId} not found`, 'error');
                 }
             });
         }
     });
+    
+    log(`Toggle reply buttons attached`);
 }
 
 
@@ -259,7 +311,7 @@ function attachToggleCommentsButtons(id=null) {
                 
                 log(`Comments button clicked for post ${postId}`);
 
-                const commentSection = document.getElementById(`comments-section-${postId}`);
+                const commentSection = document.getElementById(`comment-section-${postId}`);
                 if (!commentSection) {
                     console.error(`Comment section for post ${postId} not found`);
                     return;
@@ -410,8 +462,6 @@ export function attachEventListeners(id=null) {
         attachDetailToggleImages(id);
         log('Detail toggle images attached for post ${id}');
 
-        attachToggleReplyButtons(id);
-        log('Toggle reply buttons attached for post ${id}');
     }
 
     // handleCommentFormSubmit();
@@ -640,7 +690,6 @@ function createCommentElement(comment, isInline = false) {
         `;
     } else {
         // Match comment.html format for feed view
-        element.classList.add('item');
         element.id = `comment-${comment.id}`;
 
         element.innerHTML = `
@@ -668,17 +717,6 @@ export function addCommentToPage(comment) {
     const newComment = createCommentElement(comment);
     postList.insertBefore(newComment, postList.firstChild);
 
-    // Process the new comment
-    htmx.process(newComment);
-    htmx.trigger(newComment, 'revealed');
-
-    // Load reply form for the new comment
-    const replyFormContainer = document.getElementById(`reply-form-${comment.id}`);
-    if (replyFormContainer) {
-        loadReplyForm(comment.id, comment.post_id);
-    }
-
-
     // Add to comment list if it exists
     const commentList = document.getElementById(`comments-list-${comment.post_id}`);
     if (commentList) {
@@ -688,10 +726,52 @@ export function addCommentToPage(comment) {
         // Update comment count if button exists
         const commentButton = document.getElementById(`toggle-comments-${comment.post_id}`);
         if (commentButton) {
-            const currentCount = parseInt(commentButton.textContent.match(/\d+/)[0]);
-            commentButton.textContent = `Comments (${currentCount + 1})`;
+            const commentCountElement = commentButton.querySelector('.comment-count');
+            const currentCount = parseInt(commentCountElement.querySelector('.comment-count').textContent.match(/\d+/)[0]);
+            commentCountElement.textContent = `(${currentCount + 1})`;
         }
     }
+
+
+    const htmxProcessingPromise = new Promise ((resolve => {
+        // Process the new comment
+        htmx.process(newComment);
+
+        // Use MutationObserver to wait for the comment to be fully loaded
+        const observer = new MutationObserver((mutations, obs) => {
+            const loadedComment = document.getElementById(`comment-${comment.id}`);
+            if (loadedComment) {
+                obs.disconnect();
+                resolve(loadedComment);
+            }
+        });
+
+        observer.observe(newComment, {
+            childList: true, 
+            subtree: true, 
+            attributes: true, 
+            attributeFilter: ['hx-get', 'class'] 
+        });
+        
+        // Set a timeout to resolve anyway after 5 seconds
+        setTimeout(() => {
+            observer.disconnect();
+            resolve(document.getElementById(`comment-${comment.id}`));  
+        }, 5000);
+
+        //Trigger the revealed event`   
+        htmx.trigger(newComment, 'revealed');
+    }));
+
+    // Wait for the comment to be fully loaded before attaching event handlers
+    htmxProcessingPromise.then(loadedComment => {
+        if (!loadedComment) {
+            console.warn(`Comment ${comment.id} was not properly loaded`);
+            return;
+        }
+
+        attachEventListeners(comment.id, 'comment');
+    });
 
     return newComment;
 }
@@ -888,3 +968,105 @@ export function setupHtmxProcessing() {
 }
 
 window.scrollToElementById = scrollToElementById;
+
+function toggleReplyForm(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    
+    // Show the form when clicked
+    replyForm.style.display = 'block';
+    
+    // Add a close button to the form after it's loaded
+    setTimeout(() => {
+        if (!document.getElementById(`close-reply-${commentId}`)) {
+            const closeButton = document.createElement('button');
+            closeButton.id = `close-reply-${commentId}`;
+            closeButton.className = 'close-reply-btn';
+            closeButton.innerHTML = '×';
+            closeButton.onclick = function() {
+                replyForm.style.display = 'none';
+            };
+            
+            // Insert at the beginning of the form
+            if (replyForm.firstChild) {
+                replyForm.insertBefore(closeButton, replyForm.firstChild);
+            } else {
+                replyForm.appendChild(closeButton);
+            }
+        }
+    }, 500); // Short delay to ensure content is loaded
+}
+
+window.toggleReplyForm = toggleReplyForm;
+
+
+/**
+ * Cleans up comment skeletons that have already been loaded
+ * This prevents duplicate content and improves page performance
+ */
+export function cleanupCommentSkeletons() {
+    log("Cleaning up comment skeletons");
+    
+    // Find all comment skeletons
+    const skeletons = document.querySelectorAll('.comment-skeleton');
+    
+    if (skeletons.length === 0) {
+        log("No comment skeletons found to clean up");
+        return;
+    }
+    
+    log(`Found ${skeletons.length} comment skeletons to check`);
+    let removedCount = 0;
+    
+    skeletons.forEach(skeleton => {
+        // Get the parent element which should have id="comment-{id}"
+        const parentElement = skeleton.closest('[id^="comment-"]');
+        if (!parentElement) return;
+        
+        // Extract the comment ID from the parent element's ID
+        const parentId = parentElement.id;
+        const match = parentId.match(/comment-(\d+)/);
+        if (!match || !match[1]) return;
+        
+        const commentId = match[1];
+        
+        // Find all elements with this comment ID
+        const commentElements = document.querySelectorAll(`#comment-${commentId}`);
+        
+        // If we have more than one element with this ID, then the comment has been loaded
+        if (commentElements.length > 1) {
+            skeleton.remove();
+            removedCount++;
+            log(`Removed skeleton for comment #${commentId} (duplicate ID found)`);
+        } else {
+            // Check if the parent element has content other than the skeleton
+            // Count children that aren't the skeleton or loading indicators
+            const contentElements = Array.from(parentElement.children).filter(child => {
+                return !child.classList.contains('comment-skeleton') && 
+                       !child.classList.contains('htmx-indicator');
+            });
+            
+            if (contentElements.length > 0) {
+                skeleton.remove();
+                removedCount++;
+                log(`Removed skeleton for comment #${commentId} (content loaded)`);
+            }
+        }
+    });
+    
+    log(`Cleaned up ${removedCount} comment skeletons`);
+}
+
+// Add this to your initialization code or document ready function
+export function initSkeletonCleanup() {
+    // Run immediately
+    cleanupCommentSkeletons();
+    
+    // Then run periodically
+    setInterval(cleanupCommentSkeletons, 3000); // Check every 3 seconds
+    
+    // Also run after HTMX swaps
+    document.addEventListener('htmx:afterSwap', function(event) {
+        // Small delay to ensure DOM is updated
+        setTimeout(cleanupCommentSkeletons, 500);
+    });
+}
