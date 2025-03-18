@@ -71,6 +71,7 @@ class Post(models.Model):
     #meta
     date_posted = models.DateTimeField(auto_now_add=True, db_index=True)
     is_pinned = models.BooleanField(default=False, db_index=True)
+
     #meta/not implemented
     like_count = models.PositiveIntegerField(default=0)
     parent_post = models.ForeignKey('self',null=True,blank=True,related_name='replies',on_delete=models.CASCADE)
@@ -183,6 +184,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    #Foreign key to the post
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
 
     parent_comment = models.ForeignKey(
@@ -192,6 +194,8 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='replies'
     )
+
+    #text fields
     name = models.CharField(max_length=100, blank=True)  # Optional name field
     content = models.TextField()
     created_on = models.DateTimeField(default=timezone.now)

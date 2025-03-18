@@ -3,13 +3,14 @@
       {% if post_type == 'Post' and post_id %}
         hx-post="{% url 'add-comment' post_id %}"
         hx-target="#post-list #comments-list-{{ post_id }}"
+        hx-indicator="#upload-indicator-comment-{{ post_id }}"
       {% elif post_type == 'Comment' and comment_id %}
         hx-post="{% url 'reply-comment' comment_id %}"
         hx-target="#post-list"
+        hx-indicator="#upload-indicator-comment-{{ comment_id }}"
       {% endif %}
       hx-swap="afterbegin"
       hx-trigger="submit"
-      hx-indicator="#upload-indicator-comment-{{ comment_id }}"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
       hx-encoding="multipart/form-data">
 

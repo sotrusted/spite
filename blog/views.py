@@ -893,14 +893,36 @@ def get_word_cloud(request):
     entries = List.objects.values_list('input', flat=True)  # Get a list of inputs
     return JsonResponse({'entries': list(entries)})
 
+from functools import wraps
 
+def simple_password_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        password = "bananapizza"
+        
+        # Check if already authenticated for this session
+        if request.session.get('password_verified'):
+            return view_func(request, *args, **kwargs)
+        
+        # Check if password was submitted
+        if request.method == 'POST':
+            if request.POST.get('password') == password:
+                request.session['password_verified'] = True
+                return redirect(request.path)
+        
+        # Show password form
+        return render(request, 'blog/forms/password_form.html')
+    
+    return _wrapped_view
+
+@simple_password_required
 def download_posts_as_html_stream(request):
     # Preload comments using Prefetch
-    posts = Post.objects.prefetch_related(
+    posts = Post.objects.order_by('-date_posted').prefetch_related(
         Prefetch(
             'comments',
             queryset=Comment.objects.order_by('-created_on'),
-            to_attr='recent_comments'  # Preloaded comments are stored here
+            to_attr='recent_comments'
         )
     ).iterator()
 
@@ -1229,3 +1251,7 @@ def hx_get_post_comment_section(request, post_id):
     comment_form = CommentForm()
     context = {'post': post, 'post_id' : post_id, 'comment_form' : comment_form}
     return render(request, 'blog/partials/comment_section.html', context)
+
+
+def spite_tv(request):
+    return render(request, 'blog/spite_tv.html')

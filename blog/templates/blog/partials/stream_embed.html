@@ -1,0 +1,15 @@
+{% if request.user_agent.is_mobile %}
+<video id="videoPlayer" controls playsinline crossorigin="anonymous">
+    <source src="https://customer-eviz3pnpphw6iquz.cloudflarestream.com/31ff32aec8f5617d74a4164ab5f1b478/manifest/video.m3u8" type="application/vnd.apple.mpegurl">
+</video>
+{% else %}
+<div style="position: relative; padding-top: 100%;">
+    <iframe
+      src="https://customer-eviz3pnpphw6iquz.cloudflarestream.com/bf27869e8583bbcbaa3e356c50d45471/iframe?muted=true&preload=true&autoplay=true&poster=https%3A%2F%2Fcustomer-eviz3pnpphw6iquz.cloudflarestream.com%2Fbf27869e8583bbcbaa3e356c50d45471%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600"
+      loading="lazy"
+      style="border: none; position: absolute; top: 0; left: 0; height: 100%; width: 100%;"
+      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+      allowfullscreen="true"
+    ></iframe>
+  </div>
+{% endif %}

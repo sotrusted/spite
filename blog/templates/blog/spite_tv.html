@@ -1,0 +1,28 @@
+{% extends 'blog/spite_base.html' %}
+
+{% block meta %}
+    {{ block.super }}
+    {% if request.user_agent.is_mobile %}
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="format-detection" content="telephone=no">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' https://*.cloudflarestream.com blob:; connect-src 'self' https://*.cloudflarestream.com; script-src 'self' https://embed.cloudflarestream.com 'unsafe-inline';">
+        <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.10.2/video-js.min.css"
+        rel="stylesheet"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.10.2/video.min.js"></script>
+    {% endif %}
+{% endblock %}
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% include 'blog/partials/stream_embed.html' %}
+</div>
+
+{% endblock %}
