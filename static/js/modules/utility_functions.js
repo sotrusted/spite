@@ -1058,15 +1058,34 @@ export function cleanupCommentSkeletons() {
 
 // Add this to your initialization code or document ready function
 export function initSkeletonCleanup() {
-    // Run immediately
-    cleanupCommentSkeletons();
-    
-    // Then run periodically
-    setInterval(cleanupCommentSkeletons, 3000); // Check every 3 seconds
+    // Run periodically
+    setInterval(cleanupCommentSkeletons, 10000); // Check every 3 seconds
+
+    let lastCleanupTime = Date.now();
+    const MIN_CLEANUP_INTERVAL = 5000;
     
     // Also run after HTMX swaps
     document.addEventListener('htmx:afterSwap', function(event) {
-        // Small delay to ensure DOM is updated
-        setTimeout(cleanupCommentSkeletons, 500);
+        if (Date.now() - lastCleanupTime < MIN_CLEANUP_INTERVAL) {
+            return;
+        }
+
+        const targetElement = event.detail.target;
+
+        if (targetElement && targetElement.id === 'online-count') {
+            return;
+        }
+
+        // Check if the response is successful 
+        // Only run for specific targets
+        const validTargets = ['post-list'];
+        if (event.detail.xhr.status === 200 && validTargets.includes(targetElement.id)) {
+            // Small delay to ensure DOM is updated
+            setTimeout(() => {
+                cleanupCommentSkeletons();
+                lastCleanupTime = Date.now();
+             }, 500);
+        }
     });
+    log("Cleanup initialized");
 }

@@ -175,7 +175,8 @@ def load_posts(request):
     )
 
     # Paginate the combined feed items
-    paginator = Paginator(combined_items, 20)  # 20 items per page
+    items_per_page = 50
+    paginator = Paginator(combined_items, items_per_page) 
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
