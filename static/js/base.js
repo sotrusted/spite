@@ -44,5 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
     setupHtmxProcessing();
     initSkeletonCleanup();
 
+    const writeButton = document.getElementById('write-button');
+    if (writeButton) {
+        writeButton.addEventListener('click', function() {
+            scrollToElementById('post-form');
+        });
+    }
+    const postButton = document.getElementById('post-button');
+    if (postButton) {
+        postButton.addEventListener('click', function() {
+            scrollToElementById('post-form');
+        });
+    }
     
 });

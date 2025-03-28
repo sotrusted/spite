@@ -6,6 +6,7 @@ import time
 env = environ.Env(
     DEBUG=(bool, False)  # Set the default value for DEBUG as False
 )
+DEBUG = True
 from celery.schedules import crontab
 import mimetypes
 
@@ -81,6 +82,9 @@ INSTALLED_APPS = [
     'pwa',
     'meta',
     'compressor',
+    'ckeditor',
+    'django_ckeditor_5',
+    'ckeditor_uploader',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -508,4 +512,13 @@ CELERY_WORKER_MAX_TASKS_PER_CHILD = 10  # Restart worker more frequently
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Process one task at a time
 CELERY_TASK_TIME_LIMIT = 60  # 1 minute max
 CELERY_TASK_SOFT_TIME_LIMIT = 45  # Warn at 45 seconds
+
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Full',
+        'width': '100%',
+    },
+}
 

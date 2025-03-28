@@ -43,6 +43,7 @@ django-appconf==1.0.6
 django-axes==6.5.1
 django-block-ip==0.2.0
 django-celery-beat==2.7.0
+django-ckeditor==6.7.2
 django-cloudflare==0.0.1
 django-compressor==4.5.1
 django-cors-headers==4.6.0
@@ -51,6 +52,7 @@ django-debug-toolbar==4.4.6
 django-environ==0.11.2
 django-filer==3.3.0
 django-formtools==2.5.1
+django-js-asset==3.1.2
 django-meta==2.4.2
 django-polymorphic==3.1.0
 django-pwa==2.0.1

@@ -330,12 +330,14 @@ class PostCreateView(CreateView):
 
     def form_invalid(self, form):
         logger.error("Form errors: %s", form.errors)
-        return HttpResponse(
-            "<div class='alert alert-danger'>Error creating post</div>",
-            status=500
-        )
+        htmx = True
+        if htmx:
+            return HttpResponse(
+                "<div class='alert alert-danger'>Error creating post</div>",
+                status=500
+            )
 
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        elif self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
 
@@ -508,7 +510,7 @@ def search_results(request):
         
         
         # Paginate combined results
-        paginator = Paginator(list(combined_items), 10)
+        paginator = Paginator(list(combined_items), 100)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -1255,3 +1257,25 @@ def hx_get_post_comment_section(request, post_id):
 
 def spite_tv(request):
     return render(request, 'blog/spite_tv.html')
+
+def hx_get_comment_chain(request, comment_id):
+    # htmx endpoint to fetch a comments chain of parent comments
+    try:
+        comment = get_object_or_404(Comment, id=comment_id)
+        comment_chain = []
+        current = comment 
+        while current.parent_comment:
+            current = current.parent_comment
+            comment_chain.append(current)
+        
+        context = {
+            'comment_chain': comment_chain,
+            'original_comment_id': comment_id,
+        }
+
+        return render(request, 'blog/partials/comment_chain.html', context=context)
+
+    except Exception as e:
+        logger.exception(f'Error in hx_get_comment_chain {str(e)}')
+        return HttpResponse(f"Error loading comment chain: {str(e)}", status=500)
+

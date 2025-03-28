@@ -15,6 +15,8 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.conf import settings
 from django.core.cache import cache
+from ckeditor.fields import RichTextField
+
 class SecureIPStorage:
     def __init__(self):
         self.fernet = Fernet(settings.IP_ENCRYPTION_KEY)
@@ -285,6 +287,9 @@ class Comment(models.Model):
     def post_media_file_url(self):
         return self.post.media_file.url if self.post and self.post.media_file else ''
 
+    @property
+    def context(self):
+        return self.parent_comment.parent_comment
 
     def __str__(self):
         return f'{self.name or "Anonymous"}: \"{self.content}\" on {self.post.title}'
@@ -473,3 +478,7 @@ class BlockedIP(models.Model):
 
     class Meta:
         db_table = 'blocked_ips'
+
+class TestPost(models.Model):
+    title = models.CharField(max_length=200)
+    content = RichTextField()  # CKEditor field

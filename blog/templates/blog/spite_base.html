@@ -368,17 +368,6 @@
 
 
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('#comment-form-4504');
-            if (form) {
-              form.addEventListener('submit', function(event) {
-                console.log('Form submit event fired');
-                // Don't prevent default - we want to see if other handlers are doing this
-              });
-            } else {
-              console.log('Form not found');
-            }
-          });
-
           const writeButton = document.getElementById('write-button');
           if (writeButton) {
               writeButton.addEventListener('click', function() {
@@ -391,6 +380,9 @@
                   scrollToElementById('post-form');
               });
           }
+        }
+
+
 
     </script>
 </body>

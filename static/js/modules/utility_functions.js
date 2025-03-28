@@ -727,7 +727,13 @@ export function addCommentToPage(comment) {
         const commentButton = document.getElementById(`toggle-comments-${comment.post_id}`);
         if (commentButton) {
             const commentCountElement = commentButton.querySelector('.comment-count');
-            const currentCount = parseInt(commentCountElement.querySelector('.comment-count').textContent.match(/\d+/)[0]);
+            const commentCount = parseInt(commentCountElement.querySelector('.comment-count'));
+            let currentCount;
+            if (commentCount && commentCount.textContent) {
+                currentCount = commentCount.textContent.match(/\d+/)[0];
+            } else {
+                currentCount = 0;
+            }
             commentCountElement.textContent = `(${currentCount + 1})`;
         }
     }

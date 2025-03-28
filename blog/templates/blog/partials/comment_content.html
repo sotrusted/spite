@@ -48,12 +48,25 @@
                     </div>
                 {% endif %}
             {% endif %}
+
+            {% if comment.context %}
+                <div class="context-{{comment.parent_comment_id}}">
+                    <a hx-get="/hx/get-comment-chain/{{comment.parent_comment_id}}" 
+                       hx-target="#comment-chain-{{comment.parent_comment_id}}"
+                       hx-swap="innerHTML" 
+                       hx-trigger="click once">
+                        [More]
+                    </a>
+                    <div id="comment-chain-{{comment.parent_comment_id}}"></div>
+                </div>
+            {% endif %}
         </div>
     {% endif %}
+
     <div class="parent-post" id="parent-post-{{comment.post_id}}-{{comment.id}}">
         <div class="text-content">
             <h2 class="post-title">
-            Re:<a 
+            <a 
                 {% if comment.post_id %}
                     href="{% url 'post-detail' comment.post_id %}"
                     hx-get="{% url 'hx-get-parent-post' comment.post_id %}" 
@@ -62,6 +75,11 @@
                     hx-trigger="click once">
                 {% endif %}
                 <span class="post-title">{{ comment.post_title }}</span>
+                <span id="parent-post-indicator-{{comment.post_id}}-{{comment.id}}" class="htmx-indicator">
+                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                        <span class="visually-hidden"></span>
+                    </div>
+                </span>
             </a>
             </h2>
             <p class="parent-content">{{comment.post_content|truncatewords:30}}</p>

@@ -1,0 +1,19 @@
+{% extends "blog/spite_base.html" %}
+{% block scripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Spite Rich Content Editor</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="content" id="editor"></textarea>
+        <button type="submit">Submit</button>
+    </form>
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('editor');
+    </script>
+</div>
+{% endblock %}

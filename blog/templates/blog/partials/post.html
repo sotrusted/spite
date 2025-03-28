@@ -1,11 +1,11 @@
 <div id="post-{{post.id}}" class="post item {% if nested %}nested{% endif %}">
     {% if not nested %}
-    <div class="preview" id="post-preview-{{post.id}}"
+    <div class="preview" id="{% if nested %}nested-{% endif %}post-preview-{{post.id}}"
         {% if nested %}style="display: none;"{% endif %}>
         {% include 'blog/preview.html' with post=post %}
     </div>
     {% endif %}
-    <div class="detail {% if nested %}nested{% endif %}" id="post-detail-{{ post.id }}" 
+    <div class="detail {% if nested %}nested{% endif %}" id="{% if nested %}nested-{% endif %}post-detail-{{ post.id }}" 
         {% if not nested %}style="display: none;"{% endif %}>
         {% include 'blog/detail.html' with post=post nested=True %}
     </div>
@@ -27,36 +27,32 @@
         </button>
     </div>
     {% endif %}
-
-    {% if htmx %}
-        <div id="comment-section-{{ post.id }}" class="comment-section"
-            hx-get="/hx/get-post-comment-section/{{ post.id }}/"
+    <div id="comment-section-{{ post.id }}" class="comment-section">
+        {% if htmx %}
+        <div hx-get="/hx/get-post-comment-section/{{ post.id }}/"
             hx-trigger="revealed"
             hx-target="#comment-section-{{ post.id }}"
-            hx-swap="innerHTML"
-        >
+            hx-swap="innerHTML">
             <span id="comment-section-indicator-${post.id}" class="htmx-indicator">
                 <div class="spinner-border spinner-border-sm text-secondary" role="status">
                     <span class="visually-hidden"></span>
                 </div>
             </span>
         </div>
-    {% else %}
-    <!-- Unique Comment Section for Each Post -->
-    <div id="comment-section-{{ post.id }}" class="comment-section">
-        <div id="comments-container-{{ post.id }}" 
-            data-has-comments="{{ post.has_comments }}" 
-            class="comments-container" style="display: none;">
-            <div id="comments-list-{{ post.id }}">
-                {% for comment in post.recent_comments %}
-                    {% include 'blog/partials/inline_comment.html' with comment=comment %}
-                {% endfor %}
+        {% else %}
+        <!-- Unique Comment Section for Each Post -->
+            <div id="comments-container-{{ post.id }}" 
+                data-has-comments="{{ post.has_comments }}" 
+                class="comments-container" style="display: none;">
+                <div id="comments-list-{{ post.id }}">
+                    {% for comment in post.recent_comments %}
+                        {% include 'blog/partials/inline_comment.html' with comment=comment %}
+                    {% endfor %}
+                </div>
+
+                <!-- Comment Form -->
+                {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
             </div>
-
-            <!-- Comment Form -->
-            {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
-        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
 </div>

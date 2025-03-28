@@ -123,6 +123,9 @@
       </style>
     </div>
 
+    <div class="stream-container">
+      {% include 'blog/partials/stream_embed.html' %}
+    </div>
 
     {% include 'blog/partials/posts_list.html' with posts=posts is_search=is_search query=query count=count %}
 

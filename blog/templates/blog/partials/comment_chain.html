@@ -1,0 +1,34 @@
+{% load custom_filters %}
+<div class="comment-chain">
+    {% for comment in comment_chain %}
+        <div class="comment-wrapper" 
+             style="margin-left: {{ forloop.counter1|multiply:10 }}px; border-left: 3px solid {% cycle '#6c757d' '#007bff' '#28a745' '#dc3545' '#ffc107' %};">
+            
+            <div class="chain-comment" id="chain-comment-{{ comment.id }}">
+                <div class="chain-comment-content">
+                    <span class="reply-to">
+                        <strong>
+                            {{ comment.name|default:"Anonymous" }}
+                        </strong>
+                    </span>
+                    <p class="chain-comment-content">
+                        {{ comment.content }}
+                    </p>
+                </div>
+                    
+                {% if comment.media_file and comment.is_image %}
+                        <div class="image-container">
+                            <img src="{{ comment.media_file.url }}" alt="Comment media" class="img-fluid">
+                        </div>
+                {% elif comment.media_file and comment.is_video %}
+                    <div class="video-container">
+                        <video controls>
+                            <source src="{{ comment.media_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -17,6 +17,8 @@ from .views import (home, PostCreateView, PostDetailView,
                     hx_scroll_to_post_form, toggle_version, hx_get_post, hx_get_post_comment_section,
                     spite_tv)
 
+import blog.views as blog_views
+import blog.test_views as test_views
 
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
@@ -72,6 +74,8 @@ urlpatterns = [
     path('hx/get-post/<int:post_id>/', hx_get_post, name='hx-get-post'),
     path('hx/get-post-comment-section/<int:post_id>/', hx_get_post_comment_section, name='hx-get-post-comment-section'),
     path('live/', spite_tv, name='spite-tv'),
+    path('hx/get-comment-chain/<int:comment_id>/', blog_views.hx_get_comment_chain, name='get-comment-chain'),
+    path('editor/', test_views.editor, name='editor'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
