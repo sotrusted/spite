@@ -1,0 +1,6 @@
+{% extends 'artworks/base.html' %}
+{% block title %}About{% endblock %}
+{% block content %}
+  <h2 class="text-3xl font-bold mb-4">About the Artist</h2>
+  <p class="prose max-w-2xl">{{ bio.content|linebreaks }}</p>
+{% endblock %}

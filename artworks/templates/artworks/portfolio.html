@@ -1,0 +1,30 @@
+{% extends 'artworks/base.html' %}
+{% load static %}
+
+{% block title %}Portfolio{% endblock %}
+
+{% block content %}
+<h2 class="text-3xl font-bold mb-4">Portfolio</h2>
+
+<nav class="mb-6 space-x-4">
+  <a href="{% url 'portfolio' %}" class="text-blue-600 hover:underline">All</a>
+  {% for cat in categories %}
+    <a href="{% url 'portfolio_by_category' cat.slug %}"
+       class="{% if current_category and current_category.slug == cat.slug %}font-bold{% endif %} hover:underline">
+       {{ cat.name }}
+    </a>
+  {% endfor %}
+</nav>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for artwork in artworks %}
+    <div class="border p-2 rounded shadow">
+      <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto">
+      <h3 class="text-xl font-semibold mt-2">{{ artwork.title }}</h3>
+      <p class="text-sm text-gray-600">{{ artwork.description }}</p>
+    </div>
+  {% empty %}
+    <p>No artworks yet!</p>
+  {% endfor %}
+</div>
+{% endblock %}
