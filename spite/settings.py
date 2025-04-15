@@ -135,17 +135,16 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django_cloudflare.CloudflareMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middleware.active_session_middleware.ActiveSessionMiddleware',
     'middleware.page_view_middleware.PageViewMiddleware',
-    'middleware.loading_screen_middleware.LoadingScreenMiddleware',
+#    'middleware.loading_screen_middleware.LoadingScreenMiddleware',
     'blog.middleware.BlockIPMiddleware',
-    'blog.middleware.HtmxDebugMiddleware',
 ]
 
 ROOT_URLCONF = 'spite.urls'
@@ -423,6 +422,7 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr', 'https://sotrusted.net', 'https://www.sotrusted.net']
+CSRF_USE_SESSIONS = True
 
 
 PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
@@ -474,6 +474,7 @@ if DEBUG:
     MIDDLEWARE = [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
         'silk.middleware.SilkyMiddleware',
+        'blog.middleware.HtmxDebugMiddleware',
         ] + MIDDLEWARE
 
     INSTALLED_APPS += [

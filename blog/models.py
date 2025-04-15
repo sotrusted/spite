@@ -206,6 +206,7 @@ class Comment(models.Model):
                             validators=[validate_media_file, validate_video_file_size])  # New field
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
+    encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
 
     @property
     def post_id(self):

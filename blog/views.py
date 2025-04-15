@@ -24,7 +24,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List
+from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
 import functools
@@ -47,15 +47,6 @@ from django.db import connection
 from contextlib import contextmanager
 
 logger = logging.getLogger('spite')
-
-def write_ip(ip, *args, **kwargs):
-    with open('iplog', 'a+') as log:
-            entry = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f' -- {ip}'
-            log.write(entry)
-            if args or kwargs:
-                log.write(f'--- {" ".join([*args, *kwargs.values()])}')
-            log.write('\n')
-
 
 def check_spam(request, content='', author_name=''):
     logger.info("Checking spam")
@@ -112,32 +103,6 @@ def check_spam(request, content='', author_name=''):
     logger.info("Post is not spam")
     return False, ""
 
-
-def log_ip1(request, *args, **kwargs):
-    ip = request.META.get('HTTP_X_FORWARDED_FOR')
-    if ip:
-        ip = ip.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-
-    write_ip(ip, *args, **kwargs)
-    
-def log_ip(view_func):
-    @functools.wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        ip = request.META.get('HTTP_X_FORWARDED_FOR')
-        if ip:
-            ip = ip.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-
-        write_ip(ip, *args, **kwargs)
-
-        return view_func(request, *args, **kwargs)
-
-    return wrapper
-
-
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -150,7 +115,6 @@ CACHE_KEY = 'home_cache'
 
 @csrf_protect
 def home(request):
-    logger.info("IP Address for debug-toolbar: " + get_client_ip(request))
     
     # Get the immediate total count
     total_pageviews = cache.get('current_total_views', 0)
@@ -237,13 +201,9 @@ class PostCreateView(CreateView):
         return False, ""
  
     def post(self, request, *args, **kwargs):
-        logger.info("Request POST data: %s", request.POST)
-        logger.info("Request FILES data: %s", request.FILES)
         
         csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
         csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
-        logger.info(f"CSRF token in POST data: {csrf_token_post}")
-        logger.info(f"CSRF token in cookie: {csrf_token_cookie}")
 
         self.request = request
 
@@ -279,9 +239,11 @@ class PostCreateView(CreateView):
             post = form.save(commit=False)
             
             # Add IP address to the post
-            post.ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+            ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
                             self.request.META.get('REMOTE_ADDR')
             
+            post.set_ip_address(ip_address)
+            post.ip_address = None
             post.save()
             logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, "
                     f"media file: {post.media_file}, display name {post.display_name}")
@@ -383,7 +345,6 @@ class PostDetailView(DetailView):
 
 
 @csrf_exempt
-# @log_ip
 def like_post(request, post_id):
     if request.method == 'POST':
         try:
@@ -513,8 +474,9 @@ def search_results(request):
         paginator = Paginator(list(combined_items), 100)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
-
-        SearchQueryLog.objects.create(query=query, ip_address=get_client_ip(request))
+        query = SearchQueryLog.objects.create(query=query)
+        ip = get_client_ip(request)
+        query.set_ip_address(ip)
         
         context = {
             'query': query,
@@ -885,8 +847,9 @@ class SaveListView(View):
                 return JsonResponse({'success': False, 'error': 'Input cannot be empty.'}, status=400)
 
             # Save to the database
-            new_list = List.objects.create(input=input_text,
-                                        ip_address=get_client_ip(request),)
+            new_list = List.objects.create(input=input_text)
+            ip = get_client_ip(request)
+            new_list.set_ip_address(ip)
             return JsonResponse({'success': True, 'id': new_list.id})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
@@ -1115,29 +1078,6 @@ def loading_screen(request):
     logger.info("Loading screen view called")
     target_url = request.GET.get('to', '/')
     
-    with db_connection():
-        try:
-            response = requests.get(
-                request.build_absolute_uri(target_url),
-                timeout=5,
-                headers={'X-Requested-With': 'XMLHttpRequest'}
-            )
-            
-            if response.status_code == 200:
-                logger.info("Server check successful")
-                redirect_response = redirect(target_url)
-                redirect_response.set_cookie(
-                    'loading_complete', 
-                    'true', 
-                    path='/',
-                    max_age=3600,
-                    httponly=True
-                )
-                request.session['loading_retry_count'] = 0
-                return redirect_response
-                
-        except requests.RequestException as e:
-            logger.error(f"Request error: {e}")
     
     retry_count = request.session.get('loading_retry_count', 0)
     return render(request, 'blog/loading.html', {
@@ -1150,8 +1090,7 @@ javascript_logger = logging.getLogger('javascript')
 @csrf_exempt
 @require_POST
 def log_javascript(request):
-    javascript_logger.info(f"Received JS log request from {request.META.get('REMOTE_ADDR')}")
-    javascript_logger.info(f"Headers: {dict(request.headers)}")
+    javascript_logger.info(f"Received JS log request")
     
     try:
         message = request.POST.get('message', '')
@@ -1169,12 +1108,22 @@ def log_javascript(request):
         javascript_logger.error(f"Error in log_javascript view: {str(e)}", exc_info=True)
         return JsonResponse({'error': str(e)}, status=500)
 
+@simple_password_required
 def resume(request):
     return render(request, 'blog/resume.html')
 
 def remove_user(request):
     """Remove user from online users when they disconnect"""
-    client_id = request.META.get('REMOTE_ADDR', '') + request.META.get('HTTP_USER_AGENT', '')
+    # Create a unique ID without using raw IP and user agent
+    ip = get_client_ip(request)
+    storage = SecureIPStorage()
+    encrypted_ip = storage.encrypt_ip(ip)
+    
+    # Hash the user agent instead of using it directly
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    user_agent_hash = hashlib.md5(user_agent.encode()).hexdigest()[:8]
+    
+    client_id = f"{encrypted_ip[:16]}_{user_agent_hash}"
     online_users = cache.get('online_users', {})
     
     if client_id in online_users:

@@ -40,7 +40,6 @@ export function initAjaxPostForm() {
                 return response.json();
             })
             .then(data => {
-                console.log('Response data:', data); // Debug log
                 if (data.success) {
                     postForm.reset(); // Clear the form
                     enableSubmitButton(postForm);

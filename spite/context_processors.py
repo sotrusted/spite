@@ -180,11 +180,17 @@ def load_posts(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
+    # Process each item in the page and STORE THE RESULTS back in the object list
+    processed_items = []
     for item in page_obj.object_list:
-        if item.get_item_type() == 'Post':
-            post = preprocess_post(item)
-        elif item.get_item_type() == 'Comment':
-            comment = preprocess_comment(item)
+        if hasattr(item, 'get_item_type') and item.get_item_type() == 'Post':
+            processed_items.append(preprocess_post(item))
+        else:
+            processed_items.append(preprocess_comment(item))
+    
+    # Replace the items in the page with the processed ones
+    page_obj.object_list = processed_items
+    
     return {
         'days_since_launch': days_since_launch(),
         'comment_form': CommentForm(),

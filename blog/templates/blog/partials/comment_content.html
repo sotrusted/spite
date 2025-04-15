@@ -52,12 +52,18 @@
             {% if comment.context %}
                 <div class="context-{{comment.parent_comment_id}}">
                     <a hx-get="/hx/get-comment-chain/{{comment.parent_comment_id}}" 
-                       hx-target="#comment-chain-{{comment.parent_comment_id}}"
+                       hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment_id}}"
                        hx-swap="innerHTML" 
                        hx-trigger="click once">
                         [More]
                     </a>
-                    <div id="comment-chain-{{comment.parent_comment_id}}"></div>
+                    <div id="comment-chain-{{comment.id}}-{{comment.parent_comment_id}}">
+                        <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment_id}}" class="htmx-indicator">
+                            <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                <span class="visually-hidden"></span>
+                            </div>
+                        </span>
+                    </div>
                 </div>
             {% endif %}
         </div>
