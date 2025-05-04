@@ -1,0 +1,5 @@
+{% extends 'artworks/base.html' %}
+{% block title %}{{ artwork.title }}{% endblock %}
+{% block content %}
+    {% include 'artworks/artwork_detail_stub.html' with artwork=artwork %}
+{% endblock %}

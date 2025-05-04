@@ -4,7 +4,7 @@
 {% block title %}Portfolio{% endblock %}
 
 {% block content %}
-<h2 class="text-3xl font-bold mb-4">Portfolio</h2>
+<h2 class="text-3xl font-bold mb-4"></h2>
 
 <nav class="mb-6 space-x-4">
   <a href="{% url 'portfolio' %}" class="text-blue-600 hover:underline">All</a>
@@ -16,15 +16,30 @@
   {% endfor %}
 </nav>
 
+<div id="artwork-detail" class="hidden fixed inset-0 bg-white z-50 overflow-auto flex justify-center">
+  <div class="max-w-4xl w-full flex flex-col">
+    <div class="p-4 flex justify-end">
+      <button id="close-artwork-detail" class="text-blue-600 hover:underline text-xl"
+      hx-on:click="document.getElementById('artwork-detail').classList.add('hidden');">× Close</button>
+    </div>
+    <div id="artwork-detail-content" class="flex-grow p-4 md:p-8 overflow-auto"></div>
+  </div>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   {% for artwork in artworks %}
-    <div class="border p-2 rounded shadow">
-      <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto">
-      <h3 class="text-xl font-semibold mt-2">{{ artwork.title }}</h3>
-      <p class="text-sm text-gray-600">{{ artwork.description }}</p>
+    <div class="border">
+      <img id="artwork-{{ artwork.slug }}" src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto"
+      hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}" 
+      hx-target="#artwork-detail-content" 
+      hx-swap="innerHTML"
+      hx-trigger="click"  
+      hx-on::after-request="document.getElementById('artwork-detail').classList.remove('hidden');">
     </div>
   {% empty %}
     <p>No artworks yet!</p>
   {% endfor %}
 </div>
+{% endblock %}
+
+{% block scripts %}
 {% endblock %}
