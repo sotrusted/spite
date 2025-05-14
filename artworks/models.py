@@ -1,5 +1,7 @@
+import uuid
 from django.db import models
 from django.utils.text import slugify
+from django.urls import reverse
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -21,8 +23,12 @@ class Artwork(models.Model):
         return self.title
     
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.category.name + "-" + self.title + "-" + self.created_at.strftime("%Y%m%d%H%M%S"))
-        super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = slugify(f"{self.category.name}-{self.title}-{str(uuid.uuid4())[:8]}")
+        super().save(*args, **kwargs)    
+    
+    def get_absolute_url(self):
+        return reverse('artwork_detail', kwargs={'slug': self.slug})
 
 class Bio(models.Model):
     content = models.TextField()
