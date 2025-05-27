@@ -1,0 +1,10 @@
+<div id="artwork-detail" class="hidden fixed inset-0 bg-white z-50 overflow-auto flex justify-center">
+  <div class="max-w-4xl w-full flex flex-col">
+    <div class="p-4 flex justify-end">
+      <button id="close-artwork-detail" class="text-blue-600 hover:underline text-xl"
+      hx-on:click="document.getElementById('artwork-detail').classList.add('hidden');">× Close</button>
+    </div>
+    <div id="artwork-detail-content" class="flex-grow p-4 md:p-8 overflow-auto"></div>
+  </div>
+</div>
+

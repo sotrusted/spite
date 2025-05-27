@@ -1,7 +1,7 @@
 {% extends 'artworks/base.html' %}
 {% load static %}
 
-{% block title %}Portfolio{% endblock %}
+{% block title %}Owen Sussman | Portfolio{% endblock %}
 
 {% block content %}
 <h2 class="text-3xl font-bold mb-4"></h2>
@@ -16,20 +16,14 @@
   {% endfor %}
 </nav>
 
-<div id="artwork-detail" class="hidden fixed inset-0 bg-white z-50 overflow-auto flex justify-center">
-  <div class="max-w-4xl w-full flex flex-col">
-    <div class="p-4 flex justify-end">
-      <button id="close-artwork-detail" class="text-blue-600 hover:underline text-xl"
-      hx-on:click="document.getElementById('artwork-detail').classList.add('hidden');">× Close</button>
-    </div>
-    <div id="artwork-detail-content" class="flex-grow p-4 md:p-8 overflow-auto"></div>
-  </div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+{% include 'artworks/artwork_detail_window.html' %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center justify-center">
   {% for artwork in artworks %}
-    <div class="border">
+    <div class="artwork-card cursor-pointer">
       <img id="artwork-{{ artwork.slug }}" src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto"
-      hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}" 
+      hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
       hx-target="#artwork-detail-content" 
       hx-swap="innerHTML"
       hx-trigger="click"  

@@ -388,3 +388,216 @@
 [2025-05-14 09:41:02 +0000] [3539817] [INFO] Booting worker with pid: 3539817
 [2025-05-14 09:41:02 +0000] [3539818] [INFO] Booting worker with pid: 3539818
 [2025-05-14 09:41:02 +0000] [3539819] [INFO] Booting worker with pid: 3539819
+[2025-05-16 09:35:29 +0000] [3539818] [INFO] Worker exiting (pid: 3539818)
+[2025-05-16 09:35:29 +0000] [3539817] [INFO] Worker exiting (pid: 3539817)
+[2025-05-16 09:35:29 +0000] [3539819] [INFO] Worker exiting (pid: 3539819)
+[2025-05-16 09:35:29 +0000] [3539814] [INFO] Handling signal: term
+[2025-05-16 09:35:29 +0000] [3539814] [ERROR] Worker (pid:3539817) was sent SIGTERM!
+[2025-05-16 09:35:29 +0000] [3539814] [ERROR] Worker (pid:3539819) was sent SIGTERM!
+[2025-05-16 09:35:29 +0000] [3539814] [ERROR] Worker (pid:3539818) was sent SIGTERM!
+[2025-05-16 09:35:29 +0000] [3539814] [INFO] Shutting down: Master
+[2025-05-16 09:35:29 +0000] [3608085] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 09:35:29 +0000] [3608085] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3608085)
+[2025-05-16 09:35:29 +0000] [3608085] [INFO] Using worker: sync
+[2025-05-16 09:35:29 +0000] [3608088] [INFO] Booting worker with pid: 3608088
+[2025-05-16 09:35:29 +0000] [3608089] [INFO] Booting worker with pid: 3608089
+[2025-05-16 09:35:29 +0000] [3608090] [INFO] Booting worker with pid: 3608090
+[2025-05-27 15:05:35 +0000] [3608090] [INFO] Worker exiting (pid: 3608090)
+[2025-05-27 15:05:35 +0000] [3608089] [INFO] Worker exiting (pid: 3608089)
+[2025-05-27 15:05:35 +0000] [3608088] [INFO] Worker exiting (pid: 3608088)
+[2025-05-27 15:05:35 +0000] [3608085] [INFO] Handling signal: term
+[2025-05-27 15:05:35 +0000] [3608085] [ERROR] Worker (pid:3608089) was sent SIGTERM!
+[2025-05-27 15:05:35 +0000] [3608085] [ERROR] Worker (pid:3608090) was sent SIGTERM!
+[2025-05-27 15:05:35 +0000] [3608085] [ERROR] Worker (pid:3608088) was sent SIGTERM!
+[2025-05-27 15:05:35 +0000] [3608085] [INFO] Shutting down: Master
+[2025-05-27 15:05:36 +0000] [3921935] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:05:36 +0000] [3921935] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3921935)
+[2025-05-27 15:05:36 +0000] [3921935] [INFO] Using worker: sync
+[2025-05-27 15:05:36 +0000] [3921938] [INFO] Booting worker with pid: 3921938
+[2025-05-27 15:05:36 +0000] [3921939] [INFO] Booting worker with pid: 3921939
+[2025-05-27 15:05:36 +0000] [3921940] [INFO] Booting worker with pid: 3921940
+[2025-05-27 15:06:26 +0000] [3921938] [INFO] Worker exiting (pid: 3921938)
+[2025-05-27 15:06:26 +0000] [3921939] [INFO] Worker exiting (pid: 3921939)
+[2025-05-27 15:06:26 +0000] [3921940] [INFO] Worker exiting (pid: 3921940)
+[2025-05-27 15:06:26 +0000] [3921935] [INFO] Handling signal: term
+[2025-05-27 15:06:26 +0000] [3921935] [ERROR] Worker (pid:3921938) was sent SIGTERM!
+[2025-05-27 15:06:26 +0000] [3921935] [ERROR] Worker (pid:3921939) was sent SIGTERM!
+[2025-05-27 15:06:26 +0000] [3921935] [INFO] Shutting down: Master
+[2025-05-27 15:06:26 +0000] [3922043] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:06:26 +0000] [3922043] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922043)
+[2025-05-27 15:06:26 +0000] [3922043] [INFO] Using worker: sync
+[2025-05-27 15:06:26 +0000] [3922046] [INFO] Booting worker with pid: 3922046
+[2025-05-27 15:06:26 +0000] [3922047] [INFO] Booting worker with pid: 3922047
+[2025-05-27 15:06:26 +0000] [3922048] [INFO] Booting worker with pid: 3922048
+[2025-05-27 15:07:35 +0000] [3922043] [INFO] Handling signal: term
+[2025-05-27 15:07:35 +0000] [3922046] [INFO] Worker exiting (pid: 3922046)
+[2025-05-27 15:07:35 +0000] [3922047] [INFO] Worker exiting (pid: 3922047)
+[2025-05-27 15:07:35 +0000] [3922048] [INFO] Worker exiting (pid: 3922048)
+[2025-05-27 15:07:35 +0000] [3922043] [INFO] Shutting down: Master
+[2025-05-27 15:07:35 +0000] [3922171] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:07:35 +0000] [3922171] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922171)
+[2025-05-27 15:07:35 +0000] [3922171] [INFO] Using worker: sync
+[2025-05-27 15:07:35 +0000] [3922173] [INFO] Booting worker with pid: 3922173
+[2025-05-27 15:07:35 +0000] [3922174] [INFO] Booting worker with pid: 3922174
+[2025-05-27 15:07:35 +0000] [3922175] [INFO] Booting worker with pid: 3922175
+[2025-05-27 15:07:56 +0000] [3922171] [INFO] Handling signal: term
+[2025-05-27 15:07:56 +0000] [3922173] [INFO] Worker exiting (pid: 3922173)
+[2025-05-27 15:07:56 +0000] [3922175] [INFO] Worker exiting (pid: 3922175)
+[2025-05-27 15:07:56 +0000] [3922174] [INFO] Worker exiting (pid: 3922174)
+[2025-05-27 15:07:56 +0000] [3922171] [INFO] Shutting down: Master
+[2025-05-27 15:07:56 +0000] [3922222] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:07:56 +0000] [3922222] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922222)
+[2025-05-27 15:07:56 +0000] [3922222] [INFO] Using worker: sync
+[2025-05-27 15:07:56 +0000] [3922225] [INFO] Booting worker with pid: 3922225
+[2025-05-27 15:07:56 +0000] [3922226] [INFO] Booting worker with pid: 3922226
+[2025-05-27 15:07:57 +0000] [3922227] [INFO] Booting worker with pid: 3922227
+[2025-05-27 15:08:22 +0000] [3922226] [INFO] Worker exiting (pid: 3922226)
+[2025-05-27 15:08:22 +0000] [3922222] [INFO] Handling signal: term
+[2025-05-27 15:08:22 +0000] [3922225] [INFO] Worker exiting (pid: 3922225)
+[2025-05-27 15:08:22 +0000] [3922227] [INFO] Worker exiting (pid: 3922227)
+[2025-05-27 15:08:22 +0000] [3922222] [INFO] Shutting down: Master
+[2025-05-27 15:08:22 +0000] [3922274] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:08:22 +0000] [3922274] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922274)
+[2025-05-27 15:08:22 +0000] [3922274] [INFO] Using worker: sync
+[2025-05-27 15:08:22 +0000] [3922278] [INFO] Booting worker with pid: 3922278
+[2025-05-27 15:08:22 +0000] [3922279] [INFO] Booting worker with pid: 3922279
+[2025-05-27 15:08:23 +0000] [3922280] [INFO] Booting worker with pid: 3922280
+[2025-05-27 15:08:33 +0000] [3922274] [INFO] Handling signal: term
+[2025-05-27 15:08:33 +0000] [3922278] [INFO] Worker exiting (pid: 3922278)
+[2025-05-27 15:08:33 +0000] [3922280] [INFO] Worker exiting (pid: 3922280)
+[2025-05-27 15:08:33 +0000] [3922279] [INFO] Worker exiting (pid: 3922279)
+[2025-05-27 15:08:34 +0000] [3922274] [INFO] Shutting down: Master
+[2025-05-27 15:08:34 +0000] [3922322] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:08:34 +0000] [3922322] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922322)
+[2025-05-27 15:08:34 +0000] [3922322] [INFO] Using worker: sync
+[2025-05-27 15:08:34 +0000] [3922324] [INFO] Booting worker with pid: 3922324
+[2025-05-27 15:08:34 +0000] [3922325] [INFO] Booting worker with pid: 3922325
+[2025-05-27 15:08:34 +0000] [3922326] [INFO] Booting worker with pid: 3922326
+[2025-05-27 15:09:12 +0000] [3922322] [INFO] Handling signal: term
+[2025-05-27 15:09:12 +0000] [3922324] [INFO] Worker exiting (pid: 3922324)
+[2025-05-27 15:09:12 +0000] [3922326] [INFO] Worker exiting (pid: 3922326)
+[2025-05-27 15:09:12 +0000] [3922325] [INFO] Worker exiting (pid: 3922325)
+[2025-05-27 15:09:12 +0000] [3922322] [INFO] Shutting down: Master
+[2025-05-27 15:09:13 +0000] [3922399] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:09:13 +0000] [3922399] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3922399)
+[2025-05-27 15:09:13 +0000] [3922399] [INFO] Using worker: sync
+[2025-05-27 15:09:13 +0000] [3922401] [INFO] Booting worker with pid: 3922401
+[2025-05-27 15:09:13 +0000] [3922402] [INFO] Booting worker with pid: 3922402
+[2025-05-27 15:09:13 +0000] [3922404] [INFO] Booting worker with pid: 3922404
+[2025-05-27 15:20:54 +0000] [3922399] [INFO] Handling signal: term
+[2025-05-27 15:20:54 +0000] [3922402] [INFO] Worker exiting (pid: 3922402)
+[2025-05-27 15:20:54 +0000] [3922401] [INFO] Worker exiting (pid: 3922401)
+[2025-05-27 15:20:54 +0000] [3922404] [INFO] Worker exiting (pid: 3922404)
+[2025-05-27 15:20:55 +0000] [3922399] [INFO] Shutting down: Master
+[2025-05-27 15:20:55 +0000] [3923034] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:20:55 +0000] [3923034] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923034)
+[2025-05-27 15:20:55 +0000] [3923034] [INFO] Using worker: sync
+[2025-05-27 15:20:55 +0000] [3923037] [INFO] Booting worker with pid: 3923037
+[2025-05-27 15:20:55 +0000] [3923038] [INFO] Booting worker with pid: 3923038
+[2025-05-27 15:20:55 +0000] [3923039] [INFO] Booting worker with pid: 3923039
+[2025-05-27 15:23:38 +0000] [3923034] [INFO] Handling signal: term
+[2025-05-27 15:23:38 +0000] [3923037] [INFO] Worker exiting (pid: 3923037)
+[2025-05-27 15:23:38 +0000] [3923039] [INFO] Worker exiting (pid: 3923039)
+[2025-05-27 15:23:38 +0000] [3923038] [INFO] Worker exiting (pid: 3923038)
+[2025-05-27 15:23:38 +0000] [3923034] [INFO] Shutting down: Master
+[2025-05-27 15:23:39 +0000] [3923383] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:23:39 +0000] [3923383] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923383)
+[2025-05-27 15:23:39 +0000] [3923383] [INFO] Using worker: sync
+[2025-05-27 15:23:39 +0000] [3923386] [INFO] Booting worker with pid: 3923386
+[2025-05-27 15:23:39 +0000] [3923387] [INFO] Booting worker with pid: 3923387
+[2025-05-27 15:23:39 +0000] [3923388] [INFO] Booting worker with pid: 3923388
+[2025-05-27 15:26:10 +0000] [3923383] [INFO] Handling signal: term
+[2025-05-27 15:26:10 +0000] [3923386] [INFO] Worker exiting (pid: 3923386)
+[2025-05-27 15:26:10 +0000] [3923387] [INFO] Worker exiting (pid: 3923387)
+[2025-05-27 15:26:10 +0000] [3923388] [INFO] Worker exiting (pid: 3923388)
+[2025-05-27 15:26:11 +0000] [3923383] [INFO] Shutting down: Master
+[2025-05-27 15:26:11 +0000] [3923581] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:26:11 +0000] [3923581] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923581)
+[2025-05-27 15:26:11 +0000] [3923581] [INFO] Using worker: sync
+[2025-05-27 15:26:11 +0000] [3923585] [INFO] Booting worker with pid: 3923585
+[2025-05-27 15:26:11 +0000] [3923586] [INFO] Booting worker with pid: 3923586
+[2025-05-27 15:26:11 +0000] [3923587] [INFO] Booting worker with pid: 3923587
+[2025-05-27 15:27:37 +0000] [3923581] [INFO] Handling signal: term
+[2025-05-27 15:27:37 +0000] [3923585] [INFO] Worker exiting (pid: 3923585)
+[2025-05-27 15:27:37 +0000] [3923586] [INFO] Worker exiting (pid: 3923586)
+[2025-05-27 15:27:37 +0000] [3923587] [INFO] Worker exiting (pid: 3923587)
+[2025-05-27 15:27:38 +0000] [3923581] [INFO] Shutting down: Master
+[2025-05-27 15:27:38 +0000] [3923699] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:27:38 +0000] [3923699] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923699)
+[2025-05-27 15:27:38 +0000] [3923699] [INFO] Using worker: sync
+[2025-05-27 15:27:38 +0000] [3923701] [INFO] Booting worker with pid: 3923701
+[2025-05-27 15:27:38 +0000] [3923702] [INFO] Booting worker with pid: 3923702
+[2025-05-27 15:27:38 +0000] [3923703] [INFO] Booting worker with pid: 3923703
+[2025-05-27 15:28:51 +0000] [3923699] [INFO] Handling signal: term
+[2025-05-27 15:28:51 +0000] [3923701] [INFO] Worker exiting (pid: 3923701)
+[2025-05-27 15:28:51 +0000] [3923702] [INFO] Worker exiting (pid: 3923702)
+[2025-05-27 15:28:51 +0000] [3923703] [INFO] Worker exiting (pid: 3923703)
+[2025-05-27 15:28:51 +0000] [3923699] [INFO] Shutting down: Master
+[2025-05-27 15:28:51 +0000] [3923772] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:28:51 +0000] [3923772] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923772)
+[2025-05-27 15:28:51 +0000] [3923772] [INFO] Using worker: sync
+[2025-05-27 15:28:51 +0000] [3923776] [INFO] Booting worker with pid: 3923776
+[2025-05-27 15:28:51 +0000] [3923777] [INFO] Booting worker with pid: 3923777
+[2025-05-27 15:28:51 +0000] [3923778] [INFO] Booting worker with pid: 3923778
+[2025-05-27 15:29:31 +0000] [3923772] [INFO] Handling signal: term
+[2025-05-27 15:29:31 +0000] [3923778] [INFO] Worker exiting (pid: 3923778)
+[2025-05-27 15:29:31 +0000] [3923776] [INFO] Worker exiting (pid: 3923776)
+[2025-05-27 15:29:31 +0000] [3923777] [INFO] Worker exiting (pid: 3923777)
+[2025-05-27 15:29:31 +0000] [3923772] [INFO] Shutting down: Master
+[2025-05-27 15:29:31 +0000] [3923840] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:29:31 +0000] [3923840] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3923840)
+[2025-05-27 15:29:31 +0000] [3923840] [INFO] Using worker: sync
+[2025-05-27 15:29:31 +0000] [3923844] [INFO] Booting worker with pid: 3923844
+[2025-05-27 15:29:31 +0000] [3923845] [INFO] Booting worker with pid: 3923845
+[2025-05-27 15:29:31 +0000] [3923846] [INFO] Booting worker with pid: 3923846
+[2025-05-27 15:31:20 +0000] [3923846] [INFO] Worker exiting (pid: 3923846)
+[2025-05-27 15:31:20 +0000] [3923845] [INFO] Worker exiting (pid: 3923845)
+[2025-05-27 15:31:20 +0000] [3923844] [INFO] Worker exiting (pid: 3923844)
+[2025-05-27 15:31:20 +0000] [3923840] [INFO] Handling signal: term
+[2025-05-27 15:31:20 +0000] [3923840] [ERROR] Worker (pid:3923845) was sent SIGTERM!
+[2025-05-27 15:31:20 +0000] [3923840] [ERROR] Worker (pid:3923846) was sent SIGTERM!
+[2025-05-27 15:31:20 +0000] [3923840] [ERROR] Worker (pid:3923844) was sent SIGTERM!
+[2025-05-27 15:31:20 +0000] [3923840] [INFO] Shutting down: Master
+[2025-05-27 15:31:20 +0000] [3924038] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:31:20 +0000] [3924038] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3924038)
+[2025-05-27 15:31:20 +0000] [3924038] [INFO] Using worker: sync
+[2025-05-27 15:31:20 +0000] [3924040] [INFO] Booting worker with pid: 3924040
+[2025-05-27 15:31:20 +0000] [3924041] [INFO] Booting worker with pid: 3924041
+[2025-05-27 15:31:20 +0000] [3924045] [INFO] Booting worker with pid: 3924045
+[2025-05-27 15:32:30 +0000] [3924045] [INFO] Worker exiting (pid: 3924045)
+[2025-05-27 15:32:30 +0000] [3924038] [INFO] Handling signal: term
+[2025-05-27 15:32:30 +0000] [3924040] [INFO] Worker exiting (pid: 3924040)
+[2025-05-27 15:32:30 +0000] [3924041] [INFO] Worker exiting (pid: 3924041)
+[2025-05-27 15:32:30 +0000] [3924038] [ERROR] Worker (pid:3924045) was sent SIGTERM!
+[2025-05-27 15:32:30 +0000] [3924038] [INFO] Shutting down: Master
+[2025-05-27 15:32:30 +0000] [3924147] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:32:30 +0000] [3924147] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3924147)
+[2025-05-27 15:32:30 +0000] [3924147] [INFO] Using worker: sync
+[2025-05-27 15:32:30 +0000] [3924151] [INFO] Booting worker with pid: 3924151
+[2025-05-27 15:32:30 +0000] [3924152] [INFO] Booting worker with pid: 3924152
+[2025-05-27 15:32:30 +0000] [3924153] [INFO] Booting worker with pid: 3924153
+[2025-05-27 15:35:18 +0000] [3924147] [INFO] Handling signal: term
+[2025-05-27 15:35:18 +0000] [3924151] [INFO] Worker exiting (pid: 3924151)
+[2025-05-27 15:35:18 +0000] [3924153] [INFO] Worker exiting (pid: 3924153)
+[2025-05-27 15:35:18 +0000] [3924152] [INFO] Worker exiting (pid: 3924152)
+[2025-05-27 15:35:19 +0000] [3924147] [INFO] Shutting down: Master
+[2025-05-27 15:35:19 +0000] [3924335] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:35:19 +0000] [3924335] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3924335)
+[2025-05-27 15:35:19 +0000] [3924335] [INFO] Using worker: sync
+[2025-05-27 15:35:19 +0000] [3924339] [INFO] Booting worker with pid: 3924339
+[2025-05-27 15:35:19 +0000] [3924340] [INFO] Booting worker with pid: 3924340
+[2025-05-27 15:35:19 +0000] [3924341] [INFO] Booting worker with pid: 3924341
+[2025-05-27 15:35:48 +0000] [3924341] [INFO] Worker exiting (pid: 3924341)
+[2025-05-27 15:35:48 +0000] [3924339] [INFO] Worker exiting (pid: 3924339)
+[2025-05-27 15:35:48 +0000] [3924340] [INFO] Worker exiting (pid: 3924340)
+[2025-05-27 15:35:48 +0000] [3924335] [INFO] Handling signal: term
+[2025-05-27 15:35:48 +0000] [3924335] [ERROR] Worker (pid:3924340) was sent SIGTERM!
+[2025-05-27 15:35:48 +0000] [3924335] [ERROR] Worker (pid:3924341) was sent SIGTERM!
+[2025-05-27 15:35:48 +0000] [3924335] [ERROR] Worker (pid:3924339) was sent SIGTERM!
+[2025-05-27 15:35:48 +0000] [3924335] [INFO] Shutting down: Master
+[2025-05-27 15:35:48 +0000] [3924414] [INFO] Starting gunicorn 23.0.0
+[2025-05-27 15:35:48 +0000] [3924414] [INFO] Listening at: unix:/home/sargent/portfolio/portfolio.sock (3924414)
+[2025-05-27 15:35:48 +0000] [3924414] [INFO] Using worker: sync
+[2025-05-27 15:35:48 +0000] [3924416] [INFO] Booting worker with pid: 3924416
+[2025-05-27 15:35:48 +0000] [3924417] [INFO] Booting worker with pid: 3924417
+[2025-05-27 15:35:48 +0000] [3924418] [INFO] Booting worker with pid: 3924418
