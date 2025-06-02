@@ -8,17 +8,17 @@
 </head>
 <body class="bg-white text-gray-900 font-sans">
   <header class="p-6 bg-gray-100 shadow">
-    <div class="max-w-4xl mx-auto flex justify-between">
-      <h1 class="text-2xl font-bold">
-        <a href="{% url 'portfolio' %}">Owen Sussman</a>
+    <div class="max-w-6xl mx-auto flex justify-between">
+      <h1 class="text-2xl sm:text-3xl font-bold">
+        <a class="text-2xl sm:text-3xl" href="{% url 'portfolio' %}">{% block name %}Owen Sussman{% endblock %}</a>
       </h1>
       <nav class="space-x-4">
-        <a href="{% url 'contact' %}" class="hover:underline">Contact</a>
+        <a class="text-2xl sm:text-3xl" href="{% url 'contact' %}" class="hover:underline">Contact</a>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto p-6">
+  <main class="max-w-6xl mx-auto p-6">
     {% block content %}{% endblock %}
   </main>
 

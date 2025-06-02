@@ -61,3 +61,7 @@ def hx_get_artwork_detail(request, slug):
         'current_category': category_slug,
     }
     return render(request, 'artworks/artwork_detail_stub.html', context)
+
+
+def flyer(request):
+    return render(request, 'artworks/flyer.html')

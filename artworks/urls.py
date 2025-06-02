@@ -10,4 +10,5 @@ urlpatterns = [
     path('portfolio/<slug:slug>/', views.portfolio_by_category, name='portfolio_by_category'),
     path('artwork/<slug:slug>/', views.artwork_detail, name='artwork_detail'),
     path('hx_get_artwork/<slug:slug>/', views.hx_get_artwork_detail, name='hx_get_artwork_detail'),
+    path('flyer/', views.flyer, name='flyer'),
 ]

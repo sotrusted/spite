@@ -4,9 +4,9 @@
 {% block title %}Owen Sussman | Portfolio{% endblock %}
 
 {% block content %}
-<h2 class="text-3xl font-bold mb-4"></h2>
+<h2 class="text-2xl sm:text-3xl font-bold mb-4"></h2>
 
-<nav class="mb-6 space-x-4">
+<nav class="mb-6 space-x-4 text-2xl sm:text-3xl">
   <a href="{% url 'portfolio' %}" class="text-blue-600 hover:underline">All</a>
   {% for cat in categories %}
     <a href="{% url 'portfolio_by_category' cat.slug %}"
@@ -16,12 +16,27 @@
   {% endfor %}
 </nav>
 
+<!-- Featured Artwork Highlight -->
+{% if artworks %}
+  <div class="mb-8">
+    <h3 class="text-xl font-semibold mb-4"></h3>
+    <div class="artwork-card cursor-pointer max-w-2xl mx-auto">
+      <img id="artwork-{{ artworks.0.slug }}" src="{{ artworks.0.image.url }}" alt="{{ artworks.0.title }}" class="w-full h-auto rounded-lg shadow-lg"
+      hx-get="{% url 'hx_get_artwork_detail' artworks.0.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
+      hx-target="#artwork-detail-content" 
+      hx-swap="innerHTML"
+      hx-trigger="click"  
+      hx-on::after-request="document.getElementById('artwork-detail').classList.remove('hidden');">
+    </div>
+  </div>
+{% endif %}
+
 
 {% include 'artworks/artwork_detail_window.html' %}
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center justify-center">
+<div class="columns-2 md:columns-4 lg:columns-6 gap-4 space-y-4">
   {% for artwork in artworks %}
-    <div class="artwork-card cursor-pointer">
+    <div class="artwork-card cursor-pointer break-inside-avoid mb-4">
       <img id="artwork-{{ artwork.slug }}" src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto"
       hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
       hx-target="#artwork-detail-content" 
