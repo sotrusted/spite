@@ -18,6 +18,13 @@ class Artwork(models.Model):
     description = models.TextField(blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='artworks')
     created_at = models.DateTimeField(auto_now_add=True)
+    is_featured = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0, db_index=True, blank=False, null=False)
+
+
+
+    class Meta:
+        ordering = ['-order']  # Changed to descending order
 
     def __str__(self):
         return self.title

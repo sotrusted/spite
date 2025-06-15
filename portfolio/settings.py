@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-wn2=a=g-fxqm(83i$8ji)t5)r&7zq#)!-o9$%07y0hfgy(g4ee'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['otsussman.com', 'www.otsussman.com', 'localhost']
 
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'portfolio',
     'artworks',
     "tailwind",
+    "adminsortable2",
+
 ]
 INTERNAL_IPS = ["127.0.0.1"]
 MIDDLEWARE = [
@@ -51,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'portfolio.urls'
@@ -124,6 +127,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Changed to 'staticfiles' 
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 

@@ -16,7 +16,8 @@ def contact(request):
 def portfolio(request):
     categories = Category.objects.all()
     artworks = Artwork.objects.all().order_by('-created_at')
-    return render(request, 'artworks/portfolio.html', {'artworks': artworks, 'categories': categories})
+    featured_artwork = artworks.filter(is_featured=True).first()
+    return render(request, 'artworks/portfolio.html', {'artworks': artworks, 'categories': categories, 'featured_artwork': featured_artwork})
 
 def portfolio_by_category(request, slug):
     category = get_object_or_404(Category, slug=slug)

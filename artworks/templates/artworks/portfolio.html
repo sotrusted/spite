@@ -17,12 +17,12 @@
 </nav>
 
 <!-- Featured Artwork Highlight -->
-{% if artworks %}
+{% if featured_artwork %}
   <div class="mb-8">
     <h3 class="text-xl font-semibold mb-4"></h3>
     <div class="artwork-card cursor-pointer max-w-2xl mx-auto">
-      <img id="artwork-{{ artworks.0.slug }}" src="{{ artworks.0.image.url }}" alt="{{ artworks.0.title }}" class="w-full h-auto rounded-lg shadow-lg"
-      hx-get="{% url 'hx_get_artwork_detail' artworks.0.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
+      <img id="artwork-{{ featured_artwork.slug }}" src="{{ featured_artwork.image.url }}" alt="{{ featured_artwork.title }}" class="w-full h-auto rounded-lg shadow-lg"
+      hx-get="{% url 'hx_get_artwork_detail' featured_artwork.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
       hx-target="#artwork-detail-content" 
       hx-swap="innerHTML"
       hx-trigger="click"  
@@ -35,7 +35,7 @@
 {% include 'artworks/artwork_detail_window.html' %}
 
 <div class="columns-2 md:columns-4 lg:columns-6 gap-4 space-y-4">
-  {% for artwork in artworks %}
+  {% for artwork in artworks|slice:"1:" %}
     <div class="artwork-card cursor-pointer break-inside-avoid mb-4">
       <img id="artwork-{{ artwork.slug }}" src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto"
       hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
