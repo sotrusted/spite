@@ -34,10 +34,10 @@
 
 {% include 'artworks/artwork_detail_window.html' %}
 
-<div class="columns-2 md:columns-4 lg:columns-6 gap-4 space-y-4">
+<div class="flex flex-col items-center gap-4">
   {% for artwork in artworks %}
     {% if not artwork.id == featured_artwork.id %}
-    <div class="artwork-card cursor-pointer break-inside-avoid mb-4">
+    <div class="artwork-card cursor-pointer mb-4 w-full max-w-xs md:max-w-sm lg:max-w-md">
       <img id="artwork-{{ artwork.slug }}" src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="w-full h-auto"
       hx-get="{% url 'hx_get_artwork_detail' artwork.slug %}?category={% if current_category %}{{ current_category.slug }}{% endif %}" 
       hx-target="#artwork-detail-content" 
