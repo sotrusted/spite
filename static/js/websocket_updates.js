@@ -30,8 +30,7 @@ export function initPostWebsocketUpdates() {
         if (data.type === 'ping') {
             // Optionally send pong response
             postSocket.send(JSON.stringify({ type: 'pong' }));
-            return;
-        }
+        } 
  
         // Check if data exists and has the expected structure
         if (!data) {
@@ -53,12 +52,9 @@ export function initPostWebsocketUpdates() {
             // Play the notification sound only if enabled
             const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
             console.log('Sound enabled:', soundEnabled);
-            if (soundEnabled && !notificationSound.paused) {
+            if (soundEnabled) {
                 if (notificationSound) {
-                    notificationSound.currentTime = 0;
-                    notificationSound.play().catch(err => {
-                        console.warn("Could not play notification sound:", err);
-                    });
+                    notificationSound.play();
                 }
 
             }
@@ -100,7 +96,10 @@ export function initCommentWebsocketUpdates() {
             // Post doesn't exist; add it to the page
 
             // Play the notification sound
-            notificationSound.play();
+            const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
+            if (notificationSound && soundEnabled) {
+                notificationSound.play();
+            }
 
             // Increment SPITE COUNTER
             updateSpiteCounter();

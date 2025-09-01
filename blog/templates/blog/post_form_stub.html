@@ -6,6 +6,7 @@
       hx-target="#post-list"
       hx-indicator="#post-loading"
       hx-trigger="submit"
+    >
     {% csrf_token %}
     {% crispy postForm postForm.helper %}
     {% if form.errors %}

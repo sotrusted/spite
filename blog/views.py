@@ -455,24 +455,10 @@ class PostCreateView(CreateView):
             logger.info(f"Request POST data: {request.POST}")
             logger.info(f"Request FILES data: {request.FILES}")
             
-            # Validate CSRF token
-            csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
-            csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
-            logger.info(f"CSRF token from POST: {csrf_token_post}")
-            logger.info(f"CSRF token from cookie: {csrf_token_cookie}")
+            # Let Django handle CSRF validation automatically
+            # Remove custom CSRF validation that's causing issues
             
-            if csrf_token_post == 'Not found' or csrf_token_cookie == 'Not found':
-                logger.error("CSRF token missing")
-                if request.headers.get('HX-Request'):
-                    return HttpResponse(
-                        "<div class='alert alert-danger'>CSRF token missing. Please refresh the page and try again.</div>",
-                        status=400
-                    )
-                messages.error(request, "CSRF token missing. Please refresh the page and try again.")
-                return self.form_invalid(self.get_form())
-
             self.request = request
-
             logger.info("Calling super().post()")
             result = super().post(request, *args, **kwargs)
             logger.info(f"super().post() returned: {result}")
