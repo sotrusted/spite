@@ -96,3 +96,4 @@ class CommentForm(forms.ModelForm):
                 css_class='row justify-content-center mt-2',
             )
         )
+    

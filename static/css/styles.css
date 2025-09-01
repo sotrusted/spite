@@ -766,13 +766,13 @@ main {
     .detail .post-title {
         font-size: 1.9em;
     }
-    .comment .post-content {
-        font-size: 1.1em;
+    .comment .post-content, .comment .comment-preview {
+        font-size: 1em;
     }
 
     .comment .post-content .comment-name,
     .comment .post-content .comment-content {
-        font-size: 1.2em;
+        font-size: 0.95em;
     }
 
     .comment .post-content .comment-content {
@@ -1837,8 +1837,45 @@ video:focus {
     padding: 0 5px;
 }
 
+/* Reply form styling - smaller text and half-width on desktop */
 .reply-form {
     position: relative;
     padding: 10px;
     margin-top: 10px;
+    max-width: 50%; /* Half width on desktop */
+    margin-left: 0; /* Left justified */
+}
+
+/* Make form controls smaller in reply forms */
+.reply-form .form-control {
+    font-size: 1rem; /* Smaller text (14px instead of 16px) */
+    padding: 0.375rem 0.75rem; /* Smaller padding */
+    border-radius: 0.25rem;
+}
+
+/* Make labels smaller in reply forms */
+.reply-form label {
+    font-size: 0.875rem; /* Smaller labels */
+    margin-bottom: 0.25rem;
+}
+
+/* Make buttons smaller in reply forms */
+.reply-form .btn {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Make textarea smaller in reply forms */
+.reply-form textarea {
+    min-height: 80px; /* Smaller default height */
+    resize: vertical;
+}
+
+/* Mobile responsive - full width on mobile */
+@media (max-width: 768px) {
+    .reply-form {
+        max-width: 100%;
+        margin-left: 0;
+        font-size: 1rem;
+    }
 }

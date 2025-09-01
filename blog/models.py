@@ -92,6 +92,7 @@ class Post(models.Model):
 
     spam_score = models.IntegerField(default=0)
     spam_reasons = models.TextField(blank=True, null=True)
+    is_potentially_spam = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -212,6 +213,7 @@ class Comment(models.Model):
 
     spam_score = models.IntegerField(default=0)
     spam_reasons = models.TextField(blank=True, null=True)
+    is_potentially_spam = models.BooleanField(default=False)
 
     @property
     def post_id(self):

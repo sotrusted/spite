@@ -10,6 +10,14 @@ self.addEventListener('fetch', function(event) {
         return;
     }
 
+    // Skip API endpoints - let them be handled directly by the server
+    if (event.request.url.includes('/api/') || 
+        event.request.url.includes('/hx/') ||
+        event.request.url.includes('/ws/')) {
+        console.log('SERVICEWORKER.JS: Skipping API/HTMX/WebSocket request for:', event.request.url);
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then(function(response) {

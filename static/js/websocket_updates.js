@@ -30,6 +30,7 @@ export function initPostWebsocketUpdates() {
         if (data.type === 'ping') {
             // Optionally send pong response
             postSocket.send(JSON.stringify({ type: 'pong' }));
+            return; // Add this return statement to exit early
         } 
  
         // Check if data exists and has the expected structure

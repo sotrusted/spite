@@ -322,6 +322,16 @@ class PostCreateView(CreateView):
                         spam_reasons.append(f"Excessive repetition of '{word}'")
                         break  # Only count once
             
+           # Check for exact phrase repetition (much faster)
+            if len(content_to_check) > 200:  # Only check longer content
+                # Look for the same 20+ character substring repeated 4+ times
+                for i in range(0, len(content_to_check) - 20):
+                    phrase = content_to_check[i:i+20]
+                    if content_to_check.count(phrase) >= 4:
+                        spam_score += 30  # Lower score, more lenient
+                        spam_reasons.append("Repetitive content detected")
+                        break 
+
             # 3. Fast global duplicate check (limited scope)
             global_key = 'global_recent_posts_fast'
             global_recent = cache.get(global_key, [])
@@ -455,10 +465,24 @@ class PostCreateView(CreateView):
             logger.info(f"Request POST data: {request.POST}")
             logger.info(f"Request FILES data: {request.FILES}")
             
-            # Let Django handle CSRF validation automatically
-            # Remove custom CSRF validation that's causing issues
+            # Validate CSRF token
+            csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
+            csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
+            logger.info(f"CSRF token from POST: {csrf_token_post}")
+            logger.info(f"CSRF token from cookie: {csrf_token_cookie}")
             
+            if csrf_token_post == 'Not found' or csrf_token_cookie == 'Not found':
+                logger.error("CSRF token missing")
+                if request.headers.get('HX-Request'):
+                    return HttpResponse(
+                        "<div class='alert alert-danger'>CSRF token missing. Please refresh the page and try again.</div>",
+                        status=400
+                    )
+                messages.error(request, "CSRF token missing. Please refresh the page and try again.")
+                return self.form_invalid(self.get_form())
+
             self.request = request
+
             logger.info("Calling super().post()")
             result = super().post(request, *args, **kwargs)
             logger.info(f"super().post() returned: {result}")
@@ -525,7 +549,6 @@ class PostCreateView(CreateView):
                 # Store spam metadata with the post
                 post.spam_score = spam_score
                 post.spam_reasons = '; '.join(spam_reasons)
-                post.is_potentially_spam = True
 
             logger.info("Setting IP address and saving post")
             post.set_ip_address(ip_address)
@@ -871,6 +894,39 @@ def reply_comment(request, comment_id):
                     comment.parent_comment = parent_comment
                 
                 comment.ip_address = get_client_ip(request)
+                # SPAM DETECTION FOR COMMENTS
+                logger.info("Checking comment for spam")
+                temp_view = PostCreateView()
+                is_spam, spam_message = temp_view.check_spam_fast(
+                    request,
+                    '',  # No title for comments
+                    comment.content,
+                    comment.name or '',
+                    media_file=comment.media_file
+                )
+                logger.info(f"Comment spam check result: is_spam={is_spam}, message='{spam_message}'")
+
+                if is_spam:
+                    logger.warning(f"Spam comment detected: {spam_message}")
+                    if request.headers.get('HX-Request'):
+                        return HttpResponse(
+                            f"<div class='alert alert-danger'>{spam_message}</div>",
+                            status=400
+                        )
+                    return JsonResponse({
+                        'success': False, 
+                        'error': spam_message
+                    }, status=400)
+
+                # Store spam score and reasons if they exist
+                spam_score = getattr(request, 'spam_score', 0)
+                spam_reasons = getattr(request, 'spam_reasons', [])
+
+                if spam_score > 0:
+                    logger.info(f"Comment has spam score {spam_score}: {spam_reasons}")
+                    comment.spam_score = spam_score
+                    comment.spam_reasons = '; '.join(spam_reasons)
+                    comment.is_potentially_spam = True
                 comment.save()
                 logger.info(f"reply_comment: Saved comment with ID {comment.id}")
 
@@ -995,6 +1051,40 @@ def add_comment(request, post_id, post_type='Post'):
                 # every comment has a post
                 # if a comment is a child comment its post is the post of its parent 
                 comment.post = post
+
+                # SPAM DETECTION FOR COMMENTS
+                logger.info("Checking comment for spam")
+                temp_view = PostCreateView()
+                is_spam, spam_message = temp_view.check_spam_fast(
+                    request,
+                    '',  # No title for comments
+                    comment.content,
+                    comment.name or '',
+                    media_file=comment.media_file
+                )
+                logger.info(f"Comment spam check result: is_spam={is_spam}, message='{spam_message}'")
+
+                if is_spam:
+                    logger.warning(f"Spam comment detected: {spam_message}")
+                    if request.headers.get('HX-Request'):
+                        return HttpResponse(
+                            f"<div class='alert alert-danger'>{spam_message}</div>",
+                            status=400
+                        )
+                    return JsonResponse({
+                        'success': False, 
+                        'error': spam_message
+                    }, status=400)
+
+                # Store spam score and reasons if they exist
+                spam_score = getattr(request, 'spam_score', 0)
+                spam_reasons = getattr(request, 'spam_reasons', [])
+
+                if spam_score > 0:
+                    logger.info(f"Comment has spam score {spam_score}: {spam_reasons}")
+                    comment.spam_score = spam_score
+                    comment.spam_reasons = '; '.join(spam_reasons)
+                    comment.is_potentially_spam = True
 
             
                 if parent_comment: 

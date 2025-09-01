@@ -187,10 +187,11 @@ function loadReplyForm(commentId) {
         if (!replyForm.querySelector('.close-reply-btn')) {
             const closeButton = document.createElement('button');
             closeButton.className = 'close-reply-btn btn btn-sm btn-outline-secondary';
+            closeButton.id = `close-reply-btn-${commentId}`;
             closeButton.innerHTML = '×';
             closeButton.onclick = function(e) {
                 e.preventDefault();
-                replyForm.style.display = 'none';
+                replyForm.classList.add('hidden');
             };
             
             // Insert at the beginning

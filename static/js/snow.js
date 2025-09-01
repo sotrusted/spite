@@ -163,19 +163,7 @@ class HeartAnimation {
         this.buttonContainer.style.display = 'flex';
         this.buttonContainer.style.flexDirection = 'column';
         this.buttonContainer.style.gap = '10px';
-        /*
-        // Create toggle button
-        this.toggleButton = document.createElement('button');
-        this.toggleButton.innerHTML = '🍀';
-        this.toggleButton.className = 'heart-toggle';
-        this.toggleButton.style.zIndex = '1001';
-        this.toggleButton.style.padding = '8px';
-        this.toggleButton.style.borderRadius = '50%';
-        this.toggleButton.style.border = 'none';
-        this.toggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
-        this.toggleButton.style.cursor = 'pointer';
-        this.toggleButton.style.fontSize = '20px';
-        */
+        
         // Create sound toggle button
         this.soundToggleButton = document.createElement('button');
         this.soundToggleButton.innerHTML = '🎵';
@@ -202,24 +190,6 @@ class HeartAnimation {
             scrollToElementById('post-form');
         });
 
-        // Create version toggle button
-        /*
-        this.versionToggleButton = document.createElement('button');
-        this.versionToggleButton.innerHTML = '2.0';
-        this.versionToggleButton.className = 'version-toggle-button fixed-button';
-        this.versionToggleButton.id = 'version-toggle';
-
-        //style the version toggle button
-        this.versionToggleButton.style.padding = '8px';
-        this.versionToggleButton.style.borderRadius = '50%';
-        this.versionToggleButton.style.border = 'none';
-        this.versionToggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
-        this.versionToggleButton.style.fontFamily = 'monospace';
-        this.versionToggleButton.style.cursor = 'pointer';
-        this.versionToggleButton.style.fontSize = '20px';
-        this.versionToggleButton.style.fontWeight = 'bold';
-        this.versionToggleButton.style.transition = 'background-color 0.3s ease';
-        */
         // Add media query for mobile
         const mediaQuery = window.matchMedia('(max-width: 768px)');
         const adjustForMobile = (e) => {
@@ -236,7 +206,6 @@ class HeartAnimation {
         mediaQuery.addEventListener('change', adjustForMobile);   
         
         this.init();
-
     }
 
     init() {
@@ -244,22 +213,18 @@ class HeartAnimation {
         document.body.appendChild(this.canvas);
 
         // Add buttons to container
-        this.buttonContainer.appendChild(this.toggleButton);
         this.buttonContainer.appendChild(this.soundToggleButton);
         this.buttonContainer.appendChild(this.writeButton);
-        this.buttonContainer.appendChild(this.versionToggleButton);
         
         // Add container to DOM
         document.body.appendChild(this.buttonContainer);
 
-        
         // Initialize hearts
         for (let i = 0; i < 50; i++) {
             this.hearts.push(new Clover());
         }
         
         // Event listeners
-        this.toggleButton.addEventListener('click', () => this.toggle());
         window.addEventListener('resize', () => this.resize());
         
         // Sound toggle event listener
@@ -282,7 +247,6 @@ class HeartAnimation {
             this.soundToggleButton.innerHTML = '🔇';
             this.soundToggleButton.style.background = 'rgba(200, 200, 200, 0.7)';
         }
-
     }
 
     toggleSound() {
@@ -300,18 +264,9 @@ class HeartAnimation {
         }
     }
 
-
     resize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-    }
-
-    toggle() {
-        if (this.isActive) {
-            this.stop();
-        } else {
-            this.start();
-        }
     }
 
     start() {
@@ -319,7 +274,6 @@ class HeartAnimation {
             this.isActive = true;
             localStorage.setItem('heartsEnabled', 'true');
             this.animate();
-            this.toggleButton.style.background = 'rgba(255, 192, 203, 0.7)';
         }
     }
 
@@ -327,7 +281,6 @@ class HeartAnimation {
         this.isActive = false;
         localStorage.setItem('heartsEnabled', 'false');
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.toggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
     }
 
     animate() {

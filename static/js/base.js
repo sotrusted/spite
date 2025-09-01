@@ -100,6 +100,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        if (target.id && target.classList.contains('close-reply-btn')) {
+            const commentId = target.id.replace('close-reply-btn-', '');
+            console.log('Close reply button clicked for comment:', commentId);
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            console.log('Reply form:', replyForm);
+            if (replyForm) {
+                console.log('Reply form found, hiding it');
+                replyForm.style.setProperty('display','none','important');
+                replyForm.classList.add('hidden');
+
+            }
+        }
+
     });
     
 });
