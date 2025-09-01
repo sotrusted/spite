@@ -163,7 +163,7 @@ class HeartAnimation {
         this.buttonContainer.style.display = 'flex';
         this.buttonContainer.style.flexDirection = 'column';
         this.buttonContainer.style.gap = '10px';
-
+        /*
         // Create toggle button
         this.toggleButton = document.createElement('button');
         this.toggleButton.innerHTML = '🍀';
@@ -175,7 +175,7 @@ class HeartAnimation {
         this.toggleButton.style.background = 'rgba(255, 255, 255, 0.7)';
         this.toggleButton.style.cursor = 'pointer';
         this.toggleButton.style.fontSize = '20px';
-        
+        */
         // Create sound toggle button
         this.soundToggleButton = document.createElement('button');
         this.soundToggleButton.innerHTML = '🎵';
@@ -198,11 +198,12 @@ class HeartAnimation {
         this.writeButton.style.background = 'rgba(255, 255, 255, 0.7)';
         this.writeButton.style.cursor = 'pointer';
         this.writeButton.style.fontSize = '20px';
-        writeButton.addEventListener('click', function() {
+        this.writeButton.addEventListener('click', function() {
             scrollToElementById('post-form');
         });
 
         // Create version toggle button
+        /*
         this.versionToggleButton = document.createElement('button');
         this.versionToggleButton.innerHTML = '2.0';
         this.versionToggleButton.className = 'version-toggle-button fixed-button';
@@ -218,7 +219,7 @@ class HeartAnimation {
         this.versionToggleButton.style.fontSize = '20px';
         this.versionToggleButton.style.fontWeight = 'bold';
         this.versionToggleButton.style.transition = 'background-color 0.3s ease';
-        
+        */
         // Add media query for mobile
         const mediaQuery = window.matchMedia('(max-width: 768px)');
         const adjustForMobile = (e) => {
@@ -345,5 +346,5 @@ class HeartAnimation {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new HeartAnimation();
+//    new HeartAnimation();
 }); 
