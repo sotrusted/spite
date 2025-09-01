@@ -284,136 +284,208 @@ class PostCreateView(CreateView):
         return False, ""
         
     def check_spam_fast(self, request, title, content, display_name, media_file=None):
-        """Fast spam detection that scores content instead of blocking"""
+        """Enhanced spam detection with BlockedIP integration"""
         try:
             client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
             logger.info(f"[SpamCheck] Client IP: {client_ip}")
             
+            # 1. Check if IP is blocked using your BlockedIP model
+            if self.is_ip_blocked_db(client_ip):
+                logger.info(f"[SpamCheck] Blocked IP {client_ip} attempted to post")
+                return True, "Your IP has been temporarily blocked due to spam activity"
+            
             spam_score = 0
             spam_reasons = []
             
-            # 1. Rate limiting - still block if too aggressive
+            # 2. Rate limiting
             cache_key = f'post_count_{client_ip}'
             post_count = cache.get(cache_key, 0)
             
-            if post_count > 5:  # Back to 5 per minute
+            if post_count > 2:  # Reduced from 5 to 2 posts per minute
                 logger.info(f"[SpamCheck] Rate limit exceeded for IP {client_ip}")
                 return True, "Please wait a minute before posting again"
             
             # Increment post count
             cache.set(cache_key, post_count + 1, 60)
             
-            # 2. Fast content checks (lightweight)
+            # 3. Content checks
             content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {display_name.lower().strip() if display_name else ''}"
             content_to_check = ' '.join(content_to_check.split())
             
-            # Quick repetitive word check (fast)
+            # 4. Enhanced repetitive pattern detection
             words = content_to_check.split()
-            if len(words) > 10:
+            if len(words) > 5:
                 word_counts = {}
                 for word in words:
-                    if len(word) > 3:
+                    if len(word) > 2:
                         word_counts[word] = word_counts.get(word, 0) + 1
                 
-                # Check for excessive repetition
+                # Check for excessive repetition - STRICTER
                 for word, count in word_counts.items():
-                    if count > len(words) * 0.4:  # 40% threshold
-                        spam_score += 40  # Increased from 30
-                        spam_reasons.append(f"Excessive repetition of '{word}'")
-                        break  # Only count once
+                    if count > len(words) * 0.25:  # 25% threshold
+                        spam_score += 60
+                        spam_reasons.append(f"Excessive repetition of '{word}' ({count}/{len(words)} words)")
+                        break
             
-           # Check for exact phrase repetition (much faster)
-            if len(content_to_check) > 200:  # Only check longer content
-                # Look for the same 20+ character substring repeated 4+ times
-                for i in range(0, len(content_to_check) - 20):
-                    phrase = content_to_check[i:i+20]
-                    if content_to_check.count(phrase) >= 4:
-                        spam_score += 30  # Lower score, more lenient
-                        spam_reasons.append("Repetitive content detected")
-                        break 
-
-            # 3. Fast global duplicate check (limited scope)
+            # 5. Enhanced phrase repetition detection
+            if len(content_to_check) > 50:
+                for phrase_len in [10, 15, 20, 30]:
+                    if len(content_to_check) > phrase_len:
+                        for i in range(0, len(content_to_check) - phrase_len):
+                            phrase = content_to_check[i:i+phrase_len]
+                            if len(phrase.strip()) > phrase_len * 0.8:
+                                count = content_to_check.count(phrase)
+                                if count >= 3:
+                                    spam_score += 50
+                                    spam_reasons.append(f"Repetitive phrase detected: '{phrase[:20]}...' ({count} times)")
+                                    break
+                        if spam_score > 0:
+                            break
+            
+            # 6. Global duplicate check
             global_key = 'global_recent_posts_fast'
             global_recent = cache.get(global_key, [])
             
-            # Only check against last 20 posts for speed
-            if content_to_check in global_recent[-20:]:
-                spam_score += 70  # Increased from 50 - this should trigger hiding
+            if content_to_check in global_recent[-50:]:
+                spam_score += 80
                 spam_reasons.append("Exact duplicate of recent content")
+            else:
+                # Check for similar content
+                for recent_content in global_recent[-30:]:
+                    if len(recent_content) > 20 and len(content_to_check) > 20:
+                        similarity = SequenceMatcher(None, content_to_check, recent_content).ratio()
+                        if similarity > 0.7:
+                            spam_score += 70
+                            spam_reasons.append(f"Very similar to recent content (similarity: {similarity:.2f})")
+                            break
             
-            # 4. IP-specific duplicate check
+            # 7. IP-specific duplicate check
             recent_posts_key = f'recent_posts_{client_ip}'
             recent_posts = cache.get(recent_posts_key, [])
             
             content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
             if content_hash in recent_posts:
-                spam_score += 50  # Increased from 40
+                spam_score += 60
                 spam_reasons.append("You've posted this content recently")
             
-            # 5. Update caches
+            # 8. Specific spam patterns
+            spam_patterns = [
+                "alex bienstock and peter vack abuse",
+                "women and you support it",
+                "anonymous 1fd57237-ba40-4750-9ae3-6c7bfad3d270"
+            ]
+            
+            for pattern in spam_patterns:
+                if pattern in content_to_check:
+                    spam_score += 100
+                    spam_reasons.append(f"Known spam pattern detected: '{pattern}'")
+                    break
+            
+            # 9. Update caches
             global_recent.append(content_to_check)
-            if len(global_recent) > 100:  # Keep more posts
+            if len(global_recent) > 200:
                 global_recent.pop(0)
             cache.set(global_key, global_recent, 600)
             
             recent_posts.append(content_hash)
-            if len(recent_posts) > 10:
+            if len(recent_posts) > 15:
                 recent_posts.pop(0)
             cache.set(recent_posts_key, recent_posts, 300)
             
-            # 6. Image duplicate check (existing logic)
-            if media_file and hasattr(media_file, 'read'):
-                try:
-                    fingerprint = self.get_fast_image_fingerprint(media_file)
-                    if fingerprint: 
-                        recent_images_key = f'global_recent_images'
-                        recent_images = cache.get(recent_images_key, [])
-                        
-                        for recent_fingerprint in recent_images:
-                            if recent_fingerprint['fingerprint'] == fingerprint:
-                                spam_score += 60
-                                spam_reasons.append("This image has been posted recently")
-                                break
-
-                        image_data = {
-                            'fingerprint': fingerprint,
-                            'timestamp': time.time(),
-                        }
-                        
-                        recent_images.append(image_data)
-                        current_time = time.time()
-                        filtered_images = [
-                            img for img in recent_images[-100:]
-                            if current_time - img['timestamp'] < 1800
-                        ]
-                        cache.set(recent_images_key, filtered_images, 1800)
-
-                except Exception as e:
-                    logger.warning(f"Error checking image duplicate: {e}")
-            
-            # 7. Determine action based on score
-            if spam_score >= 80:  # High spam score - block
+            # 10. Determine action and track for blocking
+            if spam_score >= 50:  # Reduced threshold
                 logger.info(f"[SpamCheck] High spam score {spam_score} for IP {client_ip}: {spam_reasons}")
+                # Track spam attempts for IP blocking
+                self.track_spam_attempt(client_ip, spam_score)
                 return True, f"Content flagged as spam: {'; '.join(spam_reasons)}"
-            elif spam_score >= 50:  # Medium-high spam score - allow but mark (will be hidden)
+            elif spam_score >= 30:
                 logger.info(f"[SpamCheck] Medium-high spam score {spam_score} for IP {client_ip}: {spam_reasons}")
-                # Store spam score in request for later use
+                # Track spam attempts for IP blocking
+                self.track_spam_attempt(client_ip, spam_score)
                 request.spam_score = spam_score
                 request.spam_reasons = spam_reasons
-                return False, ""  # Allow the post but it will be hidden
-            elif spam_score >= 30:  # Medium spam score - allow but push down
-                logger.info(f"[SpamCheck] Medium spam score {spam_score} for IP {client_ip}: {spam_reasons}")
-                # Store spam score in request for later use
-                request.spam_score = spam_score
-                request.spam_reasons = spam_reasons
-                return False, ""  # Allow the post, will be pushed down
-            else:  # Low spam score - normal post
+                return False, ""  # Allow but hide
+            else:
                 logger.info(f"[SpamCheck] Low spam score {spam_score} for IP {client_ip}")
                 return False, ""
             
         except Exception as e:
             logger.error(f"[SpamCheck] Error in spam check: {e}", exc_info=True)
             return False, ""
+
+    def is_ip_blocked_db(self, client_ip):
+        """Check if an IP is blocked using BlockedIP model"""
+        try:
+            from blog.models import BlockedIP
+            from django.utils import timezone
+            
+            # Check for active blocks
+            blocked_ips = BlockedIP.objects.filter(
+                Q(ip_address=client_ip) | Q(ip_range__isnull=False)
+            )
+            
+            for blocked_ip in blocked_ips:
+                if blocked_ip.is_active:
+                    if blocked_ip.ip_address == client_ip:
+                        return True
+                    elif blocked_ip.ip_range and blocked_ip.is_ip_in_range(client_ip):
+                        return True
+            
+            return False
+        except Exception as e:
+            logger.error(f"Error checking blocked IPs: {e}")
+            return False
+
+    def track_spam_attempt(self, client_ip, spam_score):
+        """Track spam attempts and block IPs using BlockedIP model"""
+        try:
+            from blog.models import BlockedIP
+            from django.utils import timezone
+            from datetime import timedelta
+            
+            spam_attempts_key = f'spam_attempts_{client_ip}'
+            attempts = cache.get(spam_attempts_key, [])
+            
+            # Add this attempt
+            attempts.append({
+                'timestamp': time.time(),
+                'score': spam_score
+            })
+            
+            # Keep only last 24 hours of attempts
+            cutoff_time = time.time() - (24 * 60 * 60)
+            attempts = [attempt for attempt in attempts if attempt['timestamp'] > cutoff_time]
+            
+            # Check if IP should be blocked (3+ attempts with score >= 50)
+            high_score_attempts = [attempt for attempt in attempts if attempt['score'] >= 50]
+            
+            if len(high_score_attempts) >= 3:
+                # Create or update BlockedIP entry
+                blocked_ip, created = BlockedIP.objects.get_or_create(
+                    ip_address=client_ip,
+                    defaults={
+                        'reason': f'Automatic block: {len(high_score_attempts)} spam attempts in 24 hours',
+                        'is_permanent': False,
+                        'expires': timezone.now() + timedelta(hours=24)
+                    }
+                )
+                
+                if not created:
+                    # Update existing block
+                    blocked_ip.reason = f'Automatic block: {len(high_score_attempts)} spam attempts in 24 hours'
+                    blocked_ip.expires = timezone.now() + timedelta(hours=24)
+                    blocked_ip.save()
+                
+                # Clear the blocked IP cache
+                cache.delete('blocked_ips')
+                
+                logger.warning(f"[SpamCheck] Blocked IP {client_ip} for 24 hours due to {len(high_score_attempts)} spam attempts")
+            
+            # Update attempts cache
+            cache.set(spam_attempts_key, attempts, 24 * 60 * 60)
+            
+        except Exception as e:
+            logger.error(f"Error tracking spam attempts: {e}")
 
     def clear_spam_caches(self):
         """Clear all spam-related caches - useful for maintenance"""
@@ -981,8 +1053,6 @@ def reply_comment(request, comment_id):
                 status=500
             )
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
-    return redirect('post-detail', pk=post.id)
 
 def hx_get_post(request, post_id):
     logger.info(f"hx_get_post: called with post_id: {post_id}")

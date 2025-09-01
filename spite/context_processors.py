@@ -165,7 +165,7 @@ def load_posts(request):
     
     highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
 
-    all_comments = Comment.objects.all().order_by('-created_on')
+    all_comments = Comment.objects.all().order_by('-created_on').filter(spam_score__lt=50)
 
     # Combine posts and comments into a single feed
     combined_items = sorted(

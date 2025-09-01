@@ -49,7 +49,7 @@ def process_post_chunk(posts_chunk):
 def cache_posts_data():
     """Cache posts with better memory management"""
     try:
-        # Use values() for minimal memory usage
+        # Use values() for minimal memory usage - ADD SPAM FILTERING
         posts = Post.objects.values(
             'id',
             'title',
@@ -64,6 +64,9 @@ def cache_posts_data():
             'anon_uuid',
             'is_image',
             'is_video',
+            'spam_score',  # Add spam_score to values
+        ).filter(
+            spam_score__lt=50  # FILTER OUT SPAM POSTS
         ).order_by('-date_posted')
         
         # Process in smaller chunks
@@ -99,7 +102,7 @@ def cache_posts_data():
         
         cache.set('posts_chunk_count', len(chunks), CACHE_TIMEOUT)
         
-        logger.info(f"Cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks")
+        logger.info(f"Cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks (spam filtered)")
         
     except Exception as e:
         logger.error(f"Error in cache_posts_data: {e}")
