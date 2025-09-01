@@ -86,6 +86,39 @@
                 .resume-container {
                     margin: 0;
                     padding: 0;
+                    page-break-before: always;
+                }
+                
+                #service-resume {
+                    page-break-before: always;
+                }
+                
+                #desk-resume {
+                    page-break-before: always;
+                }
+                
+                #barback-resume {
+                    page-break-before: always;
+                }
+                
+                #artcafe-resume {
+                    page-break-before: always;
+                }
+                
+                #frontdesk-resume {
+                    page-break-before: always;
+                }
+                
+                #dishwasher-resume {
+                    page-break-before: always;
+                }
+                
+                #dishwasher-resume {
+                    page-break-before: always;
+                }
+                
+                #server-resume {
+                    page-break-before: always;
                 }
                 
                 @page {
@@ -96,22 +129,46 @@
         </style>
     </head>
     <body>
-        <div class="resume-container">
+        <style media="print">
+            * {
+              background: none !important;
+              color: black !important;
+              font-family: monospace !important;
+            }
+            a::after {
+              content: " (" attr(href) ")";
+            }
+          </style>
+          <div class="resume-container">
             <h1>Thomas Sargent Moore</h1>
-            <div class="subtitle">Full Stack Developer & Technical Product Manager</div>
-            <div class="subtitle">New York, NY • LinkedIn</div>
-
+            <p><strong>Phone:</strong> (323) 633-4682<br>
+                <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+        
+            <div class="subtitle">Data-Oriented Developer & Technical Product Manager</div>
+        
             <div class="section-title">Professional Summary</div>
-            <div>Full-stack developer and technical product manager with expertise in e-commerce, digital publishing, and Linux system administration. Creator of Spite Magazine and multiple successful e-commerce platforms. Specialized in end-to-end development from infrastructure setup to user experience, managing self-hosted <b>Linux</b> environments, and building scalable web applications.</div>
+            <div>
+                Full-stack developer with a strong mathematical foundation and a passion for data-driven problem solving. Creator of Spite Magazine and multiple analytics-enhanced e-commerce platforms. Experienced in deploying scalable data pipelines, performing real-time and asynchronous analytics, and building full-featured digital platforms on self-hosted Linux systems. Skilled in Python, SQL, PostgreSQL, Redis, and modern web stacks.
+            </div>
 
+            <div class="section-title">Education</div>
+            <div class="role">
+                <div class="role-header">
+                    <div>Bachelor of Science in Mathematical Sciences and Art -- <i>Carnegie Mellon University</i></div>
+                    <div>Graduated 2022</div>
+                </div>
+            </div>
+
+        
             <div class="section-title">Professional Experience</div>
-            
+        
             <div class="role">
                 <div class="role-header">
                     <div>Creator & Lead Developer -- <i>Spite Magazine</i></div>
                     <div>2024 - Present</div>
                 </div>
-                
+        
                 <div class="metrics">
                     <div class="metric">
                         <div class="metric-value">150+</div>
@@ -121,79 +178,65 @@
                         <div class="metric-value">2K+</div>
                         <div class="metric-label">Monthly Active Users</div>
                     </div>
-                    <div class="metric">
-                        <div class="metric-value">100</div>
-                        <div class="metric-label">Days to Market</div>
-                    </div>
-                </div>
-                
+                 </div>
+        
                 <ul>
-                    <li>Architected and developed a high-traffic digital publishing platform using <b>Python</b>, <b>Django</b>, and <b>JavaScript</b></li>
-                    <li>Built real-time features using <b>Django Channels</b> and <b>WebSocket</b> protocol:
+                    <li>Architected a real-time digital publishing platform using <b>Python</b>, <b>Django</b>, and <b>JavaScript</b>, optimized for performance and analytics</li>
+                    <li>Built real-time features using <b>Django Channels</b> and <b>WebSocket</b>:
                         <ul class="sub-list">
-                            <li>Live content updates and notifications</li>
-                            <li>Real-time chat system with user matching</li>
-                            <li>Asynchronous comment system</li>
+                            <li>Live engagement tracking and asynchronous commenting</li>
+                            <li>Real-time user matching and sentiment analysis in chat</li>
                         </ul>
                     </li>
-                    <li>Implemented distributed task processing with <b>Celery</b> and <b>Redis</b> for:
+                    <li>Implemented <b>Celery</b>-powered data pipelines for:
                         <ul class="sub-list">
-                            <li>Background media processing and optimization</li>
-                            <li>Cache management and data aggregation</li>
-                            <li>Asynchronous notifications</li>
+                            <li>Background media preprocessing and feature extraction with <b>OpenCV</b></li>
+                            <li>Engagement statistics aggregation and user behavior analytics</li>
                         </ul>
                     </li>
-                    <li>Built and deployed complete infrastructure on self-managed <b>Linux</b> servers:
+                    <li>Deployed scalable infrastructure with:
                         <ul class="sub-list">
-                            <li><b>Nginx</b> and <b>Gunicorn</b> with <b>ASGI/WSGI</b> support</li>
-                            <li><b>PostgreSQL</b> database optimization and backup strategies</li>
-                            <li><b>Redis</b> for caching and WebSocket backing</li>
-                            <li><b>Docker</b> containerization for consistent deployments</li>
+                            <li><b>Nginx</b> + <b>Gunicorn</b> (ASGI/WSGI), <b>PostgreSQL</b>, and <b>Docker</b></li>
+                            <li><b>Redis</b> for cache and real-time data stream support</li>
+                            <li>Cloud distribution via <b>AWS S3</b> and <b>CloudFront</b></li>
                         </ul>
                     </li>
-                    <li>Developed AI-powered media processing pipeline using <b>OpenCV</b> and <b>NumPy</b> for image analysis</li>
-                    <li>Implemented <b>GraphQL</b> API for efficient data fetching and content previews</li>
-                    <li>Built Progressive Web App (PWA) with offline support and push notifications</li>
-                    <li>Optimized performance with <b>AWS S3</b> and <b>CloudFront</b> CDN integration</li>
-                    <li>Implemented comprehensive monitoring using custom logging and analytics</li>
+                    <li>Implemented a <b>GraphQL API</b> to improve frontend data access efficiency</li>
+                    <li>Tracked user behavior and content metrics with custom logging and analytics dashboards</li>
                 </ul>
             </div>
-
+        
             <div class="role">
                 <div class="role-header">
                     <div>Technical Product Manager - E-commerce Data Migration & SEO -- <i>SAVED NY</i></div>
-                    <div>2022 - 2023</div>
+                    <div>2024 - present</div>
                 </div>
-                
+        
                 <ul>
-                    <li>Led full-scale e-commerce platform migration, successfully transitioning 15,000+ luxury products to new website architecture</li>
-                    <li>Implemented enterprise-level commerce integrations including:
+                    <li>Led data migration of 15,000+ luxury SKUs with <b>Python-based ETL pipelines</b> and zero data loss</li>
+                    <li>Integrated:
                         <ul class="sub-list">
-                            <li><b>Stripe</b> payment processing and fraud detection</li>
-                            <li><b>Google Analytics 4</b> for advanced e-commerce tracking</li>
-                            <li><b>Google Search Console</b> for SEO optimization and performance monitoring</li>
-                            <li>AI-powered commerce analytics for inventory forecasting and price optimization</li>
+                            <li><b>Stripe</b> for secure payments and fraud analytics</li>
+                            <li><b>Google Analytics 4</b> and <b>Search Console</b> for traffic insights and SEO</li>
                         </ul>
                     </li>
-                    <li>Architected and deployed <b>Python</b>-based ETL pipeline for automated product data transformation</li>
-                    <li>Executed comprehensive SEO optimization strategy across entire product catalog</li>
+                    <li>Refined e-commerce strategy with data-driven insights into product performance and customer behavior</li>
                 </ul>
             </div>
-
+        
             <div class="role">
                 <div class="role-header">
                     <div>Freelance Full Stack Developer -- <i>Independent Contractor</i></div>
-                    <div>2020 - Present</div>
+                    <div>2023 - Present</div>
                 </div>
-                
+        
                 <ul>
-                    <li>Designed and developed multiple custom e-commerce platforms using <b>Shopify</b> and <b>WooCommerce</b></li>
-                    <li>Managed complete infrastructure setup and maintenance on <b>Linux</b> servers</li>
-                    <li>Implemented comprehensive analytics using <b>Google Analytics</b> and <b>Tag Manager</b></li>
+                    <li>Developed bespoke online stores with advanced analytics integration using <b>Shopify</b>, <b>WooCommerce</b>, and <b>Google Tag Manager</b></li>
                 </ul>
             </div>
+        
         </div>
-        <div class="resume-container">
+        <div class="resume-container" id="service-resume">
             <h1>Thomas Sargent Moore</h1>
               <p><strong>Phone:</strong> (323) 633-4682<br>
                  <strong>Email:</strong> tsargentmoore@gmail.com<br>
@@ -254,6 +297,447 @@
                 </ul>
               </div>
             
+        </div>
+       <div class="resume-container" id="desk-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Detail-oriented professional with proven experience in administrative support and reception duties. Demonstrated excellence in managing communications, maintaining organized filing systems, and providing professional front-desk support. Strong computer skills with proficiency in office software and administrative systems. Mature, responsible team player who thrives in fast-paced environments and maintains composure under pressure. Committed to maintaining a welcoming and efficient office environment while handling multiple responsibilities with precision and care.</p>
+              </div>
+
+              <div class="section-title">Education</div>
+              <div class="role">
+                  <div class="role-header">
+                      <div>Bachelor of Science in Mathematical Sciences and Art -- <i>Carnegie Mellon University</i></div>
+                      <div>Graduated 2022</div>
+                  </div>
+              </div>              
+              <div class="section">
+                <h2>Relevant Experience</h2>
+
+                <p class="job-title">Administrative Assistant<br>
+                <span class="job-location">SAVED NY – New York, NY | Dec 2024 – present</span></p>
+                <ul>
+                  <li>Manage office calendar and coordinate meetings across departments</li>
+                  <li>Process and distribute incoming/outgoing mail efficiently</li>
+                  <li>Maintain organized digital and physical filing systems</li>
+                  <li>Handle confidential documents with attention to detail</li>
+                </ul>
+
+                <p class="job-title">Office Coordinator<br>
+                <span class="job-location">SoCal Permits – Los Angeles, CA | Jan 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Managed multi-line phone system and visitor reception for busy office</li>
+                  <li>Maintained detailed filing systems for legal documentation</li>
+                  <li>Coordinated with staff to ensure timely document processing</li>
+                </ul>
+            
+                <p class="job-title">Front Desk Representative<br>
+                <span class="job-location">Nivessa Records – Los Angeles, CA | Jan 2024 – Jun 2024</span></p>
+                <ul>
+                  <li>Provided professional reception services in fast-paced environment</li>
+                  <li>Managed scheduling and maintained accurate records</li>
+                </ul>
+
+                <p class="job-title">Administrative Support<br>
+                <span class="job-location">Big Idea Bookstore – Pittsburgh, PA | Mar 2021 – Aug 2022</span></p>
+                <ul>
+                  <li>Managed calendar and coordinated daily operations</li>
+                  <li>Handled customer inquiries professionally and efficiently</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Key Skills</h2>
+                <ul>
+                  <li>Professional Phone Etiquette</li>
+                  <li>Calendar Management</li>
+                  <li>Microsoft Office Suite</li>
+                  <li>Multi-tasking & Time Management</li>
+                  <li>Spanish (fluent)</li>
+                  <li>Scanning & Digital File Management</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="barback-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Hardworking Bushwick resident with restaurant and café experience seeking opportunity to learn bartending while barbacking. Strong work ethic with background in food service, inventory management, and maintaining clean workspaces. Available Sunday days and Friday/Saturday nights. Eager to train and develop bartending skills while supporting bar operations.</p>
+              </div>
+            
+              <div class="section">
+                <h2>Relevant Experience</h2>
+
+                <p class="job-title">Barback<br>
+                <span class="job-location">La Pergoletta Bar & Restaurant – Los Angeles, CA | Jun 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Supported bartending team and learned basic bar operations</li>
+                  <li>Restocked bar inventory and cleaned glassware and bar tools</li>
+                  <li>Assisted with bar setup and breakdown procedures</li>
+                </ul>
+
+                <p class="job-title">Café Assistant<br>
+                <span class="job-location">Big Idea Bookstore – Pittsburgh, PA | Mar 2021 – Aug 2022</span></p>
+                <ul>
+                  <li>Prepared coffee drinks and light food items for café customers</li>
+                  <li>Maintained clean café area and equipment throughout shifts</li>
+                  <li>Worked collaboratively with team in fast-paced environment</li>
+                </ul>
+
+                <p class="job-title">Retail Associate<br>
+                <span class="job-location">Nivessa Records – Los Angeles, CA | Jan 2023 – Jun 2023</span></p>
+                <ul>
+                  <li>Customer service and inventory management experience</li>
+                  <li>Maintained organized retail space during busy periods</li>
+                </ul>
+              </div>
+
+            
+              <div class="section">
+                <h2>Skills</h2>
+                <ul>
+                  <li><strong>Restaurant/Café Experience:</strong> Food and beverage preparation, customer service</li>
+                  <li><strong>Eager to Learn:</strong> Motivated to develop bartending skills while barbacking</li>
+                  <li><strong>Schedule Availability:</strong> Sunday days and Friday/Saturday nights</li>
+                  <li><strong>Area Resident:</strong> Bushwick local, familiar with neighborhood</li>
+                  <li><strong>Team Collaboration:</strong> Supporting bartenders and learning from experienced staff</li>
+                  <li><strong>Languages:</strong> Fluent in Spanish and English</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="artcafe-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Creative professional with art education and extensive hands-on service experience, passionate about supporting mission-driven creative spaces. Proven track record in dishwashing, cleaning, inventory management, and team support across café, bar, and retail environments. Strong work ethic with enthusiasm for maintaining organized, efficient spaces that enable creativity. Excited to combine artistic background with practical skills to help make the magic happen at Happy Medium.</p>
+              </div>
+
+              <div class="section-title">Education</div>
+              <div class="role">
+                  <div class="role-header">
+                      <div>Bachelor of Science in Mathematical Sciences and Art -- <i>Carnegie Mellon University</i></div>
+                      <div>Graduated 2022</div>
+                  </div>
+              </div>
+            
+              <div class="section">
+                <h2>Relevant Experience</h2>
+
+                <p class="job-title">Barback<br>
+                <span class="job-location">La Pergoletta Bar & Restaurant – Los Angeles, CA | Jun 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Washed and sanitized glassware, bar tools, and equipment throughout high-volume service</li>
+                  <li>Restocked service items and maintained organized back-of-house operations</li>
+                  <li>Assisted with setup and breakdown procedures for smooth service flow</li>
+                </ul>
+
+                <p class="job-title">Studio Assistant<br>
+                <span class="job-location">AIR Screenprint Lab – Pittsburgh, PA | May 2022 – Sep 2022</span></p>
+                <ul>
+                  <li>Cleaned and maintained screenprinting equipment, squeegees, and studio tools</li>
+                  <li>Organized art materials and supplies for daily studio operations</li>
+                  <li>Assisted with setup and breakdown of printing projects and workspace prep</li>
+                </ul>
+
+                <p class="job-title">Print Studio Technician<br>
+                <span class="job-location">CMU Print Lab – Pittsburgh, PA | May 2020 – May 2022</span></p>
+                <ul>
+                  <li>Maintained and cleaned printmaking equipment, presses, and specialized art tools</li>
+                  <li>Managed inventory of papers, inks, and printmaking supplies</li>
+                  <li>Assisted students with equipment setup and material preparation</li>
+                </ul>
+
+                <p class="job-title">Retail Associate<br>
+                <span class="job-location">Nivessa Records – Los Angeles, CA | Jan 2023 – Jun 2023</span></p>
+                <ul>
+                  <li>Managed inventory control and facility maintenance in creative retail space</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Key Skills</h2>
+                <ul>
+                  <li><strong>Art Studio Operations:</strong> 2+ years maintaining printmaking and screenprinting equipment</li>
+                  <li><strong>Dishwashing & Sanitation:</strong> Expert cleaning of dishes, tools, brushes, and specialized equipment</li>
+                  <li><strong>Creative Materials:</strong> Inventory management of art supplies, papers, inks, and studio materials</li>
+                  <li><strong>Physical Capability:</strong> Comfortable lifting 50+ lbs, working on feet, weekend/evening availability</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="frontdesk-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Reliable and professional front desk candidate with proven experience in customer service, phone management, and administrative support. Strong communication skills with ability to handle billing inquiries, reservations, and guest relations. Flexible schedule with availability for nights, weekends, and holidays. Positive team player committed to excellent guest experience and smooth property operations.</p>
+              </div>
+
+              <div class="section-title">Education</div>
+              <div class="role">
+                  <div class="role-header">
+                      <div>Bachelor of Science in Mathematical Sciences and Art -- <i>Carnegie Mellon University</i></div>
+                      <div>Graduated 2022</div>
+                  </div>
+              </div>              
+              
+              <div class="section">
+                <h2>Relevant Experience</h2>
+
+                <p class="job-title">Administrative Assistant<br>
+                <span class="job-location">SAVED NY – New York, NY | Dec 2024 – present</span></p>
+                <ul>
+                  <li>Manage multi-line phone system and coordinate scheduling</li>
+                  <li>Handle customer inquiries and resolve billing/administrative issues</li>
+                  <li>Process transactions and maintain accurate record-keeping</li>
+                </ul>
+
+                <p class="job-title">Office Coordinator<br>
+                <span class="job-location">SoCal Permits – Los Angeles, CA | Jan 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Managed reception desk and multi-line phone system for busy office</li>
+                  <li>Handled client check-ins, scheduling, and payment processing</li>
+                  <li>Resolved billing inquiries and coordinated with team for issue resolution</li>
+                  <li>Maintained detailed records and filing systems</li>
+                </ul>
+            
+                <p class="job-title">Front Desk Representative<br>
+                <span class="job-location">Nivessa Records – Los Angeles, CA | Jan 2024 – Jun 2024</span></p>
+                <ul>
+                  <li>Provided professional customer service and handled cash transactions</li>
+                  <li>Managed inventory systems and customer account information</li>
+                  <li>Worked flexible hours including evenings and weekends</li>
+                </ul>
+
+                <p class="job-title">Customer Service Associate<br>
+                <span class="job-location">Big Idea Bookstore – Pittsburgh, PA | Mar 2021 – Aug 2022</span></p>
+                <ul>
+                  <li>Handled customer check-ins for events and daily service</li>
+                  <li>Managed reservations and coordinated event logistics</li>
+                  <li>Processed payments and maintained welcoming front desk environment</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Key Skills</h2>
+                <ul>
+                  <li><strong>Phone Management:</strong> Multi-line systems, reservation taking, professional communication</li>
+                  <li><strong>Guest Services:</strong> Check-in/check-out procedures, problem resolution, positive attitude</li>
+                  <li><strong>Billing & Payments:</strong> Processing transactions, resolving billing issues, record-keeping</li>
+                  <li><strong>Night Audit Ready:</strong> Comfortable with overnight shifts and end-of-day procedures</li>
+                  <li><strong>Languages:</strong> Fluent in Spanish and English</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="dishwasher-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Experienced dishwasher currently employed in New York restaurant industry with proven track record in high-volume cocktail bar and kitchen operations. Punctual and reliable professional skilled in maintaining clean, organized dish stations during intense service periods. Thrives working under pressure with ability to follow directions precisely. Available for weekday and weekend nights with flexible scheduling.</p>
+              </div>
+            
+              <div class="section">
+                <h2>Experience</h2>
+
+                <p class="job-title">Dishwasher<br>
+                <span class="job-location">Junior's Restaurant – Brooklyn, NY | Dec 2024 – present</span></p>
+                <ul>
+                  <li>Recently started as dishwasher at iconic Brooklyn restaurant</li>
+                  <li>Learning dishwashing operations during busy weekend and weeknight shifts</li>
+                  <li>Wash dishes, glassware, and kitchen equipment during high-volume service</li>
+                  <li>Follow cleaning protocols and direction from kitchen management</li>
+                </ul>
+
+                <p class="job-title">Kitchen Assistant<br>
+                <span class="job-location">La Pergoletta Bar & Restaurant – Los Angeles, CA | Jun 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Gained initial dishwashing experience in bar and restaurant environment</li>
+                  <li>Learned to operate dish machine and hand-wash glassware for cocktail service</li>
+                  <li>Maintained dish pit during dinner and late-night rushes</li>
+                </ul>
+
+                <p class="job-title">Kitchen Support<br>
+                <span class="job-location">Big Idea Bookstore Café – Pittsburgh, PA | Mar 2021 – Aug 2022</span></p>
+                <ul>
+                  <li>Washed dishes and maintained clean café equipment during service hours</li>
+                  <li>Supported food preparation and maintained organized workspace</li>
+                  <li>Handled dishwashing duties during events and busy periods</li>
+                </ul>
+
+                <p class="job-title">Facilities Support<br>
+                <span class="job-location">Various Locations – 2023</span></p>
+                <ul>
+                  <li>Maintained clean, organized work environments in fast-paced settings</li>
+                  <li>Demonstrated reliability and strong work ethic across different roles</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Skills</h2>
+                <ul>
+                  <li><strong>Experienced Dishwasher:</strong> Commercial dish machines, hand-washing, cocktail glassware specialization</li>
+                  <li><strong>Punctual & Reliable:</strong> Consistent attendance record, never missed shift</li>
+                  <li><strong>Works Under Pressure:</strong> Thrives during high-volume rushes and intense service periods</li>
+                  <li><strong>Follows Directions:</strong> Precisely executes cleaning protocols and management instructions</li>
+                  <li><strong>Night Availability:</strong> Available weekday and weekend nights, flexible scheduling</li>
+                  <li><strong>High-Volume Bar Experience:</strong> Specialized in cocktail lounge and bar environments</li>
+                  <li><strong>Physical Stamina:</strong> Comfortable with long shifts and demanding physical work</li>
+                  <li><strong>Languages:</strong> Fluent in Spanish and English</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="server-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 242 Troutman St 1R, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Dedicated server with NYC restaurant experience and passion for Italian cuisine. Proven ability to handle high-volume service, take orders accurately, and provide exceptional customer service. Strong work ethic with experience supporting kitchen operations and managing busy dining rooms. Available for evening shifts Thursday-Saturday and committed to learning menu items and wine pairings.</p>
+              </div>
+            
+              <div class="section">
+                <h2>Restaurant Experience</h2>
+
+                <p class="job-title">Server / Food Runner<br>
+                <span class="job-location">Junior's Restaurant – Brooklyn, NY | Dec 2024 – present</span></p>
+                <ul>
+                  <li>Currently serving tables and running food in busy NYC restaurant</li>
+                  <li>Take orders, manage multiple tables, and ensure customer satisfaction</li>
+                  <li>Run food from kitchen to dining room and clear tables efficiently</li>
+                  <li>Work evening and weekend shifts in high-volume environment</li>
+                </ul>
+
+                <p class="job-title">Server Assistant / Barback<br>
+                <span class="job-location">La Pergoletta Bar & Restaurant – Los Angeles, CA | Jun 2023 – Jun 2024</span></p>
+                <ul>
+                  <li>Supported servers during high-volume dinner and bar service</li>
+                  <li>Assisted with order taking and table service during busy periods</li>
+                  <li>Ran food to tables and helped clear dishes during return trips to kitchen</li>
+                  <li>Gained experience with wine service and Italian-inspired menu items</li>
+                  <li>Worked under pressure during 200+ cover nights</li>
+                </ul>
+
+                <p class="job-title">Café Server<br>
+                <span class="job-location">Big Idea Bookstore – Pittsburgh, PA | Mar 2021 – Aug 2022</span></p>
+                <ul>
+                  <li>Served customers in café setting, taking orders and delivering food and beverages</li>
+                  <li>Managed multiple tables during events and busy periods</li>
+                  <li>Learned menu items and made recommendations to customers</li>
+                  <li>Handled cash transactions and maintained clean dining area</li>
+                </ul>
+
+                <p class="job-title">Customer Service Associate<br>
+                <span class="job-location">Nivessa Records – Los Angeles, CA | Jan 2023 – Jun 2023</span></p>
+                <ul>
+                  <li>Provided customer service in fast-paced retail environment</li>
+                  <li>Managed inventory and organized pickup orders efficiently</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Skills</h2>
+                <ul>
+                  <li><strong>Table Service:</strong> Order taking, food running, table clearing, customer relations</li>
+                  <li><strong>High-Volume Experience:</strong> Proven ability to handle 200+ covers and busy service</li>
+                  <li><strong>Kitchen Coordination:</strong> Reading tickets, calling orders, organizing takeout</li>
+                  <li><strong>Italian Cuisine Interest:</strong> Experience with Italian menu items, eager to learn wines</li>
+                  <li><strong>Pressure Performance:</strong> Thrives in fast-paced, high-stress dining environments</li>
+                  <li><strong>NYC Experience:</strong> Currently working in Brooklyn restaurant industry</li>
+                  <li><strong>Evening Availability:</strong> Available Thursday-Saturday 4pm-11pm and additional shifts</li>
+                  <li><strong>Languages:</strong> Fluent in Spanish and English</li>
+                </ul>
+              </div>
+            
+        </div>
+       <div class="resume-container" id="trader-resume">
+            <h1>Thomas Sargent Moore</h1>
+              <p><strong>Phone:</strong> (323) 633-4682<br>
+                 <strong>Email:</strong> tsargentmoore@gmail.com<br>
+                 <strong>Address:</strong> 258 Himrod Street 2L, Brooklyn, NY 11237</p>
+            
+              <div class="section">
+                <h2>Summary</h2>
+                <p>Mathematical sciences graduate with strong analytical foundation and hands-on experience in data analysis, statistical modeling, and algorithmic systems. Proven track record building high-performance systems that process large datasets and real-time analytics.</p>
+              </div>
+
+              <div class="section-title">Education</div>
+              <div class="role">
+                  <div class="role-header">
+                      <div>Bachelor of Science in Mathematical Sciences and Art -- <i>Carnegie Mellon University</i></div>
+                      <div>Graduated 2022</div>
+                  </div>
+                  <ul>
+                    <li><strong>Relevant Coursework:</strong> Combinatorics, Linear Algebra, Linear Programming, Statistics, Functional Programming</li>
+                  </ul>
+                  <div class="role-header">
+                    <div>Machine Learning Bootcamp -- <i>Noble Desktop</i></div>
+                    <div>March 2025</div>
+                  </div>
+              </div>              
+              
+              <div class="section">
+                <h2>Experience</h2>
+
+                <p class="job-title">Founder & Developer<br>
+                <span class="job-location">Spite Magazine – Brooklyn, NY | Aug 2024 – Present</span></p>
+                <ul>
+                  <li>Built analytics platform processing 3.18M monthly requests with 10K+ MAUs</li>
+                  <li>Engineered real-time WebSocket systems and optimized caching for high-frequency data delivery</li>
+                  <li>Developed sentiment analysis pipeline using Scikit-learn to predict engagement patterns</li>
+                  <li>Created recommendation engine using machine learning for content clustering and user behavior prediction</li>
+                </ul>
+
+                <p class="job-title">Research Assistant<br>
+                <span class="job-location">CMU Computer Science Department – Pittsburgh, PA | 2019 – 2020</span></p>
+                <ul>
+                  <li>Conducted research in network analysis and multi-agent systems with applications to behavioral modeling</li>
+                  <li>Designed data collection system that gathered 4M+ nodes for behavioral and influence analysis</li>
+                  <li>Applied advanced network analysis techniques including bridge-path, ego, and clique analysis to model relationships and influence patterns</li>
+                  <li>Implemented adaptive data collection strategies to handle dynamic environments and technical constraints</li>
+                </ul>
+
+                <p class="job-title">Freelance Developer<br>
+                <span class="job-location">Various Clients – Los Angeles, CA | Jan 2024 – Jun 2024</span></p>
+                <ul>
+                  <li>Built custom inventory management system with real-time API integration and automated reporting</li>
+                  <li>Deployed multiple B2B and B2C systems handling financial transactions and data analytics</li>
+                </ul>
+              </div>
+            
+              <div class="section">
+                <h2>Technical Skills</h2>
+                <ul>
+                  <li><strong>Programming:</strong> Python, Pandas, NumPy, Git, JavaScript, Jupyter, Redis</li>
+                  <li><strong>Data & Analytics:</strong> PostgreSQL, REST APIs, Seaborn, NLTK, scikit-learn</li>
+                  <li><strong>Systems:</strong> Linux, Docker, Flask, Django, Selenium, Celery</li>
+                </ul>
+              </div>
         </div>
     </body>
 </html>

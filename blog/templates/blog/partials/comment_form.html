@@ -18,7 +18,7 @@
     {{ comment_form|crispy }}
     <button type="submit" class="btn btn-primary">Submit</button>
 
-    <div id="upload-indicator-comment-{{ comment_id }}" 
+    <div id="upload-indicator-comment-{% if post_type == 'Post' and post_id %}{{ post_id }}{% elif post_type == 'Comment' and comment_id %}{{ comment_id }}{% endif %}" 
          class="htmx-indicator">
         <div class="progress mt-2">
             <div class="progress-bar progress-bar-striped progress-bar-animated" 
@@ -32,3 +32,25 @@
     </div>
 
 </form>
+
+<style>
+/* Prevent multiple clicks and show loading state */
+.toggle-reply.htmx-request {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.toggle-reply.htmx-request::after {
+    content: " Loading...";
+    font-style: italic;
+    color: #666;
+}
+
+/* Add transition for smooth state changes */
+.toggle-reply {
+    transition: opacity 0.2s ease;
+}
+</style>
+
+<!-- No HTMX event handlers here - they're handled in the base template -->

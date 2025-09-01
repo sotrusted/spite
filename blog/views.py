@@ -152,6 +152,7 @@ class PostCreateView(CreateView):
         return context
 
     def check_spam(self, request, title, content, author_name=''):
+        logger.info("Checking spam")
         client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
         
         # 1. Rate limiting
@@ -164,107 +165,354 @@ class PostCreateView(CreateView):
         # Increment post count
         cache.set(cache_key, post_count + 1, 60)  # Expires in 60 seconds
         
-        # 2. Check recent posts for similar content
+        # 2. Check recent posts for similar content (optimized for speed)
+
+        # Use cache for recent post content hashes to avoid DB hits and expensive similarity checks
         recent_posts_key = f'recent_posts_{client_ip}'
         recent_posts = cache.get(recent_posts_key, [])
-        
+
         # Create content hash including name
         content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {author_name.lower().strip() if author_name else ''}"
         content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
-        
-        # Check for duplicate or similar content
-        for recent_hash in recent_posts:
-            if content_hash == recent_hash:
-                return True, "This looks like a duplicate post"
-        
-        # Check content similarity with recent posts
-        for recent_post in Post.objects.filter(
-            date_posted__gte=localtime() - timedelta(minutes=5)
-        ).order_by('-date_posted')[:10]:
-            similarity = SequenceMatcher(
-                None,
-                content_to_check,
-                f"{recent_post.title.lower().strip() if recent_post.title else ''} \
-                {recent_post.content.lower().strip() if recent_post.content else ''} \
-                {recent_post.display_name.lower().strip() if recent_post.display_name else ''}"
-            ).ratio()
-            
+
+        # Fast: Check for exact duplicate in recent hashes (O(N), N small)
+        if content_hash in recent_posts:
+            return True, "This looks like a duplicate post"
+
+        # Optimization: Only check similarity if there are no exact matches
+        # To further speed up, cache recent post "content_to_check" strings as well
+        recent_posts_content_key = f'recent_posts_content_{client_ip}'
+        recent_posts_content = cache.get(recent_posts_content_key, [])
+
+        # Only fetch from DB if we don't have enough recent post contents cached
+        if len(recent_posts_content) < 10:
+            # Only fetch the fields we need for similarity
+            recent_db_posts = Post.objects.filter(
+                date_posted__gte=localtime() - timedelta(minutes=5)
+            ).order_by('-date_posted').values_list('title', 'content', 'display_name')[:10]
+            recent_posts_content = [
+                f"{t.lower().strip() if t else ''} {c.lower().strip() if c else ''} {d.lower().strip() if d else ''}"
+                for t, c, d in recent_db_posts
+            ]
+            cache.set(recent_posts_content_key, recent_posts_content, 300)  # 5 min cache
+
+        # Use SequenceMatcher only on recent post contents (still O(N), but N is small and avoids DB hits)
+        for recent_content in recent_posts_content:
+            # Quick length check to skip obviously different posts
+            if abs(len(content_to_check) - len(recent_content)) > 40:
+                continue
+            similarity = SequenceMatcher(None, content_to_check, recent_content).ratio()
             if similarity > 0.8:  # 80% similarity threshold
                 return True, "This content is too similar to a recent post"
-        
-        # Store this content hash
+
+        # Store this content hash and content for future fast checks
         recent_posts.append(content_hash)
         if len(recent_posts) > 10:  # Keep last 10 posts
             recent_posts.pop(0)
         cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
-        
+
+        recent_posts_content.append(content_to_check)
+        if len(recent_posts_content) > 10:
+            recent_posts_content.pop(0)
+        cache.set(recent_posts_content_key, recent_posts_content, 300)
         return False, ""
- 
-    def post(self, request, *args, **kwargs):
+    
+    def get_fast_image_fingerprint(self, media_file):
+        """Get a fast image fingerprint for a media file"""
+        try: 
+            media_file.seek(0)
+
+            # Get file size
+            media_file.seek(0,2)
+            file_size = media_file.tell()
+
+            # Read first and last 1KB for fingerprint
+            media_file.seek(0)
+            first_chunk = media_file.read(1024)
+
+            if file_size > 2048:
+                media_file.seek(-1024, 2)
+                last_chunk = media_file.read(1024)
+            else:
+                last_chunk = b''
+            
+            media_file.seek(0) # Reset for later
+
+            # Create fingerprint from size + first/last chunks
+            fingerprint_data = f"{file_size}_{hashlib.md5(first_chunk+last_chunk).hexdigest()}"
+            return fingerprint_data
+            
+        except Exception as e:
+            logger.error(f"Error getting fast image fingerprint: {e}")
+            return None
         
-        csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
-        csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
+    
+    def check_spam_fast(self, request, title, content, display_name, media_file=None):
+        """Fast spam checks rate limiting exact duplicates and image duplicates"""
+        try:
+            client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
+            logger.info(f"[SpamCheck] Client IP: {client_ip}")
+            logger.info(f"[SpamCheck] Title: '{title}', Content: '{content}', Display name: '{display_name}'")
 
-        self.request = request
+            # 1. Rate limiting
+            cache_key = f'post_count_{client_ip}'
+            post_count = cache.get(cache_key, 0)
+            logger.info(f"[SpamCheck] Rate limit cache key: {cache_key}, current count: {post_count}")
 
-        # Check for spam before processing the form
-        '''
-        is_spam, spam_message = self.check_spam(
-            request, 
-            request.POST.get('title', ''),
-            request.POST.get('content', ''), 
-            request.POST.get('display_name', '')
-        )
-        '''
-        '''
-        if is_spam:
-            logger.warning(f"Spam detected: {spam_message}")
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False, 
-                    'error': spam_message
-                }, status=400)
-            # For non-AJAX requests, add error to messages
-            messages.error(request, spam_message)
+            if post_count > 5:
+                logger.info(f"[SpamCheck] Rate limit exceeded for IP {client_ip}")
+                return True, "Please wait a minute before posting again"
+            
+            # Increment post count
+            cache.set(cache_key, post_count + 1, 60)
+            logger.info(f"[SpamCheck] Incremented post count for {client_ip} to {post_count + 1}")
+
+            # 2. Check recent posts for similar content (optimized for speed)
+
+            # Use cache for recent post content hashes to avoid DB hits and expensive similarity checks
+            recent_posts_key = f'recent_posts_{client_ip}'
+            recent_posts = cache.get(recent_posts_key, [])
+            logger.info(f"[SpamCheck] Recent posts hash list for {client_ip}: {recent_posts}")
+
+            # Create content hash including name
+            content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {display_name.lower().strip() if display_name else ''}"
+            content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
+            logger.info(f"[SpamCheck] Content to check: '{content_to_check}' | Hash: {content_hash}")
+
+            # Fast: Check for exact duplicate in recent hashes (O(N), N small)
+            if content_hash in recent_posts:
+                logger.info(f"[SpamCheck] Exact duplicate detected for IP {client_ip} with hash {content_hash}")
+                return True, "This looks like a duplicate post"
+
+            # Optimization: Only check similarity if there are no exact matches
+            # To further speed up, cache recent post "content_to_check" strings as well
+            recent_posts_content_key = f'recent_posts_content_{client_ip}'
+            recent_posts_content = cache.get(recent_posts_content_key, [])
+            logger.info(f"[SpamCheck] Recent posts content list for {client_ip}: {recent_posts_content}")
+
+            # Only fetch from DB if we don't have enough recent post contents cached
+            if len(recent_posts_content) < 10:
+                logger.info(f"[SpamCheck] Fetching recent posts from DB for similarity check (IP: {client_ip})")
+                # Only fetch the fields we need for similarity
+                recent_db_posts = Post.objects.filter(
+                    date_posted__gte=localtime() - timedelta(minutes=5)
+                ).order_by('-date_posted').values_list('title', 'content', 'display_name')[:10]
+                recent_posts_content = [
+                    f"{t.lower().strip() if t else ''} {c.lower().strip() if c else ''} {d.lower().strip() if d else ''}"
+                    for t, c, d in recent_db_posts
+                ]
+                cache.set(recent_posts_content_key, recent_posts_content, 300)  # 5 min cache
+                logger.info(f"[SpamCheck] Updated recent_posts_content cache for {client_ip}: {recent_posts_content}")
+
+            # Use SequenceMatcher only on recent post contents (still O(N), but N is small and avoids DB hits)
+            for idx, recent_content in enumerate(recent_posts_content):
+                # Quick length check to skip obviously different posts
+                if abs(len(content_to_check) - len(recent_content)) > 40:
+                    logger.info(f"[SpamCheck] Skipping similarity check for index {idx} due to length difference")
+                    continue
+                similarity = SequenceMatcher(None, content_to_check, recent_content).ratio()
+                logger.info(f"[SpamCheck] Similarity with recent post {idx}: {similarity:.3f}")
+                if similarity > 0.8:  # 80% similarity threshold
+                    logger.info(f"[SpamCheck] Similar post detected for IP {client_ip} (similarity: {similarity:.3f})")
+                    return True, "This content is too similar to a recent post"
+
+            # Store this content hash and content for future fast checks
+            recent_posts.append(content_hash)
+            if len(recent_posts) > 10:  # Keep last 10 posts
+                removed_hash = recent_posts.pop(0)
+                logger.info(f"[SpamCheck] Removing oldest hash from recent_posts: {removed_hash}")
+            cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
+            logger.info(f"[SpamCheck] Updated recent_posts cache for {client_ip}: {recent_posts}")
+
+            recent_posts_content.append(content_to_check)
+            if len(recent_posts_content) > 10:
+                removed_content = recent_posts_content.pop(0)
+                logger.info(f"[SpamCheck] Removing oldest content from recent_posts_content: {removed_content}")
+            cache.set(recent_posts_content_key, recent_posts_content, 300)
+            logger.info(f"[SpamCheck] Updated recent_posts_content cache for {client_ip}: {recent_posts_content}")
+
+            if media_file and hasattr(media_file, 'read'):
+                try:
+                    fingerprint = self.get_fast_image_fingerprint(media_file)
+                    logger.info(f"[SpamCheck] Image fingerprint: {fingerprint}")
+                    if fingerprint: 
+                        recent_images_key = f'global_recent_images'
+                        recent_images = cache.get(recent_images_key, [])
+                        logger.info(f"[SpamCheck] Recent image fingerprints: {[img['fingerprint'] for img in recent_images]}")
+
+                        # Check if this exact image has been posted recently
+                        for recent_fingerprint in recent_images:
+                            if recent_fingerprint['fingerprint'] == fingerprint:
+                                logger.info(f"[SpamCheck] Duplicate image detected for fingerprint: {fingerprint}")
+                                return True, "This image has been posted recently"
+
+                        image_data = {
+                            'fingerprint': fingerprint,
+                            'timestamp': time.time(),
+                        }
+                        
+                        # Add this image to the recent images list
+                        recent_images.append(image_data)
+
+                        # Keep only last 100 images and remove older ones 
+                        current_time = time.time()
+                        filtered_images = [
+                            img for img in recent_images[-100:]
+                            if current_time - img['timestamp'] < 1800 # 30 minutes
+                        ]
+                        logger.info(f"[SpamCheck] Filtered recent images count: {len(filtered_images)}")
+                        cache.set(recent_images_key, filtered_images, 1800)
+
+                except Exception as e:
+                    logger.warning(f"Error checking image duplicate: {e}")
+            
+            logger.info(f"[SpamCheck] No spam detected for IP {client_ip}")
+            return False, ""
+            
+        except Exception as e:
+            logger.error(f"[SpamCheck] Error in spam check: {e}", exc_info=True)
+            # If spam check fails, allow the post but log the error
+            return False, ""
+
+
+
+
+
+    def post(self, request, *args, **kwargs):
+        try:
+            logger.info(f"PostCreateView.post called with method: {request.method}")
+            logger.info(f"Request headers: {dict(request.headers)}")
+            logger.info(f"Request POST data: {request.POST}")
+            logger.info(f"Request FILES data: {request.FILES}")
+            
+            # Validate CSRF token
+            csrf_token_post = request.POST.get('csrfmiddlewaretoken', 'Not found')
+            csrf_token_cookie = request.COOKIES.get('csrftoken', 'Not found')
+            logger.info(f"CSRF token from POST: {csrf_token_post}")
+            logger.info(f"CSRF token from cookie: {csrf_token_cookie}")
+            
+            if csrf_token_post == 'Not found' or csrf_token_cookie == 'Not found':
+                logger.error("CSRF token missing")
+                if request.headers.get('HX-Request'):
+                    return HttpResponse(
+                        "<div class='alert alert-danger'>CSRF token missing. Please refresh the page and try again.</div>",
+                        status=400
+                    )
+                messages.error(request, "CSRF token missing. Please refresh the page and try again.")
+                return self.form_invalid(self.get_form())
+
+            self.request = request
+
+            # Check for spam before processing the form
+            '''
+            is_spam, spam_message = self.check_spam(
+                request, 
+                request.POST.get('title', ''),
+                request.POST.get('content', ''), 
+                request.POST.get('display_name', '')
+            )
+            '''
+            '''
+            if is_spam:
+                logger.warning(f"Spam detected: {spam_message}")
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False, 
+                        'error': spam_message
+                    }, status=400
+                # For non-AJAX requests, add error to messages
+                messages.error(request, spam_message)
+                return self.form_invalid(self.get_form())
+            '''
+            logger.info("Calling super().post()")
+            result = super().post(request, *args, **kwargs)
+            logger.info(f"super().post() returned: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in PostCreateView.post: {e}", exc_info=True)
+            if request.headers.get('HX-Request'):
+                return HttpResponse(
+                    f"<div class='alert alert-danger'>Server error: {str(e)}</div>",
+                    status=500
+                )
+            messages.error(request, f"Server error: {str(e)}")
             return self.form_invalid(self.get_form())
-        '''
-        return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
+        logger.info("PostCreateView.form_valid called")
         logger.info("Form submitted successfully via %s", self.request.headers.get('x-requested-with'))
         logger.info(f"Form data: {form.cleaned_data}")
+        logger.info(f"Request headers: {dict(self.request.headers)}")
         
         try:
+            logger.info("Form is valid, proceeding to save")
             # Save the form and get the post instance
             post = form.save(commit=False)
+            logger.info(f"Post instance created: title='{post.title}', content='{post.content}', display_name='{post.display_name}'")
             
             # Add IP address to the post
             ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
                             self.request.META.get('REMOTE_ADDR')
+            logger.info(f"IP address: {ip_address}")
             
+            logger.info("Checking for spam")
+            is_spam, spam_message = self.check_spam_fast(
+                self.request,
+                post.title,
+                post.content,
+                post.display_name,
+                media_file=post.media_file  # This is the uploaded file object
+            )
+            logger.info(f"Spam check result: is_spam={is_spam}, message='{spam_message}'")
+            
+            if is_spam:
+                logger.warning(f"Spam detected: {spam_message}")
+                if self.request.headers.get('HX-Request'):
+                    return HttpResponse(
+                        f"<div class='alert alert-danger'>{spam_message}</div>",
+                        status=400
+                    )
+                if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False, 
+                        'error': spam_message
+                    }, status=400)
+                messages.error(self.request, spam_message)
+                return self.form_invalid(form)
+
+            logger.info("Setting IP address and saving post")
             post.set_ip_address(ip_address)
             post.ip_address = None
             post.save()
-            logger.info(f"Post id: {post.id}, title: {post.title}, content: {post.content}, "
+            logger.info(f"Post saved successfully - id: {post.id}, title: {post.title}, content: {post.content}, "
                     f"media file: {post.media_file}, display name {post.display_name}")
             
-
-            context = {
-                'post': post,
-                'is_new': True,
-            }
-            htmx = True
-            response = render(self.request, 'blog/partials/post.html', context=context)
-            response['HX-Trigger'] = json.dumps({
-                'postCreated': True,
-                'showMessage': 'Post created successfully!'
-            })
-
-            if htmx:
-                return response
+            # Check if this is an HTMX request
+            if self.request.headers.get('HX-Request'):
+                logger.info("Processing HTMX request")
+                try:
+                    context = {
+                        'post': post,
+                        'is_new': True,
+                    }
+                    response = render(self.request, 'blog/partials/post.html', context=context)
+                    response['HX-Trigger'] = json.dumps({
+                        'postCreated': True,
+                        'showMessage': 'Post created successfully!'
+                    })
+                    logger.info("HTMX response created successfully")
+                    return response
+                except Exception as render_error:
+                    logger.error(f"Error rendering HTMX response: {render_error}", exc_info=True)
+                    return HttpResponse(
+                        f"<div class='alert alert-danger'>Error rendering post: {str(render_error)}</div>",
+                        status=500
+                    )
             
             # Return JSON response for AJAX requests
             if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                logger.info("Processing AJAX request")
                 return JsonResponse({
                     'success': True, 
                     'post': {
@@ -285,22 +533,41 @@ class PostCreateView(CreateView):
                         'is_video': post.is_video,
                     }
                 })
+            
+            logger.info("Processing regular form submission")
             return super().form_valid(form)
+            
         except Exception as e:
-            logger.error(f"Error in form_valid: {e}")
+            logger.error(f"Error in form_valid: {e}", exc_info=True)
+            error_message = f"Error creating post: {str(e)}"
+            
+            if self.request.headers.get('HX-Request'):
+                return HttpResponse(
+                    f"<div class='alert alert-danger'>{error_message}</div>",
+                    status=500
+                )
+            elif self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': error_message}, status=500)
+            
+            messages.error(self.request, error_message)
             return super().form_invalid(form)
 
     def form_invalid(self, form):
+        logger.error("PostCreateView.form_invalid called")
         logger.error("Form errors: %s", form.errors)
-        htmx = True
-        if htmx:
-            return HttpResponse(
-                "<div class='alert alert-danger'>Error creating post</div>",
-                status=500
-            )
-
+        logger.error("Form data: %s", form.data)
+        logger.error("Form files: %s", form.files)
+        
+        # Check if this is an HTMX request
+        if self.request.headers.get('HX-Request'):
+            logger.info("Returning HTMX error response")
+            error_details = f"<div class='alert alert-danger'>Error creating post: {form.errors}</div>"
+            logger.info(f"HTMX error response: {error_details}")
+            return HttpResponse(error_details, status=400)
         elif self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            logger.info("Returning AJAX error response")
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        logger.info("Returning super().form_invalid")
         return super().form_invalid(form)
 
 
@@ -312,6 +579,58 @@ class PostReplyView(PostCreateView):
     def form_valid(self, form):
         parent_post = get_object_or_404(Post, pk=self.kwargs['pk'])
         reply = form.save(commit=False)
+        # Check spam
+        # 1. Rate limiting
+        client_ip = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+                            self.request.META.get('REMOTE_ADDR')
+        cache_key = f'reply_count_{client_ip}'
+        reply_count = cache.get(cache_key, 0)
+        
+        if reply_count > 5:  # Max 5 posts per minute
+            is_spam = True
+            spam_message = "Please wait a minute before posting again"
+        # Increment post count
+        cache.set(cache_key, reply_count + 1, 60)  # Expires in 60 seconds
+
+        # 2. Check recent posts for similar content
+        recent_replies_key = f'recent_replies_{client_ip}'
+        recent_replies = cache.get(recent_replies_key, [])
+        
+        # Create content hash including name
+        content_to_check = f"{reply.name.lower().strip() if reply.name else ''} {reply.content.lower().strip() if reply.content else ''}"
+        content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
+        
+        # Check for duplicate or similar content
+        for recent_hash in recent_replies:
+            if content_hash == recent_hash:
+                is_spam = True
+                spam_message = "This looks like a duplicate reply"
+
+        # Store this content hash
+        recent_replies.append(content_hash)
+        if len(recent_replies) > 10:  # Keep last 10 replies
+            recent_replies.pop(0)
+        cache.set(recent_replies_key, recent_replies, 300)  # Store for 5 minutes
+
+        is_spam, spam_message = self.check_spam_fast(
+            self.request,
+            reply.name,
+            reply.content,
+            '',
+            media_file=reply.media_file  # This is the uploaded file object
+        )
+        
+        if is_spam:
+            logger.warning(f"Image spam detected: {spam_message}")
+            if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False, 
+                    'error': spam_message
+                }, status=400)
+            messages.error(self.request, spam_message)
+            return self.form_invalid(form)
+
+
         reply.author = self.request.user
         reply.parent_post = parent_post
         reply.save()
@@ -434,6 +753,7 @@ def preview_pdf_template(request):
 
 def search_results(request):
     query = request.GET.get('query', '')
+    query = query.strip()
     logger.info(f"Searching for: {query}")
     
     if query:
@@ -474,9 +794,9 @@ def search_results(request):
         paginator = Paginator(list(combined_items), 100)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
-        query = SearchQueryLog.objects.create(query=query)
+        querylog = SearchQueryLog.objects.create(query=query)
         ip = get_client_ip(request)
-        query.set_ip_address(ip)
+        querylog.set_ip_address(ip)
         
         context = {
             'query': query,
@@ -1228,3 +1548,49 @@ def hx_get_comment_chain(request, comment_id):
         logger.exception(f'Error in hx_get_comment_chain {str(e)}')
         return HttpResponse(f"Error loading comment chain: {str(e)}", status=500)
 
+
+def spite_counter(request):
+    return render(request, 'blog/spite_counter.html', {'SPITE_COUNT': Post.objects.count() + Comment.objects.count(), 'DATE': datetime.now().strftime('%B %d, %Y')})
+
+def htmx_health_check(request):
+    """Simple health check endpoint for HTMX debugging"""
+    return HttpResponse("HTMX endpoint is working", content_type="text/plain")
+
+def htmx_test_post(request):
+    """Test endpoint to simulate a simple post creation for debugging"""
+    if request.method == 'POST':
+        try:
+            # Log the request details
+            logger.info(f"HTMX test post received - headers: {dict(request.headers)}")
+            logger.info(f"POST data: {request.POST}")
+            logger.info(f"FILES data: {request.FILES}")
+            
+            # Check if this is an HTMX request
+            if request.headers.get('HX-Request'):
+                logger.info("This is an HTMX request")
+                return HttpResponse(
+                    "<div class='alert alert-success'>HTMX test post successful! HTMX is working.</div>",
+                    content_type="text/html"
+                )
+            else:
+                logger.info("This is NOT an HTMX request")
+                return HttpResponse(
+                    "<div class='alert alert-warning'>Not an HTMX request</div>",
+                    content_type="text/html"
+                )
+        except Exception as e:
+            logger.error(f"Error in htmx_test_post: {e}", exc_info=True)
+            return HttpResponse(
+                f"<div class='alert alert-danger'>Test post failed: {str(e)}</div>",
+                content_type="text/html",
+                status=500
+            )
+    
+    return HttpResponse(
+        "<div class='alert alert-info'>Send a POST request to test HTMX</div>",
+        content_type="text/html"
+    )
+
+def htmx_debug_view(request):
+    """Debug view for testing HTMX functionality"""
+    return render(request, 'blog/htmx_debug.html')

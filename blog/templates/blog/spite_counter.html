@@ -1,0 +1,11 @@
+{% extends "blog/spite_base.html" %}
+
+{% block content %}
+<div class="spite-counter" style="display: flex; background-color: #000; justify-content: center;">
+    <div class="spite-text-container" style="font-size: 3em;">
+        <span class="spite-text">SPITE COUNTER</span><br>
+        <span class="spite-text">{{SPITE_COUNT}}</span><br>
+        <span class="spite-text">{{DATE}}</span>
+    </div>
+</div>
+{% endblock %}

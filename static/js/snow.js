@@ -198,6 +198,9 @@ class HeartAnimation {
         this.writeButton.style.background = 'rgba(255, 255, 255, 0.7)';
         this.writeButton.style.cursor = 'pointer';
         this.writeButton.style.fontSize = '20px';
+        writeButton.addEventListener('click', function() {
+            scrollToElementById('post-form');
+        });
 
         // Create version toggle button
         this.versionToggleButton = document.createElement('button');

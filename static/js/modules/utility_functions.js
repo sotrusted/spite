@@ -156,78 +156,147 @@ export function attachToggleReplyButtons(id=null) {
         return;
     }
 
+    // Attach JavaScript handlers for reply buttons (no HTMX conflicts)
     toggleReplyButtons.forEach(a => {
         if (!a.hasAttribute('data-listener-attached')) {
             a.setAttribute('data-listener-attached', 'true');
             const commentId = a.id.split('-').pop();
-            log(`Attaching click listener to reply button for comment ${commentId}`);
-        
-            a.addEventListener('click', function() {
-                log(`Reply button clicked for comment ${commentId}`);
-                const replyForm = document.getElementById(`reply-form-${commentId}`);
-                
-                if (replyForm) {
-                    // Toggle the form visibility
-                    if (replyForm.style.display === 'none' || replyForm.style.display === '') {
-                        replyForm.style.display = 'block';
-                        
-                        // Add loading indicator if it doesn't exist
-                        if (!document.getElementById(`reply-indicator-${commentId}`)) {
-                            const indicator = document.createElement('div');
-                            indicator.id = `reply-indicator-${commentId}`;
-                            indicator.className = 'htmx-indicator';
-                            indicator.innerHTML = `
-                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                                    <span class="visually-hidden">Loading reply form...</span>
-                                </div>
-                                <span class="ms-2">Loading...</span>
-                            `;
-                            replyForm.appendChild(indicator);
-                            
-                            // Update the HTMX attributes to use the indicator
-                            a.setAttribute('hx-indicator', `#reply-indicator-${commentId}`);
-                        }
-                        
-                        // Add a close button after the form is loaded
-                        document.addEventListener('htmx:afterSwap', function(event) {
-                            if (event.detail.target.id === `reply-form-${commentId}`) {
-                                const formContainer = document.getElementById(`comment-form-container-${commentId}`);
-                                if (formContainer) {
-                                    formContainer.style.display = 'block';
-                                    
-                                    // Add close button if it doesn't exist
-                                    if (!document.getElementById(`close-reply-${commentId}`)) {
-                                        const closeButton = document.createElement('button');
-                                        closeButton.id = `close-reply-${commentId}`;
-                                        closeButton.className = 'close-reply-btn';
-                                        closeButton.innerHTML = '×';
-                                        closeButton.onclick = function(e) {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            replyForm.style.display = 'none';
-                                        };
-                                        
-                                        // Insert at the beginning of the form container
-                                        if (formContainer.firstChild) {
-                                            formContainer.insertBefore(closeButton, formContainer.firstChild);
-                                        } else {
-                                            formContainer.appendChild(closeButton);
-                                        }
-                                    }
-                                }
-                            }
-                        }, { once: true });
-                    } else {
-                        replyForm.style.display = 'none';
-                    }
-                } else {
-                    log(`Reply form for comment ${commentId} not found`, 'error');
-                }
+            log(`Attaching JavaScript handler to reply button ${commentId}`);
+            
+            
+            // Add click handler
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadReplyForm(commentId);
             });
         }
     });
     
-    log(`Toggle reply buttons attached`);
+    log(`Toggle reply buttons attached with JavaScript handlers`);
+}
+
+function loadReplyForm(commentId) {
+    log(`Loading reply form for comment ${commentId}`);
+    
+    // Simply show the existing form that's already in the HTML
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'block';
+        
+        // Add close button if it doesn't exist
+        if (!replyForm.querySelector('.close-reply-btn')) {
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-reply-btn btn btn-sm btn-outline-secondary';
+            closeButton.innerHTML = '×';
+            closeButton.onclick = function(e) {
+                e.preventDefault();
+                replyForm.style.display = 'none';
+            };
+            
+            // Insert at the beginning
+            if (replyForm.firstChild) {
+                replyForm.insertBefore(closeButton, replyForm.firstChild);
+            } else {
+                replyForm.appendChild(closeButton);
+            }
+        }
+        
+        // Handle form submission
+        const form = replyForm.querySelector('form');
+        if (form) {
+            // Remove any existing event listeners to prevent duplicates
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitReplyForm(commentId, newForm);
+            });
+        }
+    }
+}
+
+function submitReplyForm(commentId, form) {
+    log(`Submitting reply form for comment ${commentId}`);
+    
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Show loading state
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Submitting...';
+    
+    fetch('/add-comment/comment/' + commentId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Get HTML response
+    })
+    .then(html => {
+        log(`Reply submitted successfully for comment ${commentId}`);
+        
+        // Hide the form
+        const replyForm = document.getElementById(`reply-form-${commentId}`);
+        if (replyForm) {
+            replyForm.style.display = 'none';
+        }
+        
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'alert alert-success alert-dismissible fade show';
+        successMsg.innerHTML = `
+            Reply submitted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert after the reply button
+        const replyButton = document.getElementById(`toggle-reply-${commentId}`);
+        if (replyButton) {
+            replyButton.parentNode.insertBefore(successMsg, replyButton.nextSibling);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        }
+        
+        // Refresh the comment section to show the new reply
+        const commentSection = document.getElementById(`comment-section-${commentId}`);
+        if (commentSection) {
+            // Trigger a refresh of the comment section
+            // This could be a simple page reload or a more sophisticated refresh
+            location.reload();
+        }
+    })
+    .catch(error => {
+        log(`Error submitting reply: ${error}`, 'error');
+        
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'alert alert-danger alert-dismissible fade show';
+        errorMsg.innerHTML = `
+            Error submitting reply: ${error.message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert after the reply button
+        const replyButton = document.getElementById(`toggle-reply-${commentId}`);
+        if (replyButton) {
+            replyButton.parentNode.insertBefore(errorMsg, replyButton.nextSibling);
+        }
+        
+        // Reset button
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
 }
 
 
@@ -255,7 +324,7 @@ function attachCopyLinks(id=null) {
                 const postId = this.id.replace('copy-link-', ''); // e.g., 'copy-link-123' -> '123'
 
                 // Construct the URL dynamically
-                const link = `https://spite.fr/post/${postId}`;
+                const link = `https://spite.fr/post/${postId}/`;
 
                 // Copy the link to the clipboard
                 navigator.clipboard.writeText(link).then(() => {
@@ -825,46 +894,6 @@ function loadCommentForm(postId) {
         .catch(error => console.error('Error fetching the comment form:', error));
 }
 
-// Add this function to handle loading reply forms
-function loadReplyForm(commentId, postId) {
-    const apiUrl = `/api/get-reply-form-html/${commentId}/`;
-    
-    fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error(`Error loading reply form: ${data.error}`);
-            return;
-        }
-
-        const formContainer = document.getElementById(`reply-form-${commentId}`);
-        if (formContainer) {
-            formContainer.innerHTML = data.form;
-            
-            // Add event listener to the new form
-            const formElement = formContainer.querySelector('form');
-            if (formElement) {
-                console.log("Form element found");
-                /*
-                formElement.setAttribute('action', data.action_url);
-                formElement.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    submitCommentForm(formElement, postId);
-                });
-                */
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching reply form:', error);
-        logToBackend(`Error loading reply form for comment ${commentId}: ${error}`, 'error');
-    });
-}
 
 function submitCommentForm(formElement, postId) {
     // Prevent double submission

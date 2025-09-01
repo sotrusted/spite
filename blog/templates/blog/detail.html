@@ -18,7 +18,7 @@
     <div class="image-content">
         <div class="image-container detail-image-container" id="image-container-{{post.id}}" style="display: none;">
             {% if post.media_file and post.is_video %}
-                <video controls muted autoplay playsinline>
+                <video controls muted loop autoplay playsinline>
                     <source src="{{ post.media_file.url }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>

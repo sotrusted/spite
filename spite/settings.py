@@ -82,9 +82,6 @@ INSTALLED_APPS = [
     'pwa',
     'meta',
     'compressor',
-    'ckeditor',
-    'django_ckeditor_5',
-    'ckeditor_uploader',
 ]
 
 CORS_ALLOWED_ORIGINS = [

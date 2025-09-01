@@ -4,7 +4,9 @@
       hx-encoding="multipart/form-data"
       hx-swap="afterbegin"
       hx-target="#post-list"
-      hx-indicator="#post-loading">
+      hx-indicator="#post-loading"
+      hx-trigger="submit"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% csrf_token %}
     {% crispy postForm postForm.helper %}
     {% if form.errors %}
@@ -18,12 +20,49 @@
         </ul>
     </div>
     {% endif %}
-    <div id="post-loading" style="display: none;">Posting...</div>
+    <div id="post-loading" class="htmx-indicator" style="display: none;">
+        <div class="progress mt-2">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                 role="progressbar" 
+                 aria-valuenow="100" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100" 
+                 style="width: 100%"></div>
+        </div>
+        <div class="text-center">Posting...</div>
+    </div>
 </form>
 <div id="post-success" style="display: none; color: green;">Post created successfully!</div>
 <div id="post-error" style="display: none; color: red;">Failed to create the post!</div>
 
 <script>
+    // Prevent double submissions
+    let isSubmitting = false;
+    
+    // Comprehensive HTMX event handling
+    htmx.on('#post-form', 'htmx:beforeSend', function(evt) {
+        console.log('HTMX beforeSend triggered', evt.detail);
+        
+        if (isSubmitting) {
+            evt.preventDefault();
+            console.log('Form submission blocked - already submitting');
+            return;
+        }
+        
+        isSubmitting = true;
+        const submitBtn = this.querySelector('input[type="submit"], button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.value = 'Posting...';
+        }
+        
+        // Hide any previous messages
+        document.getElementById('post-success').style.display = 'none';
+        document.getElementById('post-error').style.display = 'none';
+        
+        console.log('Form submission started');
+    });
+    
     htmx.on('#post-form', 'htmx:xhr:progress', function(evt) {
         // Update progress bar
         if (evt.lengthComputable) {
@@ -31,9 +70,21 @@
             this.querySelector('.progress-bar').style.width = percentComplete + '%';
         }
     });
-
+    
     htmx.on('#post-form', 'htmx:afterRequest', function(evt) {
+        console.log('HTMX afterRequest triggered', evt.detail);
+        console.log('Response status:', evt.detail.xhr.status);
+        console.log('Response text:', evt.detail.xhr.responseText.substring(0, 200));
+        
+        isSubmitting = false;
+        const submitBtn = this.querySelector('input[type="submit"], button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.value = 'Submit';
+        }
+        
         if (evt.detail.successful) {
+            console.log('Request successful');
             // Clear form after successful submission
             this.reset();
             // Show success message
@@ -42,16 +93,89 @@
                 document.getElementById('post-success').style.display = 'none';
             }, 3000);
         } else {
+            console.log('Request failed');
             // Show error message
             document.getElementById('post-error').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('post-error').style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
     });
+    
+    htmx.on('#post-form', 'htmx:responseError', function(evt) {
+        console.error('HTMX response error:', evt.detail);
+        console.error('Status:', evt.detail.xhr.status);
+        console.error('Status text:', evt.detail.xhr.statusText);
+        console.error('Response text:', evt.detail.xhr.responseText);
+        
+        isSubmitting = false;
+        const submitBtn = this.querySelector('input[type="submit"], button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.value = 'Submit';
+        }
+        
+        // Show error message with more details
+        const errorDiv = document.getElementById('post-error');
+        errorDiv.innerHTML = `Failed to create post: ${evt.detail.xhr.status} ${evt.detail.xhr.statusText}`;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    });
+    
+    htmx.on('#post-form', 'htmx:sendError', function(evt) {
+        console.error('HTMX send error:', evt.detail);
+        
+        isSubmitting = false;
+        const submitBtn = this.querySelector('input[type="submit"], button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.value = 'Submit';
+        }
+        
+        // Show error message
+        const errorDiv = document.getElementById('post-error');
+        errorDiv.innerHTML = `Network error: ${evt.detail.error || 'Failed to send request'}`;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    });
+    
+    htmx.on('#post-form', 'htmx:beforeSwap', function(evt) {
+        console.log('HTMX beforeSwap triggered', evt.detail);
+        console.log('Content to swap:', evt.detail.serverResponse.substring(0, 200));
+    });
+    
+    htmx.on('#post-form', 'htmx:afterSwap', function(evt) {
+        console.log('HTMX afterSwap triggered', evt.detail);
+        console.log('Target element:', evt.detail.target);
+    });
+    
+    // Global HTMX error handling
+    document.addEventListener('htmx:responseError', function(evt) {
+        console.error('Global HTMX response error:', evt.detail);
+        if (evt.detail.target && evt.detail.target.id === 'post-list') {
+            console.error('Post list target error:', evt.detail);
+        }
+    });
+ 
 </script>
 
 <style>
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: block;
+}
+
+.htmx-request.htmx-indicator {
+    display: block;
+}
+
 .progress {
     height: 20px;
     margin-bottom: 10px;
@@ -65,15 +189,21 @@
     transition: width .6s ease;
 }
 
-.htmx-indicator {
-    display: none;
+.alert {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border-radius: 4px;
 }
 
-.htmx-request .htmx-indicator {
-    display: block;
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
 }
 
-.htmx-request.htmx-indicator {
-    display: block;
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
 }
 </style>

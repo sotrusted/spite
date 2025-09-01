@@ -1,74 +1,112 @@
 {% load crispy_forms_tags %}
-<div class="post-content">
-    <div class="text-content"> 
-        <strong class="comment-name">{{ comment.name|default:"Anonymous" }}</strong>
-        <p class="comment-content">{{ comment.content }}</p>
-    </div>
-    
-    {% if comment.media_file and comment.is_video %}
-        <div class="image-container">
-            <video 
-                controls 
-                playsinline
-                preload="metadata"
-                data-post-id="{{ comment.id }}"
-            >
-                <source src="{{ comment.media_file.url }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    {% elif comment.media_file and comment.is_image %}
-        <div class="image-container">
-            <img src="{{ comment.media_file.url }}" alt="Comment image" loading="lazy">
-        </div>
-    {% endif %}
-</div>
-
 <div class="comment-content blockquote" 
 {% if comment.parent_comment %}
     data-parent-id="{{comment.parent_comment.id}}"
 {% endif %}>
-    {% if comment.parent_comment %}
-        <div class="parent-comment" style="margin-left: 10px;">
-            <div class="parent-comment-content">
-                <span class="reply-to"><strong>{{ comment.parent_comment_name|default:"Anonymous" }}</strong></span>
-                <p class="parent-comment-content">{{ comment.parent_comment_content }}</p>
+    
+    <!-- Preview (collapsed by default) -->
+    <div class="comment-preview" id="comment-preview-{{comment.id}}">
+        <div class="post-content">
+            <div class="text-content"> 
+                <strong class="comment-name">{{ comment.name|default:"Anonymous" }}</strong>
+                <p class="comment-content">{{ comment.content|truncatewords:20 }}</p>
             </div>
-            {% if comment.parent_comment_media_file %}
-                {% if comment.parent_comment_is_video %}
-                    <div class="video-container">
-                        <video controls autoplay muted loop playsinline>
-                            <source src="{{ comment.post_media_file_url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                {% elif comment.parent_comment_is_image %}
-                    <div class="image-container">
-                        <img src="{{ comment.parent_comment_media_file.url }}" alt="{{ comment.parent_comment_name }}" loading="lazy">
-                    </div>
-                {% endif %}
-            {% endif %}
-
-            {% if comment.context %}
-                <div class="context-{{comment.parent_comment_id}}">
-                    <a hx-get="/hx/get-comment-chain/{{comment.parent_comment_id}}" 
-                       hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment_id}}"
-                       hx-swap="innerHTML" 
-                       hx-trigger="click once">
-                        [More]
-                    </a>
-                    <div id="comment-chain-{{comment.id}}-{{comment.parent_comment_id}}">
-                        <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment_id}}" class="htmx-indicator">
-                            <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                                <span class="visually-hidden"></span>
-                            </div>
-                        </span>
-                    </div>
+            
+            {% if comment.media_file and comment.is_video %}
+                <div class="image-container">
+                    <video 
+                        controls 
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        data-post-id="{{ comment.id }}"
+                    >
+                        <source src="{{ comment.media_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            {% elif comment.media_file and comment.is_image %}
+                <div class="image-container">
+                    <img src="{{ comment.media_file.url }}" alt="Comment image" loading="lazy">
                 </div>
             {% endif %}
         </div>
-    {% endif %}
+    </div>
+    
+    <!-- Detail (expanded view) -->
+    <div class="comment-detail" id="comment-detail-{{comment.id}}" style="display: none;">
+        <div class="post-content">
+            <div class="text-content"> 
+                <strong class="comment-name">{{ comment.name|default:"Anonymous" }}</strong>
+                <p class="comment-content">{{ comment.content }}</p>
+            </div>
+            
+            {% if comment.media_file and comment.is_video %}
+                <div class="image-container">
+                    <video 
+                        controls 
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        data-post-id="{{ comment.id }}"
+                    >
+                        <source src="{{ comment.media_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            {% elif comment.media_file and comment.is_image %}
+                <div class="image-container">
+                    <img src="{{ comment.media_file.url }}" alt="Comment image" loading="lazy">
+                </div>
+            {% endif %}
+        </div>
 
+        {% if comment.parent_comment %}
+            <div class="parent-comment" style="margin-left: 10px;">
+                <div class="parent-comment-content">
+                    <span class="reply-to"><strong>{{ comment.parent_comment_name|default:"Anonymous" }}</strong></span>
+                    <p class="parent-comment-content">{{ comment.parent_comment_content }}</p>
+                </div>
+                {% if comment.parent_comment_media_file %}
+                    {% if comment.parent_comment_is_video %}
+                        <div class="video-container">
+                            <video controls autoplay muted loop playsinline>
+                                <source src="{{ comment.post_media_file_url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    {% elif comment.parent_comment_is_image %}
+                        <div class="image-container">
+                            <img src="{{ comment.parent_comment_media_file.url }}" alt="{{ comment.parent_comment_name }}" loading="lazy">
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if comment.context %}
+                    <div class="context-{{comment.parent_comment_id}}">
+                        <a hx-get="/hx/get-comment-chain/{{comment.parent_comment_id}}" 
+                           hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment_id}}"
+                           hx-swap="innerHTML" 
+                           hx-trigger="click once">
+                            [More]
+                        </a>
+                        <div id="comment-chain-{{comment.id}}-{{comment.parent_comment_id}}">
+                            <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment_id}}" class="htmx-indicator">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
     <div class="parent-post" id="parent-post-{{comment.post_id}}-{{comment.id}}">
         <div class="text-content">
             <h2 class="post-title">
@@ -113,19 +151,20 @@
             {% endif %}
         </div>
     </div>
+
 </div>  
 
 <div class="menu">
     <p><em>{{ comment.created_on }}</em></p>
     <a href="javascript:void(0);" 
+       id="expand-comment-{{comment.id}}" 
+       class="expand-comment">Expand</a>
+    <a href="javascript:void(0);" 
        id="toggle-reply-{{comment.id}}" 
-       class="toggle-reply"
-       hx-get="/hx/get-reply-form-html/{{comment.id}}"
-       hx-target="#reply-form-{{comment.id}}"
-       hx-swap="innerHTML"
-       hx-trigger="click">Reply</a>
+       class="toggle-reply">Reply</a>
 </div>
 
 <div id="reply-form-{{comment.id}}" class="reply-form" style="display: none;">
     <!-- We'll add the indicator dynamically in JavaScript -->
+    {% include 'blog/partials/comment_form.html' with comment_id=comment.id comment_form=comment_form post_type='Comment' %}
 </div>

@@ -56,6 +56,7 @@
         {% include 'blog/post_form_stub.html' %}
     </div>
 
+    <!--
     <h2 class="section-header">recent posts</h2> 
         <div class="highlight post detail" style="margin: auto; text-align: center; margin-top: 30px; max-width: 900px; padding-top: 10px; border: 5px solid black; hyphens: none; margin: auto; padding: 40px; font-size: 1.2em;">
         <div class="title-box" style="border-bottom: 2px solid black; margin-top: 30px; margin-bottom: 50px;">
@@ -126,7 +127,7 @@
     <div class="stream-container">
       {% include 'blog/partials/stream_embed.html' %}
     </div>
-
+  -->
     {% include 'blog/partials/posts_list.html' with posts=posts is_search=is_search query=query count=count %}
 
     <div class="cta">

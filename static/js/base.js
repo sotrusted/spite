@@ -56,5 +56,50 @@ document.addEventListener('DOMContentLoaded', function() {
             scrollToElementById('post-form');
         });
     }
+
+    document.getElementById('post-list').addEventListener('click', function(event) {
+        const target = event.target;
+    
+        // Toggle comments button
+        if (target.id && target.id.startsWith('toggle-comments-')) {
+            const postId = target.id.replace('toggle-comments-', '');
+
+            console.log('Toggle comments clicked for post:', postId);
+            
+            // Call your existing attachToggleComments function or implement the logic here
+            // attachToggleComments(postId);
+            
+            // Or implement the toggle logic directly:
+            const commentSection = document.getElementById(`comment-section-${postId}`);
+            const commentsContainer = document.getElementById(`comments-container-${postId}`);
+            
+            if (commentsContainer.style.display === 'none') {
+                commentsContainer.style.display = 'block';
+                target.innerHTML = '↩ <span class="comment-count">(0)</span>';
+            } else {
+                commentsContainer.style.display = 'none';
+                target.innerHTML = '↩ <span class="comment-count">(0)</span>';
+            }
+        }
+        // Toggle comment expand/collapse
+        if (target.id && target.id.startsWith('expand-comment-')) {
+            const commentId = target.id.replace('expand-comment-', '');
+            console.log('Toggle comment clicked for comment:', commentId);
+            
+            const preview = document.getElementById(`comment-preview-${commentId}`);
+            const detail = document.getElementById(`comment-detail-${commentId}`);
+            
+            if (detail.style.display === 'none') {
+                preview.style.display = 'none';
+                detail.style.display = 'block';
+                target.textContent = 'Collapse';
+            } else {
+                preview.style.display = 'block';
+                detail.style.display = 'none';
+                target.textContent = 'Expand';
+            }
+        }
+
+    });
     
 });

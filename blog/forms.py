@@ -2,7 +2,6 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from blog.models import Post, Comment
 from crispy_forms.layout import Layout, Submit, Div, Field, HTML, Row, Column
-from ckeditor.fields import RichTextField
 
 class PostForm(forms.ModelForm):
     title = forms.CharField(

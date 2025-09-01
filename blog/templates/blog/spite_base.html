@@ -365,6 +365,9 @@
                 responseText: event.detail.xhr.responseText.substring(0, 100) + '...'
             });
         });
+        
+        // Reply buttons are now handled by JavaScript (no HTMX conflicts)
+        console.log('Reply buttons handled by JavaScript in utility_functions.js');
 
 
         document.addEventListener('DOMContentLoaded', function() {

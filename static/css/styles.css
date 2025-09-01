@@ -24,7 +24,6 @@ body {
     width: 100vw;
     white-space: normal;
     word-wrap: break-word;
-    overflow-wrap: break-word;
     overflow: visible;
     font-display: swap;
 }
@@ -452,6 +451,7 @@ form {
 .item {
     overflow: hidden;
     position: relative;
+    padding-top: 10px;
 }
 
 .post.item {
@@ -512,6 +512,8 @@ form {
 .post .post-title {
     font-weight: bold;
     margin: 0;
+    word-wrap: normal;
+    overflow-wrap: normal !important;
 }
 
 .post.nested {
@@ -719,10 +721,10 @@ main {
         -ms-touch-action: manipulation; /* For older IE/Edge support */
     }
     h2 {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
     p {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
     .container {
 	    max-width:100%;
@@ -761,6 +763,9 @@ main {
     .post .post-title {
         font-size: 1.5em;
     }
+    .detail .post-title {
+        font-size: 1.9em;
+    }
     .comment .post-content {
         font-size: 1.1em;
     }
@@ -788,6 +793,7 @@ main {
     .preview .image-container {
         background: transparent;
         width: auto;
+        max-width: 100%;
         display: inline-block; /* Change from flex to inline-block */
         padding: 0;
         margin: 0;

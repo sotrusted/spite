@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.conf import settings
 from django.core.cache import cache
-from ckeditor.fields import RichTextField
 
 class SecureIPStorage:
     def __init__(self):
@@ -482,4 +481,3 @@ class BlockedIP(models.Model):
 
 class TestPost(models.Model):
     title = models.CharField(max_length=200)
-    content = RichTextField()  # CKEditor field

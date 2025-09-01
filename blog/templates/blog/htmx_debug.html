@@ -1,0 +1,200 @@
+{% extends "blog/spite_base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>HTMX Debug Form</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Test HTMX Health Check</h4>
+            <button class="btn btn-info" 
+                    hx-get="/hx/health-check/"
+                    hx-target="#health-result"
+                    hx-swap="innerHTML">
+                Test Health Check
+            </button>
+            <div id="health-result" class="mt-2"></div>
+        </div>
+        
+        <div class="col-md-6">
+            <h4>Test HTMX POST</h4>
+            <form hx-post="/hx/test-post/"
+                  hx-target="#test-result"
+                  hx-swap="innerHTML">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="test-input" class="form-label">Test Input</label>
+                    <input type="text" class="form-control" id="test-input" name="test_input" value="test value">
+                </div>
+                <button type="submit" class="btn btn-primary">Test POST</button>
+            </form>
+            <div id="test-result" class="mt-2"></div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h4>Test Online Count</h4>
+            <button class="btn btn-warning" 
+                    hx-get="/api/online-count/"
+                    hx-target="#online-result"
+                    hx-swap="innerHTML">
+                Test Online Count
+            </button>
+            <div id="online-result" class="mt-2"></div>
+        </div>
+        
+        <div class="col-md-6">
+            <h4>Test Reply Form</h4>
+            <button class="btn btn-success" 
+                    hx-get="/hx/get-reply-form-html/1/"
+                    hx-target="#reply-result"
+                    hx-swap="innerHTML">
+                Test Reply Form (Comment ID 1)
+            </button>
+            <div id="reply-result" class="mt-2"></div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>Debug Information</h4>
+            <div class="card">
+                <div class="card-body">
+                    <h6>HTMX Events Log:</h6>
+                    <div id="htmx-events" style="max-height: 300px; overflow-y: auto; background: #f8f9fa; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>Performance Metrics</h4>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Request Counts</h6>
+                            <div id="request-counts">
+                                <p>Total Requests: <span id="total-requests">0</span></p>
+                                <p>Successful: <span id="successful-requests">0</span></p>
+                                <p>Failed: <span id="failed-requests">0</span></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Response Times</h6>
+                            <div id="response-times">
+                                <p>Average: <span id="avg-response-time">0</span>ms</p>
+                                <p>Slowest: <span id="slowest-response">0</span>ms</p>
+                                <p>Fastest: <span id="fastest-response">0</span>ms</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Errors</h6>
+                            <div id="error-log">
+                                <p>Last Error: <span id="last-error">None</span></p>
+                                <p>Error Count: <span id="error-count">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let requestCounts = { total: 0, successful: 0, failed: 0 };
+let responseTimes = [];
+let errors = [];
+
+// Log all HTMX events for debugging
+htmx.on('htmx:beforeSend', function(evt) {
+    logEvent('beforeSend', evt);
+    requestCounts.total++;
+    updateMetrics();
+});
+
+htmx.on('htmx:sendError', function(evt) {
+    logEvent('sendError', evt);
+    requestCounts.failed++;
+    errors.push({ type: 'sendError', message: evt.detail.error, timestamp: new Date() });
+    updateMetrics();
+});
+
+htmx.on('htmx:responseError', function(evt) {
+    logEvent('responseError', evt);
+    requestCounts.failed++;
+    errors.push({ type: 'responseError', message: evt.detail.xhr.statusText, timestamp: new Date() });
+    updateMetrics();
+});
+
+htmx.on('htmx:afterRequest', function(evt) {
+    logEvent('afterRequest', evt);
+    if (evt.detail.successful) {
+        requestCounts.successful++;
+    } else {
+        requestCounts.failed++;
+    }
+    
+    // Calculate response time
+    const startTime = evt.detail.xhr.startTime || Date.now();
+    const responseTime = Date.now() - startTime;
+    responseTimes.push(responseTime);
+    
+    updateMetrics();
+});
+
+htmx.on('htmx:beforeSwap', function(evt) {
+    logEvent('beforeSwap', evt);
+});
+
+htmx.on('htmx:afterSwap', function(evt) {
+    logEvent('afterSwap', evt);
+});
+
+function logEvent(eventType, evt) {
+    const eventsDiv = document.getElementById('htmx-events');
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${eventType}: ${evt.detail.xhr ? evt.detail.xhr.status : 'N/A'}\n`;
+    
+    eventsDiv.textContent += logEntry;
+    eventsDiv.scrollTop = eventsDiv.scrollHeight;
+    
+    console.log(`HTMX Event: ${eventType}`, evt);
+}
+
+function updateMetrics() {
+    // Update request counts
+    document.getElementById('total-requests').textContent = requestCounts.total;
+    document.getElementById('successful-requests').textContent = requestCounts.successful;
+    document.getElementById('failed-requests').textContent = requestCounts.failed;
+    
+    // Update response times
+    if (responseTimes.length > 0) {
+        const avg = Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length);
+        const slowest = Math.max(...responseTimes);
+        const fastest = Math.min(...responseTimes);
+        
+        document.getElementById('avg-response-time').textContent = avg;
+        document.getElementById('slowest-response').textContent = slowest;
+        document.getElementById('fastest-response').textContent = fastest;
+    }
+    
+    // Update error info
+    if (errors.length > 0) {
+        const lastError = errors[errors.length - 1];
+        document.getElementById('last-error').textContent = `${lastError.type}: ${lastError.message}`;
+        document.getElementById('error-count').textContent = errors.length;
+    }
+}
+
+// Track request start times
+htmx.on('htmx:beforeRequest', function(evt) {
+    if (evt.detail.xhr) {
+        evt.detail.xhr.startTime = Date.now();
+    }
+});
+</script>
+{% endblock %} 

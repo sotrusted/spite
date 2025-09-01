@@ -1,0 +1,18 @@
+<!-- Debug script for reply buttons - Simplified version since main handling is in base template -->
+<script>
+(function() {
+    console.log('Reply button debug script loaded (simplified)');
+    
+    // This script is now just for debugging - main functionality is in base template
+    // Monitor reply button clicks for debugging only
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('toggle-reply')) {
+            const buttonId = e.target.id;
+            const now = Date.now();
+            console.log(`Reply button clicked: ${buttonId} at ${now}`);
+        }
+    });
+    
+    console.log('Reply button debug script ready (simplified)');
+})();
+</script> 
