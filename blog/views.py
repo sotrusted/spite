@@ -245,136 +245,206 @@ class PostCreateView(CreateView):
         except Exception as e:
             logger.error(f"Error getting fast image fingerprint: {e}")
             return None
+
+    def detect_repetitive_patterns(self, content):
+        """Detect repetitive text patterns that indicate spam"""
+        if not content or len(content) < 20:
+            return False, ""
         
-    
+        # Normalize content
+        normalized = ' '.join(content.lower().split())
+        
+        # Check for repeated phrases (3+ times)
+        words = normalized.split()
+        if len(words) < 10:
+            return False, ""
+        
+        # Look for repeated word sequences
+        for seq_len in range(3, min(8, len(words)//2)):
+            for i in range(len(words) - seq_len + 1):
+                sequence = ' '.join(words[i:i+seq_len])
+                if len(sequence) > 15:  # Only check meaningful sequences
+                    count = normalized.count(sequence)
+                    if count >= 3:
+                        logger.info(f"[SpamCheck] Repetitive pattern detected: '{sequence}' appears {count} times")
+                        return True, "Content contains repetitive patterns"
+        
+        # Check for excessive repetition of individual words
+        word_counts = {}
+        for word in words:
+            if len(word) > 3:  # Only count words longer than 3 chars
+                word_counts[word] = word_counts.get(word, 0) + 1
+        
+        # If any word appears more than 30% of the time, it's suspicious
+        for word, count in word_counts.items():
+            if count > len(words) * 0.3:
+                logger.info(f"[SpamCheck] Excessive word repetition: '{word}' appears {count} times in {len(words)} words")
+                return True, "Content contains excessive word repetition"
+        
+        return False, ""
+        
     def check_spam_fast(self, request, title, content, display_name, media_file=None):
-        """Fast spam checks rate limiting exact duplicates and image duplicates"""
+        """Fast spam detection that scores content instead of blocking"""
         try:
             client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
             logger.info(f"[SpamCheck] Client IP: {client_ip}")
-            logger.info(f"[SpamCheck] Title: '{title}', Content: '{content}', Display name: '{display_name}'")
-
-            # 1. Rate limiting
+            
+            spam_score = 0
+            spam_reasons = []
+            
+            # 1. Rate limiting - still block if too aggressive
             cache_key = f'post_count_{client_ip}'
             post_count = cache.get(cache_key, 0)
-            logger.info(f"[SpamCheck] Rate limit cache key: {cache_key}, current count: {post_count}")
-
-            if post_count > 5:
+            
+            if post_count > 5:  # Back to 5 per minute
                 logger.info(f"[SpamCheck] Rate limit exceeded for IP {client_ip}")
                 return True, "Please wait a minute before posting again"
             
             # Increment post count
             cache.set(cache_key, post_count + 1, 60)
-            logger.info(f"[SpamCheck] Incremented post count for {client_ip} to {post_count + 1}")
-
-            # 2. Check recent posts for similar content (optimized for speed)
-
-            # Use cache for recent post content hashes to avoid DB hits and expensive similarity checks
+            
+            # 2. Fast content checks (lightweight)
+            content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {display_name.lower().strip() if display_name else ''}"
+            content_to_check = ' '.join(content_to_check.split())
+            
+            # Quick repetitive word check (fast)
+            words = content_to_check.split()
+            if len(words) > 10:
+                word_counts = {}
+                for word in words:
+                    if len(word) > 3:
+                        word_counts[word] = word_counts.get(word, 0) + 1
+                
+                # Check for excessive repetition
+                for word, count in word_counts.items():
+                    if count > len(words) * 0.4:  # 40% threshold
+                        spam_score += 40  # Increased from 30
+                        spam_reasons.append(f"Excessive repetition of '{word}'")
+                        break  # Only count once
+            
+            # 3. Fast global duplicate check (limited scope)
+            global_key = 'global_recent_posts_fast'
+            global_recent = cache.get(global_key, [])
+            
+            # Only check against last 20 posts for speed
+            if content_to_check in global_recent[-20:]:
+                spam_score += 70  # Increased from 50 - this should trigger hiding
+                spam_reasons.append("Exact duplicate of recent content")
+            
+            # 4. IP-specific duplicate check
             recent_posts_key = f'recent_posts_{client_ip}'
             recent_posts = cache.get(recent_posts_key, [])
-            logger.info(f"[SpamCheck] Recent posts hash list for {client_ip}: {recent_posts}")
-
-            # Create content hash including name
-            content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {display_name.lower().strip() if display_name else ''}"
+            
             content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
-            logger.info(f"[SpamCheck] Content to check: '{content_to_check}' | Hash: {content_hash}")
-
-            # Fast: Check for exact duplicate in recent hashes (O(N), N small)
             if content_hash in recent_posts:
-                logger.info(f"[SpamCheck] Exact duplicate detected for IP {client_ip} with hash {content_hash}")
-                return True, "This looks like a duplicate post"
-
-            # Optimization: Only check similarity if there are no exact matches
-            # To further speed up, cache recent post "content_to_check" strings as well
-            recent_posts_content_key = f'recent_posts_content_{client_ip}'
-            recent_posts_content = cache.get(recent_posts_content_key, [])
-            logger.info(f"[SpamCheck] Recent posts content list for {client_ip}: {recent_posts_content}")
-
-            # Only fetch from DB if we don't have enough recent post contents cached
-            if len(recent_posts_content) < 10:
-                logger.info(f"[SpamCheck] Fetching recent posts from DB for similarity check (IP: {client_ip})")
-                # Only fetch the fields we need for similarity
-                recent_db_posts = Post.objects.filter(
-                    date_posted__gte=localtime() - timedelta(minutes=5)
-                ).order_by('-date_posted').values_list('title', 'content', 'display_name')[:10]
-                recent_posts_content = [
-                    f"{t.lower().strip() if t else ''} {c.lower().strip() if c else ''} {d.lower().strip() if d else ''}"
-                    for t, c, d in recent_db_posts
-                ]
-                cache.set(recent_posts_content_key, recent_posts_content, 300)  # 5 min cache
-                logger.info(f"[SpamCheck] Updated recent_posts_content cache for {client_ip}: {recent_posts_content}")
-
-            # Use SequenceMatcher only on recent post contents (still O(N), but N is small and avoids DB hits)
-            for idx, recent_content in enumerate(recent_posts_content):
-                # Quick length check to skip obviously different posts
-                if abs(len(content_to_check) - len(recent_content)) > 40:
-                    logger.info(f"[SpamCheck] Skipping similarity check for index {idx} due to length difference")
-                    continue
-                similarity = SequenceMatcher(None, content_to_check, recent_content).ratio()
-                logger.info(f"[SpamCheck] Similarity with recent post {idx}: {similarity:.3f}")
-                if similarity > 0.8:  # 80% similarity threshold
-                    logger.info(f"[SpamCheck] Similar post detected for IP {client_ip} (similarity: {similarity:.3f})")
-                    return True, "This content is too similar to a recent post"
-
-            # Store this content hash and content for future fast checks
+                spam_score += 50  # Increased from 40
+                spam_reasons.append("You've posted this content recently")
+            
+            # 5. Update caches
+            global_recent.append(content_to_check)
+            if len(global_recent) > 100:  # Keep more posts
+                global_recent.pop(0)
+            cache.set(global_key, global_recent, 600)
+            
             recent_posts.append(content_hash)
-            if len(recent_posts) > 10:  # Keep last 10 posts
-                removed_hash = recent_posts.pop(0)
-                logger.info(f"[SpamCheck] Removing oldest hash from recent_posts: {removed_hash}")
-            cache.set(recent_posts_key, recent_posts, 300)  # Store for 5 minutes
-            logger.info(f"[SpamCheck] Updated recent_posts cache for {client_ip}: {recent_posts}")
-
-            recent_posts_content.append(content_to_check)
-            if len(recent_posts_content) > 10:
-                removed_content = recent_posts_content.pop(0)
-                logger.info(f"[SpamCheck] Removing oldest content from recent_posts_content: {removed_content}")
-            cache.set(recent_posts_content_key, recent_posts_content, 300)
-            logger.info(f"[SpamCheck] Updated recent_posts_content cache for {client_ip}: {recent_posts_content}")
-
+            if len(recent_posts) > 10:
+                recent_posts.pop(0)
+            cache.set(recent_posts_key, recent_posts, 300)
+            
+            # 6. Image duplicate check (existing logic)
             if media_file and hasattr(media_file, 'read'):
                 try:
                     fingerprint = self.get_fast_image_fingerprint(media_file)
-                    logger.info(f"[SpamCheck] Image fingerprint: {fingerprint}")
                     if fingerprint: 
                         recent_images_key = f'global_recent_images'
                         recent_images = cache.get(recent_images_key, [])
-                        logger.info(f"[SpamCheck] Recent image fingerprints: {[img['fingerprint'] for img in recent_images]}")
-
-                        # Check if this exact image has been posted recently
+                        
                         for recent_fingerprint in recent_images:
                             if recent_fingerprint['fingerprint'] == fingerprint:
-                                logger.info(f"[SpamCheck] Duplicate image detected for fingerprint: {fingerprint}")
-                                return True, "This image has been posted recently"
+                                spam_score += 60
+                                spam_reasons.append("This image has been posted recently")
+                                break
 
                         image_data = {
                             'fingerprint': fingerprint,
                             'timestamp': time.time(),
                         }
                         
-                        # Add this image to the recent images list
                         recent_images.append(image_data)
-
-                        # Keep only last 100 images and remove older ones 
                         current_time = time.time()
                         filtered_images = [
                             img for img in recent_images[-100:]
-                            if current_time - img['timestamp'] < 1800 # 30 minutes
+                            if current_time - img['timestamp'] < 1800
                         ]
-                        logger.info(f"[SpamCheck] Filtered recent images count: {len(filtered_images)}")
                         cache.set(recent_images_key, filtered_images, 1800)
 
                 except Exception as e:
                     logger.warning(f"Error checking image duplicate: {e}")
             
-            logger.info(f"[SpamCheck] No spam detected for IP {client_ip}")
-            return False, ""
+            # 7. Determine action based on score
+            if spam_score >= 80:  # High spam score - block
+                logger.info(f"[SpamCheck] High spam score {spam_score} for IP {client_ip}: {spam_reasons}")
+                return True, f"Content flagged as spam: {'; '.join(spam_reasons)}"
+            elif spam_score >= 50:  # Medium-high spam score - allow but mark (will be hidden)
+                logger.info(f"[SpamCheck] Medium-high spam score {spam_score} for IP {client_ip}: {spam_reasons}")
+                # Store spam score in request for later use
+                request.spam_score = spam_score
+                request.spam_reasons = spam_reasons
+                return False, ""  # Allow the post but it will be hidden
+            elif spam_score >= 30:  # Medium spam score - allow but push down
+                logger.info(f"[SpamCheck] Medium spam score {spam_score} for IP {client_ip}: {spam_reasons}")
+                # Store spam score in request for later use
+                request.spam_score = spam_score
+                request.spam_reasons = spam_reasons
+                return False, ""  # Allow the post, will be pushed down
+            else:  # Low spam score - normal post
+                logger.info(f"[SpamCheck] Low spam score {spam_score} for IP {client_ip}")
+                return False, ""
             
         except Exception as e:
             logger.error(f"[SpamCheck] Error in spam check: {e}", exc_info=True)
-            # If spam check fails, allow the post but log the error
             return False, ""
 
+    def clear_spam_caches(self):
+        """Clear all spam-related caches - useful for maintenance"""
+        try:
+            # Clear global content cache
+            cache.delete('global_recent_posts_fast')
+            # Clear global image cache
+            cache.delete('global_recent_images')
+            # Clear all IP-specific caches (this is more aggressive)
+            # Note: In production, you might want to be more selective
+            logger.info("[SpamCheck] Cleared all spam caches")
+        except Exception as e:
+            logger.error(f"[SpamCheck] Error clearing caches: {e}")
 
+    def get_spam_stats(self):
+        """Get statistics about current spam detection state"""
+        try:
+            global_posts = cache.get('global_recent_posts_fast', [])
+            global_images = cache.get('global_recent_images', [])
+            
+            stats = {
+                'global_posts_count': len(global_posts),
+                'global_images_count': len(global_images),
+                'cache_keys': [
+                    'global_recent_posts_fast',
+                    'global_recent_images'
+                ]
+            }
+            
+            # Count IP-specific caches
+            ip_caches = 0
+            for key in cache.keys('*'):
+                if key.startswith('post_count_') or key.startswith('recent_posts_'):
+                    ip_caches += 1
+            
+            stats['ip_caches_count'] = ip_caches
+            return stats
+            
+        except Exception as e:
+            logger.error(f"[SpamCheck] Error getting spam stats: {e}")
+            return {'error': str(e)}
 
 
 
@@ -403,27 +473,6 @@ class PostCreateView(CreateView):
 
             self.request = request
 
-            # Check for spam before processing the form
-            '''
-            is_spam, spam_message = self.check_spam(
-                request, 
-                request.POST.get('title', ''),
-                request.POST.get('content', ''), 
-                request.POST.get('display_name', '')
-            )
-            '''
-            '''
-            if is_spam:
-                logger.warning(f"Spam detected: {spam_message}")
-                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False, 
-                        'error': spam_message
-                    }, status=400
-                # For non-AJAX requests, add error to messages
-                messages.error(request, spam_message)
-                return self.form_invalid(self.get_form())
-            '''
             logger.info("Calling super().post()")
             result = super().post(request, *args, **kwargs)
             logger.info(f"super().post() returned: {result}")
@@ -480,6 +529,17 @@ class PostCreateView(CreateView):
                     }, status=400)
                 messages.error(self.request, spam_message)
                 return self.form_invalid(form)
+
+            # Store spam score and reasons if they exist
+            spam_score = getattr(self.request, 'spam_score', 0)
+            spam_reasons = getattr(self.request, 'spam_reasons', [])
+            
+            if spam_score > 0:
+                logger.info(f"Post has spam score {spam_score}: {spam_reasons}")
+                # Store spam metadata with the post
+                post.spam_score = spam_score
+                post.spam_reasons = '; '.join(spam_reasons)
+                post.is_potentially_spam = True
 
             logger.info("Setting IP address and saving post")
             post.set_ip_address(ip_address)
@@ -579,38 +639,6 @@ class PostReplyView(PostCreateView):
     def form_valid(self, form):
         parent_post = get_object_or_404(Post, pk=self.kwargs['pk'])
         reply = form.save(commit=False)
-        # Check spam
-        # 1. Rate limiting
-        client_ip = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
-                            self.request.META.get('REMOTE_ADDR')
-        cache_key = f'reply_count_{client_ip}'
-        reply_count = cache.get(cache_key, 0)
-        
-        if reply_count > 5:  # Max 5 posts per minute
-            is_spam = True
-            spam_message = "Please wait a minute before posting again"
-        # Increment post count
-        cache.set(cache_key, reply_count + 1, 60)  # Expires in 60 seconds
-
-        # 2. Check recent posts for similar content
-        recent_replies_key = f'recent_replies_{client_ip}'
-        recent_replies = cache.get(recent_replies_key, [])
-        
-        # Create content hash including name
-        content_to_check = f"{reply.name.lower().strip() if reply.name else ''} {reply.content.lower().strip() if reply.content else ''}"
-        content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
-        
-        # Check for duplicate or similar content
-        for recent_hash in recent_replies:
-            if content_hash == recent_hash:
-                is_spam = True
-                spam_message = "This looks like a duplicate reply"
-
-        # Store this content hash
-        recent_replies.append(content_hash)
-        if len(recent_replies) > 10:  # Keep last 10 replies
-            recent_replies.pop(0)
-        cache.set(recent_replies_key, recent_replies, 300)  # Store for 5 minutes
 
         is_spam, spam_message = self.check_spam_fast(
             self.request,
@@ -621,7 +649,12 @@ class PostReplyView(PostCreateView):
         )
         
         if is_spam:
-            logger.warning(f"Image spam detected: {spam_message}")
+            logger.warning(f"Spam detected: {spam_message}")
+            if self.request.headers.get('HX-Request'):
+                return HttpResponse(
+                    f"<div class='alert alert-danger'>{spam_message}</div>",
+                    status=400
+                )
             if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': False, 
@@ -1594,3 +1627,30 @@ def htmx_test_post(request):
 def htmx_debug_view(request):
     """Debug view for testing HTMX functionality"""
     return render(request, 'blog/htmx_debug.html')
+
+
+def spam_monitor_view(request):
+    """Admin view to monitor spam detection"""
+    try:
+        # Get spam statistics
+        temp_view = PostCreateView()
+        spam_stats = temp_view.get_spam_stats()
+        
+        # Get recent posts with spam scores
+        from blog.models import Post
+        recent_spam_posts = Post.objects.filter(
+            spam_score__gt=0
+        ).order_by('-date_posted')[:20]
+        
+        context = {
+            'spam_stats': spam_stats,
+            'recent_spam_posts': recent_spam_posts,
+        }
+        
+        return render(request, 'blog/spam_monitor.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in spam monitor view: {e}")
+        return HttpResponse(f"Error: {str(e)}", status=500)
+
+

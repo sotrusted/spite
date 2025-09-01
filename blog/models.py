@@ -90,6 +90,9 @@ class Post(models.Model):
     is_image = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
 
+    spam_score = models.IntegerField(default=0)
+    spam_reasons = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return f'{self.id} - {self.title}'
@@ -206,6 +209,9 @@ class Comment(models.Model):
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
+
+    spam_score = models.IntegerField(default=0)
+    spam_reasons = models.TextField(blank=True, null=True)
 
     @property
     def post_id(self):

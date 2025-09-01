@@ -15,7 +15,9 @@ from .views import (home, PostCreateView, PostDetailView,
                     remove_user,                     hx_get_parent_post, hx_get_comment,
                     hx_get_comment_by_id, hx_get_comment_reply_form_html,
                     hx_scroll_to_post_form, toggle_version, hx_get_post, hx_get_post_comment_section,
-                    spite_tv, spite_counter, htmx_health_check, htmx_test_post, htmx_debug_view)
+                    spite_tv, spite_counter, htmx_health_check, htmx_test_post, htmx_debug_view,
+                    spam_monitor_view)
+
 
 import blog.views as blog_views
 import blog.test_views as test_views
@@ -80,6 +82,7 @@ urlpatterns = [
     path('hx/health-check/', htmx_health_check, name='htmx-health-check'),
     path('hx/test-post/', htmx_test_post, name='htmx-test-post'),
     path('hx/debug/', htmx_debug_view, name='htmx-debug'),
+    path('spam-monitor/', spam_monitor_view, name='spam-monitor'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

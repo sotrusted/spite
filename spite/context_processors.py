@@ -168,9 +168,34 @@ def load_posts(request):
     all_comments = Comment.objects.all().order_by('-created_on')
 
     # Combine posts and comments into a single feed
-    combined_items = sorted(
-        chain(posts_data['posts'], all_comments),
-        key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+    # Filter out high-spam posts entirely, keep medium-spam posts but push them down
+    combined_items = []
+    filtered_count = 0
+    total_count = 0
+    
+    for item in chain(posts_data['posts'], all_comments):
+        total_count += 1
+        spam_score = getattr(item, 'spam_score', 0)
+        
+        # Completely hide high-spam content (score >= 50)
+        if spam_score >= 50:
+            filtered_count += 1
+            logger.info(f"Filtering out high-spam post with score {spam_score} (ID: {getattr(item, 'id', 'unknown')})")
+            continue
+        
+        # Keep all other content
+        combined_items.append(item)
+    
+    logger.info(f"Spam filtering: {filtered_count}/{total_count} posts filtered out due to high spam scores")
+    
+    # Sort remaining items by date and spam score
+    combined_items.sort(
+        key=lambda x: (
+            # Primary sort: date (newest first)
+            x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+            # Secondary sort: spam score (lower scores first, pushing medium spam down)
+            getattr(x, 'spam_score', 0) if hasattr(x, 'spam_score') else 0
+        ),
         reverse=True
     )
 
