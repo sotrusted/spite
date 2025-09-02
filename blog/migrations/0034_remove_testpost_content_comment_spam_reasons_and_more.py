@@ -10,10 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='testpost',
-            name='content',
-        ),
+        # Removed RemoveField for testpost.content as it never existed
         migrations.AddField(
             model_name='comment',
             name='spam_reasons',

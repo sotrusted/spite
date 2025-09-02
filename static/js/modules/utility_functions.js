@@ -705,6 +705,17 @@ export function addPostToPage(post) {
 
     // Process with HTMX
     htmx.process(newPost);
+    
+    // Add error handling for HTMX requests
+    htmx.on(newPost, 'htmx:responseError', function(evt) {
+        console.error(`HTMX error loading post ${postId}:`, evt.detail);
+        // Replace skeleton with error message
+        newPost.innerHTML = `
+            <div class="alert alert-warning">
+                <p>Failed to load post #${postId}. <a href="javascript:void(0);" onclick="location.reload();">Refresh page</a></p>
+            </div>`;
+    });
+    
     htmx.trigger(newPost, 'revealed');
 
     // Wait for the post to be fully loaded before attaching event handlers

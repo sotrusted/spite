@@ -4,7 +4,7 @@ import lz4.frame as lz4
 import zlib
 from celery import shared_task
 from django.core.cache import cache
-from blog.models import Post, Summary
+from blog.models import Post, Summary, Comment
 from .openai import generate_summary
 from django.db.models import Q
 import logging
@@ -102,7 +102,60 @@ def cache_posts_data():
         
         cache.set('posts_chunk_count', len(chunks), CACHE_TIMEOUT)
         
-        logger.info(f"Cached {len(pinned_posts)} pinned posts and {len(chunks)} chunks (spam filtered)")
+        # Set the cache update timestamp so context processor knows cache is fresh
+        from datetime import datetime
+        cache.set('last_cache_update', datetime.now().timestamp(), CACHE_TIMEOUT)
+        
+        # OPTIMIZED: Cache comments as well since they're used as "quote posts"
+        # Include related post data for proper rendering
+        comments = Comment.objects.select_related('post', 'parent_comment').values(
+            'id',
+            'content',
+            'name',
+            'created_on',
+            'post_id',
+            'parent_comment_id',
+            'media_file',
+            'spam_score',
+            # Include post data
+            'post__id',
+            'post__title',
+            'post__content',
+            'post__display_name',
+            'post__date_posted',
+            'post__media_file',
+            'post__image',
+            'post__is_image',
+            'post__is_video',
+            'post__anon_uuid',
+            # Include parent comment data
+            'parent_comment__id',
+            'parent_comment__content',
+            'parent_comment__name',
+            'parent_comment__created_on',
+            'parent_comment__media_file',
+        ).filter(
+            spam_score__lt=50
+        ).order_by('-created_on')
+        
+        # Cache comments in chunks too
+        comment_chunks = []
+        for i in range(0, len(comments), CHUNK_SIZE):
+            comment_chunk = list(comments[i:i + CHUNK_SIZE])
+            comment_chunks.append(comment_chunk)
+        
+        # Cache comment chunks
+        for i, comment_chunk in enumerate(comment_chunks):
+            compressed_comments = lz4.compress(pickle.dumps(comment_chunk))
+            cache.set(f'comments_chunk_{i}', compressed_comments, CACHE_TIMEOUT)
+        
+        cache.set('comments_chunk_count', len(comment_chunks), CACHE_TIMEOUT)
+        
+        # Cache the total count to avoid expensive queries on every request
+        total_count = Post.objects.count() + Comment.objects.count()
+        cache.set('total_posts_comments', total_count, CACHE_TIMEOUT)
+        
+        logger.info(f"Cached {len(pinned_posts)} pinned posts, {len(chunks)} post chunks, and {len(comment_chunks)} comment chunks (spam filtered)")
         
     except Exception as e:
         logger.error(f"Error in cache_posts_data: {e}")
@@ -226,7 +279,19 @@ def persist_pageview_count():
 
 @shared_task
 def cleanup_old_caches():
+    # Clean up post chunks
     chunk_count = cache.get('posts_chunk_count', 0)
     for i in range(chunk_count):
         cache.delete(f'posts_chunk_{i}')
     cache.delete('posts_chunk_count')
+    
+    # Clean up comment chunks
+    comment_chunk_count = cache.get('comments_chunk_count', 0)
+    for i in range(comment_chunk_count):
+        cache.delete(f'comments_chunk_{i}')
+    cache.delete('comments_chunk_count')
+    
+    # Clean up other caches
+    cache.delete('pinned_posts')
+    cache.delete('highlight_comments')
+    cache.delete('last_cache_update')

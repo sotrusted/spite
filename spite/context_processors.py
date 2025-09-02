@@ -62,31 +62,37 @@ def get_cached_posts(request):
         last_update = cache.get('last_cache_update')
         current_time = datetime.now().timestamp()
         
-        # If cache is older than 1 minute or missing, force refresh
-        if not last_update or (current_time - last_update) > 60:
-            logger.info("Cache stale or missing, forcing refresh")
-            cache_posts_data()  # Direct call for immediate refresh
+        # If cache is older than 10 minutes, trigger async refresh (non-blocking)
+        # Use a longer threshold to prevent constant refreshes
+        if not last_update or (current_time - last_update) > 600:  # 10 minutes
+            logger.info("Cache stale or missing, triggering async refresh")
+            cache_posts_data.delay()  # Async call - non-blocking
             
-        # Get pinned posts (usually few)
+        # OPTIMIZED: Get pinned posts (usually few)
         compressed_pinned = cache.get('pinned_posts')
         pinned_posts = []
         if compressed_pinned:
-            pickled_pinned = lz4.decompress(compressed_pinned)
-            pinned_posts = [DictToObject(post) for post in pickle.loads(pickled_pinned)]
+            try:
+                pickled_pinned = lz4.decompress(compressed_pinned)
+                pinned_posts = [DictToObject(post) for post in pickle.loads(pickled_pinned)]
+            except Exception as e:
+                logger.error(f"Error loading pinned posts: {e}")
 
-        # Get only needed chunks for current page
+        # OPTIMIZED: Load chunks more efficiently
         chunk_count = cache.get('posts_chunk_count', 0)
-        page = int(request.GET.get('page', 1))
-        chunks_needed = min(3, max(1, page))  # Load 1-3 chunks based on page
-
         regular_posts = []
-        # Load all chunks instead of just the first few
+        
+        # Load all chunks but with better error handling
         for i in range(chunk_count):
             compressed_chunk = cache.get(f'posts_chunk_{i}')
             if compressed_chunk:
                 try:
                     chunk = pickle.loads(lz4.decompress(compressed_chunk))
-                    regular_posts.extend(DictToObject(post) for post in chunk)
+                    chunk_posts = [DictToObject(post) for post in chunk]
+                    # Add get_item_type attribute to each post for template compatibility
+                    for post in chunk_posts:
+                        post.get_item_type = "Post"
+                    regular_posts.extend(chunk_posts)
                 except Exception as e:
                     logger.error(f"Error loading chunk {i}: {e}")
                     continue
@@ -104,6 +110,103 @@ def get_cached_posts(request):
         logger.error(f"Cache error: {e}")
         return get_optimized_posts()
 
+def get_cached_comments():
+    """Get comments from cache, fallback to database if needed"""
+    try:
+        comment_chunk_count = cache.get('comments_chunk_count', 0)
+        all_comments = []
+        
+        # Load all comment chunks from cache
+        for i in range(comment_chunk_count):
+            compressed_chunk = cache.get(f'comments_chunk_{i}')
+            if compressed_chunk:
+                try:
+                    chunk = pickle.loads(lz4.decompress(compressed_chunk))
+                    # Convert dict to Comment-like objects
+                    comment_objects = []
+                    for comment_data in chunk:
+                        comment_obj = CommentDictToObject(comment_data)
+                        comment_objects.append(comment_obj)
+                    all_comments.extend(comment_objects)
+                except Exception as e:
+                    logger.error(f"Error loading comment chunk {i}: {e}")
+                    continue
+        
+        if all_comments:
+            return all_comments
+        
+        # Fallback to database if cache is empty
+        logger.info("Comment cache empty, fetching from database")
+        return Comment.objects.select_related('post').filter(
+            spam_score__lt=50
+        ).order_by('-created_on')
+        
+    except Exception as e:
+        logger.error(f"Error in get_cached_comments: {e}")
+            # Fallback to database
+    comments = Comment.objects.select_related('post').filter(
+        spam_score__lt=50
+    ).order_by('-created_on')
+    
+    # Add get_item_type attribute to each comment for template compatibility
+    for comment in comments:
+        comment.get_item_type = "Comment"
+    
+    return comments
+
+class CommentDictToObject:
+    """Convert comment dictionary to object-like structure with related objects"""
+    def __init__(self, data):
+        # Set basic comment fields
+        for key, value in data.items():
+            if key == 'media_file':
+                # Create a FileField-like object with a url attribute
+                if value:
+                    setattr(self, key, FileFieldLike(value))
+                else:
+                    setattr(self, key, None)
+            elif not key.startswith('post__') and not key.startswith('parent_comment__'):
+                setattr(self, key, value)
+        
+        # Add get_item_type attribute for template compatibility
+        self.get_item_type = "Comment"
+        
+        # Create post object if post data exists
+        if any(key.startswith('post__') for key in data.keys()):
+            post_data = {}
+            for key, value in data.items():
+                if key.startswith('post__'):
+                    field_name = key.replace('post__', '')
+                    if field_name in ['media_file', 'image']:
+                        if value:
+                            post_data[field_name] = FileFieldLike(value)
+                        else:
+                            post_data[field_name] = None
+                    else:
+                        post_data[field_name] = value
+            
+            self.post = DictToObject(post_data)
+        else:
+            self.post = None
+        
+        # Create parent comment object if parent comment data exists
+        if any(key.startswith('parent_comment__') for key in data.keys()):
+            parent_data = {}
+            for key, value in data.items():
+                if key.startswith('parent_comment__'):
+                    field_name = key.replace('parent_comment__', '')
+                    if field_name == 'media_file':
+                        if value:
+                            parent_data[field_name] = FileFieldLike(value)
+                        else:
+                            parent_data[field_name] = None
+                    else:
+                        parent_data[field_name] = value
+            
+            self.parent_comment = CommentDictToObject(parent_data)
+        else:
+            self.parent_comment = None
+
 class DictToObject:
     """Convert dictionary to object-like structure with support for FileField URLs"""
     def __init__(self, data):
@@ -116,14 +219,14 @@ class DictToObject:
                     setattr(self, key, None)
             else:
                 setattr(self, key, value)
-    
-    def get_item_type(self):
-        return "Post"
+        
+        # Add get_item_type attribute for template compatibility
+        self.get_item_type = "Post"
 
 class FileFieldLike:
     """Mimics Django's FileField with url attribute"""
     def __init__(self, url):
-        if url and not url.startswith(settings.MEDIA_URL):  # Ensure MEDIA_URL is prefixed
+        if url and isinstance(url, str) and not url.startswith(settings.MEDIA_URL):  # Ensure MEDIA_URL is prefixed
             self.name = url.split('/')[-1] 
             self.url = f"{settings.MEDIA_URL}{url.lstrip('/')}"
         else:
@@ -149,30 +252,44 @@ def load_posts(request):
     # Try cache first, fallback to database
     posts_data = get_cached_posts(request)
 
+    # OPTIMIZED: Batch load comments for pinned posts to avoid N+1 queries
+    if posts_data['pinned_posts']:
+        pinned_post_ids = [post.id for post in posts_data['pinned_posts']]
+        pinned_comments = Comment.objects.filter(
+            post_id__in=pinned_post_ids
+        ).select_related('post').order_by('-created_on')
+        
+        # Group comments by post_id
+        comments_by_pinned_post = {}
+        for comment in pinned_comments:
+            if comment.post_id not in comments_by_pinned_post:
+                comments_by_pinned_post[comment.post_id] = []
+            comments_by_pinned_post[comment.post_id].append(comment)
+        
+        # Attach comments to pinned posts
+        for post in posts_data['pinned_posts']:
+            post.comments_total = len(comments_by_pinned_post.get(post.id, []))
+            post.recent_comments = comments_by_pinned_post.get(post.id, [])[:5]
 
+    # OPTIMIZED: Use cached highlight comments (kept for future use)
+    highlight_comments = cache.get('highlight_comments')
+    if not highlight_comments:
+        highlight_comments = list(Comment.objects.select_related('post').filter(
+            spam_score__lt=50
+        ).order_by('-created_on')[:5])
+        cache.set('highlight_comments', highlight_comments, 300)  # Cache for 5 minutes
 
-
-    # Add comments context
+    # Load ALL comments as quote posts from cache
+    all_comments = get_cached_comments()
     
- 
-    for post in posts_data['pinned_posts']:
-        query_post = Post.objects.get(id=post.id)
-        comments = Comment.objects.filter(post=query_post).order_by('-created_on')
-        # Attach comments and total count directly to the post object
-        post.comments_total = comments.count()
-        post.recent_comments = comments
-
-    
-    highlight_comments = Comment.objects.all().order_by('-created_on')[:5]
-
-    all_comments = Comment.objects.all().order_by('-created_on').filter(spam_score__lt=50)
-
     # Combine posts and comments into a single feed
     combined_items = sorted(
         chain(posts_data['posts'], all_comments),
         key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
         reverse=True
     )
+    
+
 
     # Paginate the combined feed items
     items_per_page = 50
@@ -180,13 +297,34 @@ def load_posts(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # Process each item in the page and STORE THE RESULTS back in the object list
-    processed_items = []
-    for item in page_obj.object_list:
-        if hasattr(item, 'get_item_type') and item.get_item_type() == 'Post':
-            processed_items.append(preprocess_post(item))
-        else:
-            processed_items.append(preprocess_comment(item))
+    # Optimize item processing - batch load comments for posts in current page
+    post_items = [item for item in page_obj.object_list if hasattr(item, 'get_item_type') and item.get_item_type == 'Post']
+    comment_items = [item for item in page_obj.object_list if not (hasattr(item, 'get_item_type') and item.get_item_type == 'Post')]
+    
+    # Batch load comments for all posts in the page
+    if post_items:
+        post_ids = [item.id for item in post_items]
+        comments_by_post = {}
+        comments_queryset = Comment.objects.filter(
+            post_id__in=post_ids
+        ).order_by('-created_on').select_related('post')
+        
+        for comment in comments_queryset:
+            if comment.post_id not in comments_by_post:
+                comments_by_post[comment.post_id] = []
+            comments_by_post[comment.post_id].append(comment)
+        
+        # Attach comments to posts
+        for post in post_items:
+            post.comments_total = len(comments_by_post.get(post.id, []))
+            post.recent_comments = comments_by_post.get(post.id, [])[:5]
+    
+    # Process items (comments don't need additional processing)
+    processed_items = list(chain(sorted(
+        post_items + comment_items,
+        key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+        reverse=True
+    )))
     
     # Replace the items in the page with the processed ones
     page_obj.object_list = processed_items
@@ -196,9 +334,9 @@ def load_posts(request):
         'comment_form': CommentForm(),
         'search_form': PostSearchForm(), 
         'postForm': PostForm(),
-        'posts': page_obj,
+        'posts': page_obj.object_list,  # Return the actual list of items, not the paginator
         'pinned_posts': posts_data['pinned_posts'],
-        'spite': Post.objects.count() + Comment.objects.count(),
+        'spite': cache.get('total_posts_comments', 0),  # Cache this expensive query
         'is_paginated': page_obj.has_other_pages(),
         'highlight_comments': highlight_comments,
         'is_loading': is_loading,

@@ -79,37 +79,55 @@ def refresh_recent_comments(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Post)
 def broadcast_new_post(sender, instance, created, **kwargs):
+    logger.info(f"broadcast_new_post signal triggered: created={created}, post_id={instance.id}")
     if created:  # Only broadcast new posts
         try:
+            logger.info(f"Attempting to broadcast post {instance.id}")
+            # Add a small delay to ensure database transaction is committed
+            import time
+            time.sleep(0.05)  # 50ms delay
+            
             channel_layer = get_channel_layer()
+            logger.info(f"Channel layer obtained: {channel_layer}")
+            
+            message_data = {
+                "id": instance.id,
+                "title": instance.title,
+                "content": instance.content,
+                'date_posted': localtime(instance.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
+                "anon_uuid": str(instance.anon_uuid),
+                "parent_post": {
+                    "id": instance.parent_post.id,
+                    "title": instance.parent_post.title,
+                } if instance.parent_post else None,
+                "city": instance.city,
+                "contact": instance.contact,
+                "media_file": {"url": instance.media_file.url} if instance.media_file else None,
+                "image": instance.image.url if instance.image else None,
+                "is_image": instance.is_image,
+                "is_video": instance.is_video,
+                "display_name": instance.display_name,
+            }
+            
+            logger.info(f"Broadcasting message data: {message_data}")
+            
             async_to_sync(channel_layer.group_send)(
                 "posts",  # Group name for clients subscribed to post updates
                 {
                     "type": "post_message",
-                    "message": {
-                        "id": instance.id,
-                        "title": instance.title,
-                        "content": instance.content,
-                        'date_posted': localtime(instance.date_posted).strftime('%b. %d, %Y, %I:%M %p'),
-                        "anon_uuid": str(instance.anon_uuid),
-                        "parent_post": {
-                            "id": instance.parent_post.id,
-                            "title": instance.parent_post.title,
-                        } if instance.parent_post else None,
-                        "city": instance.city,
-                        "contact": instance.contact,
-                        "media_file": {"url": instance.media_file.url} if instance.media_file else None,
-                        "image": instance.image.url if instance.image else None,
-                        "is_image": instance.is_image,
-                        "is_video": instance.is_video,
-                        "display_name": instance.display_name,
-                    },
+                    "message": message_data,
                 },
             )
-        except (ConnectionError, ChannelFull):
-            logger.error("Failed to send post message to channel layer")
+            logger.info(f"WebSocket broadcast sent for post {instance.id}")
+        except (ConnectionError, ChannelFull) as e:
+            logger.error(f"Failed to send post message to channel layer: {e}")
             #Continue wo broadcasting
             pass
+        except Exception as e:
+            logger.error(f"Error in broadcast_new_post: {e}", exc_info=True)
+            pass
+    else:
+        logger.info(f"Post {instance.id} was updated, not created - skipping broadcast")
 
 @receiver(post_save, sender=Comment)
 def broadcast_new_comment(sender, instance, created, **kwargs):

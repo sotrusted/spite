@@ -7,6 +7,7 @@ class Heart {
         this.speedX = Math.random() * 2 - 1; // Sideways movement
         this.swing = Math.random() * 3; // Swinging amplitude
         this.phase = Math.random() * Math.PI * 2; // Random starting phase
+        this.isActive = false; // Disable for now 
     }
 
     update() {
@@ -220,8 +221,10 @@ class HeartAnimation {
         document.body.appendChild(this.buttonContainer);
 
         // Initialize hearts
-        for (let i = 0; i < 50; i++) {
-            this.hearts.push(new Clover());
+        if (this.isActive) {
+            for (let i = 0; i < 50; i++) {
+                this.hearts.push(new Clover());
+            }
         }
         
         // Event listeners
@@ -299,5 +302,5 @@ class HeartAnimation {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-//    new HeartAnimation();
+    new HeartAnimation();
 }); 

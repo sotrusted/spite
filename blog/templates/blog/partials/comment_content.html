@@ -9,7 +9,7 @@
         <div class="post-content">
             <div class="text-content"> 
                 <strong class="comment-name">{{ comment.name|default:"Anonymous" }}</strong>
-                <p class="comment-content">{{ comment.content|truncatewords:20 }}</p>
+                <p class="comment-content">{{ comment.content|truncatewords:40 }}</p>
             </div>
             
             {% if comment.media_file and comment.is_video %}

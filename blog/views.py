@@ -314,18 +314,18 @@ class PostCreateView(CreateView):
             
             # 4. Enhanced repetitive pattern detection
             words = content_to_check.split()
-            if len(words) > 5:
+            if len(words) > 10:
                 word_counts = {}
                 for word in words:
-                    if len(word) > 2:
+                    if len(word) > 3:
                         word_counts[word] = word_counts.get(word, 0) + 1
                 
-                # Check for excessive repetition - STRICTER
+                # Check for excessive repetition
                 for word, count in word_counts.items():
-                    if count > len(words) * 0.25:  # 25% threshold
-                        spam_score += 60
-                        spam_reasons.append(f"Excessive repetition of '{word}' ({count}/{len(words)} words)")
-                        break
+                    if count > len(words) * 0.4:  # 40% threshold
+                        spam_score += 40  # Increased from 30
+                        spam_reasons.append(f"Excessive repetition of '{word}'")
+                        break  # Only count once
             
             # 5. Enhanced phrase repetition detection
             if len(content_to_check) > 50:
@@ -372,7 +372,6 @@ class PostCreateView(CreateView):
             spam_patterns = [
                 "alex bienstock and peter vack abuse",
                 "women and you support it",
-                "anonymous 1fd57237-ba40-4750-9ae3-6c7bfad3d270"
             ]
             
             for pattern in spam_patterns:
@@ -392,8 +391,38 @@ class PostCreateView(CreateView):
                 recent_posts.pop(0)
             cache.set(recent_posts_key, recent_posts, 300)
             
-            # 10. Determine action and track for blocking
-            if spam_score >= 50:  # Reduced threshold
+            # 6. Image duplicate check (existing logic)
+            if media_file and hasattr(media_file, 'read'):
+                try:
+                    fingerprint = self.get_fast_image_fingerprint(media_file)
+                    if fingerprint: 
+                        recent_images_key = f'global_recent_images'
+                        recent_images = cache.get(recent_images_key, [])
+                        
+                        for recent_fingerprint in recent_images:
+                            if recent_fingerprint['fingerprint'] == fingerprint:
+                                spam_score += 60
+                                spam_reasons.append("This image has been posted recently")
+                                break
+
+                        image_data = {
+                            'fingerprint': fingerprint,
+                            'timestamp': time.time(),
+                        }
+                        
+                        recent_images.append(image_data)
+                        current_time = time.time()
+                        filtered_images = [
+                            img for img in recent_images[-100:]
+                            if current_time - img['timestamp'] < 1800
+                        ]
+                        cache.set(recent_images_key, filtered_images, 1800)
+
+                except Exception as e:
+                    logger.warning(f"Error checking image duplicate: {e}")
+            
+            # 7. Determine action based on score
+            if spam_score >= 80:  # High spam score - block
                 logger.info(f"[SpamCheck] High spam score {spam_score} for IP {client_ip}: {spam_reasons}")
                 # Track spam attempts for IP blocking
                 self.track_spam_attempt(client_ip, spam_score)
@@ -1057,8 +1086,23 @@ def reply_comment(request, comment_id):
 def hx_get_post(request, post_id):
     logger.info(f"hx_get_post: called with post_id: {post_id}")
     try:
-        post = get_object_or_404(Post, id=post_id)
-        return render(request, 'blog/partials/post.html', {'post': post, 'htmx': True})
+        # Try to get the post with retry logic for race conditions
+        max_retries = 2
+        for attempt in range(max_retries):
+            try:
+                post = Post.objects.get(id=post_id)
+                return render(request, 'blog/partials/post.html', {'post': post, 'htmx': True})
+            except Post.DoesNotExist:
+                if attempt < max_retries - 1:
+                    # Wait a bit and retry (race condition with WebSocket broadcast)
+                    import time
+                    time.sleep(0.1)  # 100ms delay
+                    logger.info(f"hx_get_post: Post {post_id} not found, retrying (attempt {attempt + 1})")
+                    continue
+                else:
+                    # Final attempt failed
+                    logger.error(f"hx_get_post: Post {post_id} not found after {max_retries} attempts")
+                    return HttpResponse(f"Post not found", status=404)
     except Exception as e:
         logger.exception(f"hx_get_post: Error in hx_get_post: {str(e)}")
         return HttpResponse(f"Error loading post: {str(e)}", status=500)

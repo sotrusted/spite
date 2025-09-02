@@ -185,6 +185,7 @@ class Post(models.Model):
             models.Index(fields=['is_pinned', '-date_posted']),
             # Add index for media fields if you query by them often
             models.Index(fields=['media_file', 'image']),
+            models.Index(fields=['spam_score', '-date_posted']),
         ]
 
 
@@ -214,6 +215,13 @@ class Comment(models.Model):
     spam_score = models.IntegerField(default=0)
     spam_reasons = models.TextField(blank=True, null=True)
     is_potentially_spam = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_on']),
+            models.Index(fields=['spam_score', '-created_on']),
+            models.Index(fields=['post', '-created_on']),
+        ]
 
     @property
     def post_id(self):
@@ -354,6 +362,14 @@ class Comment(models.Model):
             and hasattr(self.parent_comment, 'id') \
                 and Comment.objects.filter(id=self.parent_comment.id).exists()
     
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_on']),
+            models.Index(fields=['post', '-created_on']),
+            models.Index(fields=['spam_score', '-created_on']),
+            models.Index(fields=['parent_comment']),
+        ]
+
 
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)

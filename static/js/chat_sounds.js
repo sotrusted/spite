@@ -11,7 +11,9 @@ Object.values(chatSounds).forEach(sound => {
 });
 
 export function playSound(soundName) {
-    if (chatSounds[soundName]) {
+    // Check if sound is enabled
+    const soundEnabled = localStorage.getItem('notificationSoundEnabled') !== 'false';
+    if (soundEnabled && chatSounds[soundName]) {
         chatSounds[soundName].currentTime = 0; // Reset sound
         chatSounds[soundName].play().catch(e => console.log('Sound play prevented'));
     }
