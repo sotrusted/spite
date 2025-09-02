@@ -1,4 +1,4 @@
-<div class="posts" id="post-list">
+<div class="posts">
     {% if is_search and query and count %}
         <p>{{ count }} posts matching "{{ query }}"</p>
     {% elif count %}
@@ -16,4 +16,20 @@
         <p class="oops">No one seems to have posted yet! Click below to post!</p>
     {% endif %}
 </div>
+
+<!-- Initial infinite scroll trigger for first page -->
+{% if not is_search and posts_has_next %}
+<div class="infinite-scroll-trigger"
+     hx-get="{% url 'infinite-scroll-posts' %}?page={{ posts_next_page_number }}"
+     hx-target="#post-list"
+     hx-swap="beforeend"
+     hx-trigger="intersect once"
+     hx-indicator="#loading-indicator"
+     hx-disabled-elt="this"
+     hx-on::after-request="this.remove()"
+     data-triggered="false"
+     style="height: 50px; margin: 20px 0; display: flex; align-items: center; justify-content: center; animation: trigger-flash 2s ease-in-out infinite;">
+    <div style="color: #666; text-align: center; padding: 10px; font-size: 0.9em;">...</div>
+</div>
+{% endif %}
 

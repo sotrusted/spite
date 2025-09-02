@@ -17,6 +17,9 @@ export function logToBackend(message, level = 'info') {
     // Always log to console first
     console.log(`[${level}] ${message}`);
     
+    // Temporarily disable backend logging to fix infinite scroll testing
+    return;
+    
     // Then try to log to backend
     const baseUrl = window.location.origin;
     const csrfToken = getCookie('csrftoken');
@@ -140,11 +143,39 @@ export function showModalIfNeeded() {
 // Function to refresh the csrf token in the DOM 
 export async function refreshCSRFToken() {
     try {
-        const response = await fetch('/get-csrf-token/');
+        const response = await fetch('/get-csrf-token/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin'
+        });
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        
+        // Check if response is actually JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Expected JSON response, got: ${contentType}`);
+        }
+        
+        const text = await response.text();
+        console.log('CSRF response text:', text); // Debug log
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            console.error('Response text:', text);
+            throw new Error(`Invalid JSON response: ${parseError.message}`);
+        }
+        
+        if (!data.csrfToken) {
+            throw new Error('No csrfToken in response');
+        }
         
         // Create csrf input if it doesn't exist
         let csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');

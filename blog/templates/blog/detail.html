@@ -62,6 +62,6 @@
         {% else %}
             <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
         {% endif %}
-        <p class="post-date">{{post.date_posted }}</p>
+        <p class="post-date">{{ post.formatted_date|default:post.date_posted }}</p>
     </div>
 </div>

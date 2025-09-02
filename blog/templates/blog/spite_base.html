@@ -288,9 +288,9 @@
             // Don't clear the cookie for pagination requests
             if (!targetUrl.includes('page=')) {
                 document.cookie = "loading_complete=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                logToBackend('Cleared loading cookie for non-pagination navigation');
+                console.log('Cleared loading cookie for non-pagination navigation');
             } else {
-                logToBackend('Kept loading cookie for pagination');
+                console.log('Kept loading cookie for pagination');
             }
         });
         
@@ -322,7 +322,7 @@
                 console.log(`Link clicked: ${href}`);
                 // Don't show splash for pagination or same-page links
                 if (href && (href.includes('page=') || href.startsWith('#'))) {
-                    logToBackend('Pagination or same-page link clicked, not showing splash');
+                    console.log('Pagination or same-page link clicked, not showing splash');
                     e.preventDefault();  // Prevent default
                     e.stopPropagation(); // Stop event bubbling
                     
@@ -335,7 +335,7 @@
                 
                 const splash = document.querySelector('.site-loading-splash');
                 if (splash) {
-                    logToBackend('Showing splash for navigation');
+                    console.log('Showing splash for navigation');
                     splash.classList.remove('hidden');
                 }
             }

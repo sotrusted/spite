@@ -128,7 +128,27 @@
       {% include 'blog/partials/stream_embed.html' %}
     </div>
   -->
-    {% include 'blog/partials/posts_list.html' with posts=posts is_search=is_search query=query count=count %}
+    <!-- Posts list with infinite scroll -->
+    <div id="post-list">
+        {% include 'blog/partials/posts_list.html' with posts=posts is_search=is_search query=query count=count %}
+    </div>
+
+
+
+    <!-- Loading indicator at bottom of post list -->
+    <div id="loading-indicator" style="display: none; text-align: center; padding: 20px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+        <div class="loading-blink" style="display: inline-block; padding: 10px 20px; background: #3498db; color: white; border-radius: 5px; animation: blink 1s ease-in-out infinite alternate;">Loading more posts...</div>
+    </div>
+
+    <!-- Fallback pagination for non-HTMX browsers -->
+    {% if not is_search and posts_has_next %}
+    <div id="fallback-pagination" style="display: none;">
+        {% include 'blog/partials/pagination.html' with posts=posts is_search=is_search query=query %}
+    </div>
+    
+    <!-- Load fallback script for non-HTMX browsers -->
+    <script src="{% static 'js/infinite-scroll.js' %}"></script>
+    {% endif %}
 
     <div class="cta">
         <div class="post-button">
@@ -136,51 +156,14 @@
         </div>
     </div>
 
-    {% include 'blog/partials/pagination.html' with posts=posts is_search=is_search query=query %}
+    <!-- Show pagination only for search results -->
+    {% if is_search %}
+        {% include 'blog/partials/pagination.html' with posts=posts is_search=is_search query=query %}
+    {% endif %}
 
 </div>
 
 <style>
-.load-more-section {
-    text-align: center;
-    margin: 20px 0;
-}
 
-.load-more-btn {
-    background-color: black;
-    color: white;
-    border: 1px solid white;
-    padding: 10px 20px;
-    font-family: 'Crimson Text', serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.2em;
-}
-
-.load-more-btn:hover {
-    background-color: white;
-    color: black;
-}
-
-.loading-indicator {
-    text-align: center;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
 </style>
 

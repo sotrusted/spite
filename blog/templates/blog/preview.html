@@ -14,7 +14,7 @@
 
     <div class="post-content">
         {% if post.content %}
-            <p>{{ post.content|truncatewords:30 }}</p>
+            <p>{{ post.excerpt|default:post.content|truncatewords:30 }}</p>
         {% endif %}
     </div>
 
@@ -26,7 +26,7 @@
     {% else %}
         <p class="post-author">by Anonymous {{ post.anon_uuid }}</p>
     {% endif %}
-    <p class="post-date">{{post.date_posted }}</p>
+    <p class="post-date">{{ post.formatted_date|default:post.date_posted }}</p>
     {% if post.city or post.contact %}
         <p class="post-info">
             {% if post.city %}{{ post.city }}{% endif %}

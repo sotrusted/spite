@@ -20,39 +20,24 @@
         <button id="toggle-comments-{{ post.id }}" 
                 class="toggle-comments" 
                 data-post-id="{{ post.id }}"
-                {% if htmx %}
-                {% endif %}
                 >
             ↩ <span class="comment-count">({{ post.comments_total|default:0 }})</span>
         </button>
     </div>
     {% endif %}
-    <div id="comment-section-{{ post.id }}" class="comment-section">
-        {% if htmx %}
-        <div hx-get="/hx/get-post-comment-section/{{ post.id }}/"
-            hx-trigger="revealed"
-            hx-target="#comment-section-{{ post.id }}"
-            hx-swap="innerHTML">
-            <span id="comment-section-indicator-${post.id}" class="htmx-indicator">
-                <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                    <span class="visually-hidden"></span>
-                </div>
-            </span>
-        </div>
-        {% else %}
+    <div id="comment-section-{{ post.id }}" class="comment-section" style="display: none;">
         <!-- Unique Comment Section for Each Post -->
-            <div id="comments-container-{{ post.id }}" 
-                data-has-comments="{{ post.has_comments }}" 
-                class="comments-container" style="display: none;">
-                <div id="comments-list-{{ post.id }}">
-                    {% for comment in post.recent_comments %}
-                        {% include 'blog/partials/inline_comment.html' with comment=comment %}
-                    {% endfor %}
-                </div>
-
-                <!-- Comment Form -->
-                {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
+        <div id="comments-container-{{ post.id }}" 
+            data-has-comments="{{ post.has_comments }}" 
+            class="comments-container">
+            <div id="comments-list-{{ post.id }}">
+                {% for comment in post.recent_comments %}
+                    {% include 'blog/partials/inline_comment.html' with comment=comment %}
+                {% endfor %}
             </div>
-        {% endif %}
+
+            <!-- Comment Form -->
+            {% include 'blog/partials/comment_form.html' with post_id=post.id comment_form=comment_form post_type='Post' %}
+        </div>
     </div>
 </div>

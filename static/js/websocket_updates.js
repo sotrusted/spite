@@ -69,7 +69,7 @@ export function initPostWebsocketUpdates() {
 
             // Add the post to the DOM
             addPostToPage(post);
-            attachEventListeners(post.id);
+            // Event listeners are now attached within addPostToPage after HTMX loads the content
 
         } else {
             console.log(`Post with ID ${post.id} already exists.`);

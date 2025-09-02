@@ -1733,6 +1733,7 @@ video:focus {
         font-size: 1em;
     }
 
+    
     .parent-post .post-title {
         font-size: 1.1em;
     }
@@ -1877,5 +1878,25 @@ video:focus {
         max-width: 100%;
         margin-left: 0;
         font-size: 1rem;
+    }
+}
+
+@keyframes blink {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+@keyframes trigger-flash {
+    0% { 
+        background-color: rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+    50% { 
+        background-color: rgba(52, 152, 219, 0.3);
+        border: 1px solid rgba(52, 152, 219, 0.6);
+    }
+    100% { 
+        background-color: rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.3);
     }
 }

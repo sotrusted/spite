@@ -93,6 +93,10 @@ class Post(models.Model):
     spam_score = models.IntegerField(default=0)
     spam_reasons = models.TextField(blank=True, null=True)
     is_potentially_spam = models.BooleanField(default=False)
+    
+    # Pre-calculated template fields (populated by context processor)
+    formatted_date = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    excerpt = models.TextField(blank=True, null=True, editable=False)
 
 
     def __str__(self):
@@ -215,6 +219,10 @@ class Comment(models.Model):
     spam_score = models.IntegerField(default=0)
     spam_reasons = models.TextField(blank=True, null=True)
     is_potentially_spam = models.BooleanField(default=False)
+    
+    # Pre-calculated template fields (populated by context processor)
+    formatted_date = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    excerpt = models.TextField(blank=True, null=True, editable=False)
 
     class Meta:
         indexes = [

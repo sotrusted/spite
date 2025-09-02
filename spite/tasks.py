@@ -151,6 +151,18 @@ def cache_posts_data():
         
         cache.set('comments_chunk_count', len(comment_chunks), CACHE_TIMEOUT)
         
+        # OPTIMIZED: Cache pinned comments data for faster loading
+        if pinned_posts:
+            pinned_comments_data = {}
+            for post in pinned_posts:
+                post_comments = Comment.objects.filter(
+                    post_id=post['id']
+                ).order_by('-created_on')[:5]  # Only get recent comments
+                pinned_comments_data[str(post['id'])] = list(post_comments.values())
+            
+            import json
+            cache.set('pinned_comments_data', json.dumps(pinned_comments_data), CACHE_TIMEOUT)
+        
         # Cache the total count to avoid expensive queries on every request
         total_count = Post.objects.count() + Comment.objects.count()
         cache.set('total_posts_comments', total_count, CACHE_TIMEOUT)

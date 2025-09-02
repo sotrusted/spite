@@ -1,5 +1,5 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
-import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing, initSkeletonCleanup } from './modules/utility_functions.js';
+import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing, initSkeletonCleanup, toggleContent, reattachEventListenersForInitialPosts, attachEventListenersToNewPosts } from './modules/utility_functions.js';
 // import { initAjaxPostForm } from './ajax_posts.js';
 import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
 
@@ -15,8 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
     showModalIfNeeded();
     logToBackend("Modal shown if needed", 'info');
 
-    attachEventListeners();
-    logToBackend("Event listeners attached", 'info');
+    // Add a small delay to ensure DOM is fully rendered
+    setTimeout(() => {
+        attachEventListeners();
+        logToBackend("Event listeners attached", 'info');
+        
+        // Double-check that initially loaded posts have event listeners
+        setTimeout(() => {
+            reattachEventListenersForInitialPosts();
+        }, 200);
+    }, 100);
 
     // initAjaxPostForm();
     logToBackend("Post form submitted", 'info');
@@ -43,6 +51,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupHtmxProcessing();
     initSkeletonCleanup();
+    
+    // Handle infinite scroll posts - attach event listeners when new posts are loaded
+    document.addEventListener('htmx:afterSwap', function(event) {
+        // Check if this is an infinite scroll request (target is #post-list)
+        if (event.detail.target && event.detail.target.id === 'post-list') {
+            logToBackend('Infinite scroll content loaded, attaching event listeners', 'info');
+            
+            // Add a small delay to ensure DOM is updated
+            setTimeout(() => {
+                attachEventListenersToNewPosts();
+            }, 100);
+        }
+    });
 
     const writeButton = document.getElementById('write-button');
     if (writeButton) {
@@ -60,27 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('post-list').addEventListener('click', function(event) {
         const target = event.target;
     
-        // Toggle comments button
-        if (target.id && target.id.startsWith('toggle-comments-')) {
-            const postId = target.id.replace('toggle-comments-', '');
-
-            console.log('Toggle comments clicked for post:', postId);
-            
-            // Call your existing attachToggleComments function or implement the logic here
-            // attachToggleComments(postId);
-            
-            // Or implement the toggle logic directly:
-            const commentSection = document.getElementById(`comment-section-${postId}`);
-            const commentsContainer = document.getElementById(`comments-container-${postId}`);
-            
-            if (commentsContainer.style.display === 'none') {
-                commentsContainer.style.display = 'block';
-                target.innerHTML = '↩ <span class="comment-count">(0)</span>';
-            } else {
-                commentsContainer.style.display = 'none';
-                target.innerHTML = '↩ <span class="comment-count">(0)</span>';
-            }
-        }
+        // Toggle comments button - handled by utility_functions.js
+        // Removed conflicting handler to prevent double event binding
         // Toggle comment expand/collapse
         if (target.id && target.id.startsWith('expand-comment-')) {
             const commentId = target.id.replace('expand-comment-', '');
@@ -111,6 +113,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 replyForm.classList.add('hidden');
 
             }
+        }
+
+        // Toggle link handling is now done by individual event listeners in utility_functions.js
+        // Removed to prevent conflicts
+
+        // Debug: log all clicks to see what's happening
+        if (target.classList.contains('toggle-link')) {
+            console.log('Toggle link clicked (class-based):', target.id, target);
         }
 
     });

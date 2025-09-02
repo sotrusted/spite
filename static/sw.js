@@ -80,6 +80,19 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // Skip API endpoints, CSRF token requests, and audio files - let them be handled directly by the server
+    if (event.request.url.includes('/api/') || 
+        event.request.url.includes('/hx/') ||
+        event.request.url.includes('/ws/') ||
+        event.request.url.includes('/get-csrf-token/') ||
+        event.request.url.includes('/static/sounds/') ||
+        url.pathname.endsWith('.mp3') ||
+        url.pathname.endsWith('.wav') ||
+        url.pathname.endsWith('.ogg')) {
+        console.log('SW.JS: Skipping API/HTMX/WebSocket/CSRF/Audio request for:', event.request.url);
+        return;
+    }
+
     // Only handle GET requests
     if (event.request.method !== 'GET') {
         console.log('SW.JS: Bypassing non-GET request:', event.request.method);

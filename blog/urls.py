@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import path
 from .views import (home, PostCreateView, PostDetailView, 
                     like_post, PostListView, PostReplyView, 
-                    load_more_posts, reading_flyer, generate_pdf,
+                    load_more_posts, infinite_scroll_posts, reading_flyer, generate_pdf,
                     preview_pdf_template, search_results,
                     store_page, add_comment, reply_comment, get_csrf_token, 
                     offline_view, all_posts, get_comment_form_html,
@@ -42,6 +42,7 @@ urlpatterns = [
     path('catalog/', all_posts, name='catalog'),
     path('post/<int:pk>/reply/', PostReplyView.as_view(), name='post-reply'),
     path('load-more/', load_more_posts, name='load-more-posts'),
+    path('infinite-scroll/', infinite_scroll_posts, name='infinite-scroll-posts'),
     path('reading/', reading_flyer, name='reading'),
     path('generate-pdf/', generate_pdf, name='generate_pdf'),
     path('preview-pdf-template/', preview_pdf_template, name='preview_pdf_template'),

@@ -16,4 +16,10 @@ self.addEventListener('install', event => {
         );
       })
   );
+});
+
+self.addEventListener('fetch', event => {
+    // Skip all requests - let them be handled directly by the server
+    // This serviceworker is essentially disabled
+    return;
 }); 

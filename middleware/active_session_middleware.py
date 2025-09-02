@@ -11,25 +11,15 @@ class ActiveSessionMiddleware(MiddlewareMixin):
 
         session_key = request.session.session_key
         if session_key:
-            try:
-                session = Session.objects.get(session_key=session_key)
-                if not session.expire_date or session.expire_date > timezone.now():
-                    return
-            except Session.DoesNotExist:
-                pass
+            # OPTIMIZED: Skip database check for existing sessions
+            # Django's session middleware already handles session validation
+            # Only create new session if no session key exists
+            return
 
         request.session.create()
         settings.ACTIVE_SESSION_COUNT += 1
 
     def process_response(self, request, response):
-        session_key = request.session.session_key
-        if session_key:
-            try:
-                session = Session.objects.get(session_key=session_key)
-                if session.expire_date and session.expire_date <= timezone.now():
-                    settings.ACTIVE_SESSION_COUNT -= 1
-                    session.delete()
-            except Session.DoesNotExist:
-                pass
-
+        # OPTIMIZED: Skip database operations in response processing
+        # Django's session middleware handles session cleanup automatically
         return response

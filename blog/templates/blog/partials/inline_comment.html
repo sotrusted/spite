@@ -1,6 +1,6 @@
 <div class="comment">
     <strong>{{ comment.name|default:"Anonymous" }}</strong>: {{ comment.content }}
-    <p><em>{{ comment.created_on }}</em></p>
+    <p><em>{{ comment.formatted_date|default:comment.created_on }}</em></p>
     {% if comment.media_file %}
     <div class="image-container inline-comment-image-container">
         <img src="{{ comment.media_file.url }}" alt="{{ comment.name }}" loading="lazy">

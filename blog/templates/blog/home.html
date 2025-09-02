@@ -81,71 +81,27 @@
 
 {% block feed %}
     {% include 'blog/feed.html' with home=True posts=posts%}
+    
+    <!-- Loading indicator at bottom of post list -->
+    <div id="loading-indicator" style="display: none; text-align: center; padding: 20px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+        <div class="loading-spinner" style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <div style="margin-top: 15px; color: #666; font-weight: 500;">...</div>
+    </div>
 {% endblock %}
 
 {% block tail %}
 
-<!-- Invisible bottom trigger -->
-<!--
-<div class="bottom-trigger"
-     hx-get="{% url 'load-more-posts' %}?page=1"
-     hx-target="#post-list"
-     hx-swap="beforeend"
-     hx-trigger="intersect once"
-     hx-indicator=".loading-indicator">
-</div>
--->
-<!-- Loading indicator -->
-<div class="loading-indicator">
-    <div class="loading-spinner"></div>
-    <div>Loading more posts...</div>
-</div>
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
 
-<script>
-// Keep track of the current page
-let currentPage = 1;
-
-document.addEventListener('htmx:afterRequest', function(evt) {
-    if (evt.detail.successful && evt.detail.target.id === 'post-list') {
-        currentPage++;
-        
-        // Update the trigger with new page number
-        let trigger = document.querySelector('.bottom-trigger');
-        if (trigger) {
-            trigger.setAttribute('hx-get', `{% url 'load-more-posts' %}?page=${currentPage}`);
-            // Re-enable the trigger for the next page
-            trigger.removeAttribute('data-hx-trigger-processed');
-        }
-    } else if (!evt.detail.successful) {
-        console.log('Load more request failed:', evt.detail);
-    }
-});
-
-document.body.addEventListener('htmx:xhr:progress', function(evt) {
-    if (evt.detail.loaded && evt.detail.total) {
-        // Calculate percentage
-        const percent = Math.round((evt.detail.loaded / evt.detail.total) * 100);
-        
-        // Find the progress bar in the indicator
-        const indicator = evt.detail.indicator;
-        if (indicator) {
-            const progressBar = indicator.querySelector('.progress-bar');
-            if (progressBar) {
-                progressBar.style.width = percent + '%';
-                progressBar.setAttribute('aria-valuenow', percent);
-            }
-            
-            // Update text if needed
-            const progressText = indicator.querySelector('.progress-text');
-            if (progressText) {
-                progressText.textContent = `Uploading... ${percent}%`;
-            }
-        }
-    }
-});
-
-
-</script>
+<!-- Load fallback script for non-HTMX browsers -->
+{% if posts_has_next %}
+<script src="{% static 'js/infinite-scroll.js' %}"></script>
+{% endif %}
 
 {% endblock %}
 

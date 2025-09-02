@@ -41,12 +41,25 @@ def clear_cache_on_post_save(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Comment)
 def clear_comments_cache(sender, instance, created, **kwargs):
     """
-    Clears the cached comments data when a new Comment is saved.
+    Clears only the comment-related caches when a new Comment is saved.
     """
-    logger.info(f"Comment {instance.id} saved. Clearing cache")
+    logger.info(f"Comment {instance.id} saved. Clearing comment caches")
     if created:
-        cache.clear()
-    logger.info(f"Cache cleared")
+        # Clear only comment-related caches, not the entire cache
+        cache.delete('highlight_comments')
+        cache.delete('pinned_comments_data')
+        
+        # Clear comment chunks
+        comment_chunk_count = cache.get('comments_chunk_count', 0)
+        for i in range(comment_chunk_count):
+            cache.delete(f'comments_chunk_{i}')
+        cache.delete('comments_chunk_count')
+        
+        # Trigger async cache rebuild for comments only
+        from spite.tasks import cache_posts_data
+        cache_posts_data.delay()
+        
+    logger.info(f"Comment caches cleared and rebuild triggered")
 
 
 @receiver(post_save, sender=Post)

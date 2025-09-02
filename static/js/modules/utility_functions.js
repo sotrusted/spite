@@ -31,18 +31,29 @@ function loadWordCloud() {
 
 
 // Function to toggle content between detail and preview
-function toggleContent(postId) {
+export function toggleContent(postId) {
+    log(`toggleContent called for post ${postId}`);
     var detailDiv = document.getElementById('post-detail-' + postId);
     var previewDiv = document.getElementById('post-preview-' + postId);
-    var toggleButton = document.getElementById('toggle-link-' + postId); 
+    var toggleButton = document.getElementById('toggle-link-' + postId);
+    
+    log(`Elements found - detailDiv: ${!!detailDiv}, previewDiv: ${!!previewDiv}, toggleButton: ${!!toggleButton}`);
+    
+    if (!detailDiv || !previewDiv || !toggleButton) {
+        log(`Missing elements for post ${postId}`, 'error');
+        return;
+    }
+    
     if (detailDiv.style.display === 'none') {
         detailDiv.style.display = 'flex';
         previewDiv.style.display = 'none';
         toggleButton.textContent = 'Collapse';
+        log(`Expanded post ${postId}`);
     } else {
         detailDiv.style.display = 'none';
         previewDiv.style.display = 'flex';
         toggleButton.textContent = 'Expand';
+        log(`Collapsed post ${postId}`);
     }
 }
 
@@ -118,11 +129,16 @@ function attachToggleContentButtons(id=null) {
         // Only attach listener if not already attached
         if (!a.hasAttribute('data-listener-attached')) {
             a.setAttribute('data-listener-attached', 'true');
-            a.addEventListener('click', function() {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 const postId = a.id.replace('toggle-link-', '');
+                log(`Toggle button clicked for post ${postId}`);
                 toggleContent(postId);
             });
             log(`Attached listener to toggle button for post ${a.id}`);
+        } else {
+            log(`Toggle button for post ${a.id} already has listener attached`);
         }
     });
 
@@ -388,8 +404,12 @@ function attachToggleCommentsButtons(id=null) {
                 }
 
 
-                if (!commentSection.querySelector('.comments-container')) {
-                    console.log(`Loading comments container for post ${postId}`);
+                // Check if this is an HTMX-enabled comment section
+                const htmxElement = commentSection.querySelector('[hx-get]');
+                
+                if (htmxElement && typeof htmx !== 'undefined') {
+                    // HTMX case: trigger the HTMX request
+                    console.log(`Loading comments container for post ${postId} via HTMX`);
                     htmx.process(commentSection);
                     htmx.trigger(commentSection, 'revealed');
 
@@ -402,11 +422,23 @@ function attachToggleCommentsButtons(id=null) {
                             <span>Loading comments...</span>
                         </div>
                     `;
-
                 } else {
-                    const commentsContainer = commentSection.querySelector('.comments-container');
-                    commentsContainer.style.display = 
-                        commentsContainer.style.display === 'none' ? 'block' : 'none';
+                    // Non-HTMX case: toggle the comment section visibility
+                    const isHidden = commentSection.style.display === 'none' || 
+                                   window.getComputedStyle(commentSection).display === 'none';
+                    commentSection.style.display = isHidden ? 'block' : 'none';
+                    console.log(`Toggled comment section for post ${postId}, now ${isHidden ? 'visible' : 'hidden'}`);
+                    
+                    // Update button text to reflect state
+                    const buttonText = button.querySelector('.comment-count');
+                    if (buttonText) {
+                        const currentText = buttonText.textContent;
+                        if (isHidden) {
+                            buttonText.textContent = currentText.replace('↩', '↪');
+                        } else {
+                            buttonText.textContent = currentText.replace('↪', '↩');
+                        }
+                    }
                 }
             });
         } else {
@@ -521,16 +553,16 @@ export function attachEventListeners(id=null) {
 
     if (id) {
         attachToggleContentButtons(id);
-        log('Toggle content buttons attached for post ${id}');
+        log(`Toggle content buttons attached for post ${id}`);
 
         attachCopyLinks(id);
-        log('Copy links attached for post ${id}');
+        log(`Copy links attached for post ${id}`);
 
         attachToggleCommentsButtons(id);
-        log('Toggle comments buttons attached for post ${id}');
+        log(`Toggle comments buttons attached for post ${id}`);
 
         attachDetailToggleImages(id);
-        log('Detail toggle images attached for post ${id}');
+        log(`Detail toggle images attached for post ${id}`);
 
     }
 
@@ -544,6 +576,43 @@ export function attachEventListeners(id=null) {
         a.addEventListener('click', () => scrollToElementById('recent-posts'));
     });
     log('Feed scroller attached');
+}
+
+// Function to re-attach event listeners for initially loaded posts
+export function reattachEventListenersForInitialPosts() {
+    log('Re-attaching event listeners for initially loaded posts');
+    
+    // Find all posts that don't have event listeners attached
+    const allToggleButtons = document.querySelectorAll('a[id^="toggle-link-"]');
+    const unattachedButtons = Array.from(allToggleButtons).filter(button => 
+        !button.hasAttribute('data-listener-attached')
+    );
+    
+    log(`Found ${unattachedButtons.length} unattached toggle buttons`);
+    
+    if (unattachedButtons.length > 0) {
+        attachToggleContentButtons();
+        log('Re-attached toggle content buttons for initially loaded posts');
+    }
+}
+
+// Function to attach event listeners to newly loaded posts (for infinite scroll)
+export function attachEventListenersToNewPosts() {
+    log('Attaching event listeners to new posts');
+    
+    // Find all toggle buttons that don't have event listeners attached
+    const newToggleButtons = document.querySelectorAll('a[id^="toggle-link-"]:not([data-listener-attached])');
+    log(`Found ${newToggleButtons.length} new toggle buttons`);
+    
+    if (newToggleButtons.length > 0) {
+        // Attach event listeners to all new posts
+        attachToggleContentButtons();
+        attachCopyLinks();
+        attachToggleCommentsButtons();
+        attachDetailToggleImages();
+        attachToggleReplyButtons();
+        log(`Event listeners attached to ${newToggleButtons.length} new posts`);
+    }
 }
 
 
@@ -716,6 +785,19 @@ export function addPostToPage(post) {
             </div>`;
     });
     
+    // Add event listener for when HTMX successfully loads the post content
+    htmx.on(newPost, 'htmx:afterSwap', function(evt) {
+        log(`HTMX afterSwap event for post ${postId}`);
+        // Attach event listeners after HTMX has swapped the content
+        setTimeout(() => {
+            attachToggleContentButtons(postId);
+            attachCopyLinks(postId);
+            attachToggleCommentsButtons(postId);
+            attachToggleReplyButtons(postId);
+            log(`Event listeners attached for post ${postId} after HTMX swap`);
+        }, 50);
+    });
+    
     htmx.trigger(newPost, 'revealed');
 
     // Wait for the post to be fully loaded before attaching event handlers
@@ -729,18 +811,27 @@ export function addPostToPage(post) {
         loadedPost.classList.add("highlight");
         setTimeout(() => loadedPost.classList.remove("highlight"), 3000);
 
-        // Attach all event listeners
-        attachToggleContentButtons(postId);
-        log('Toggle content buttons attached');
+        // Add a small delay to ensure HTMX has fully processed the content
+        setTimeout(() => {
+            // Check if event listeners are already attached (from HTMX afterSwap)
+            const toggleButton = document.getElementById(`toggle-link-${postId}`);
+            if (toggleButton && !toggleButton.hasAttribute('data-listener-attached')) {
+                // Attach all event listeners to the loaded post as fallback
+                attachToggleContentButtons(postId);
+                log(`Toggle content buttons attached for post ${postId} (fallback)`);
 
-        attachCopyLinks(postId);
-        log('Copy links attached');
+                attachCopyLinks(postId);
+                log(`Copy links attached for post ${postId} (fallback)`);
 
-        attachToggleCommentsButtons(postId);
-        log('Toggle comments buttons attached');
+                attachToggleCommentsButtons(postId);
+                log(`Toggle comments buttons attached for post ${postId} (fallback)`);
 
-        attachToggleReplyButtons(postId);
-        log('Toggle reply buttons attached');
+                attachToggleReplyButtons(postId);
+                log(`Toggle reply buttons attached for post ${postId} (fallback)`);
+            } else {
+                log(`Event listeners already attached for post ${postId}`);
+            }
+        }, 200);
     });
     
     return newPost;

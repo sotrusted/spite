@@ -1,0 +1,29 @@
+<!-- Render posts using the same structure as posts_list -->
+{% for post in posts %} 
+    {% if post.get_item_type == 'Post' %}
+        {% include 'blog/partials/post.html' with post=post nested=False %}
+    {% elif post.get_item_type == 'Comment' %}
+        {% include 'blog/partials/comment.html' with comment=post %}
+    {% endif %}
+{% endfor %}
+
+<!-- Infinite scroll trigger for next page -->
+{% if has_more %}
+<div class="infinite-scroll-trigger"
+     hx-get="{% url 'infinite-scroll-posts' %}?page={{ current_page|add:1 }}"
+     hx-target="#post-list"
+     hx-swap="beforeend"
+     hx-trigger="intersect once"
+     hx-indicator="#loading-indicator"
+     hx-disabled-elt="this"
+     hx-on::after-request="this.remove()"
+     data-triggered="false"
+     style="height: 50px; margin: 20px 0; display: flex; align-items: center; justify-content: center; animation: trigger-flash 2s ease-in-out infinite;">
+    <div style="color: #666; text-align: center; padding: 10px; font-size: 0.9em;">...</div>
+</div>
+{% else %}
+<!-- End of content indicator -->
+<div class="end-of-content" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+    <p>You've reached the end of the feed!</p>
+</div>
+{% endif %}

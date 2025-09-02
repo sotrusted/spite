@@ -9,7 +9,7 @@
         <div class="post-content">
             <div class="text-content"> 
                 <strong class="comment-name">{{ comment.name|default:"Anonymous" }}</strong>
-                <p class="comment-content">{{ comment.content|truncatewords:40 }}</p>
+                <p class="comment-content">{{ comment.excerpt|default:comment.content|truncatewords:40 }}</p>
             </div>
             
             {% if comment.media_file and comment.is_video %}
@@ -155,7 +155,7 @@
 </div>  
 
 <div class="menu">
-    <p><em>{{ comment.created_on }}</em></p>
+    <p><em>{{ comment.formatted_date|default:comment.created_on }}</em></p>
     <a href="javascript:void(0);" 
        id="expand-comment-{{comment.id}}" 
        class="expand-comment">Expand</a>

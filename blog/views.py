@@ -27,9 +27,9 @@ from django.views import View
 from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm
+from spite.context_processors import get_cached_posts, get_cached_comments, preprocess_posts_for_template, get_posts, get_optimized_posts
 import functools
 from datetime import datetime, timedelta
-from spite.context_processors import get_posts, get_optimized_posts, get_cached_posts
 from django.http import StreamingHttpResponse
 from weasyprint import HTML
 import cv2
@@ -127,7 +127,7 @@ def home(request):
     if ip_has_submitted is None:
         # Only hit the database if not in cache
         ip_has_submitted = List.objects.filter(ip_address=client_ip).exists()
-        # Cache for 1 hour (3600 seconds)
+        # Cache for 7 hours (25200 seconds) - longer cache for better performance
         cache.set(cache_key, ip_has_submitted, 60 * 60 * 7)
 
     return render(request, 'blog/home.html', 
@@ -856,19 +856,131 @@ def load_more_posts(request):
         page = paginator.num_pages
         posts_page = paginator.page(page)
     
-    # Add comment counts for posts
-    for item in posts_page:
-        if item.get_item_type() == 'Post':
-            comments = Comment.objects.filter(post=item).order_by('-created_on')
-            item.comments_total = comments.count()
-            item.recent_comments = comments
+    # OPTIMIZED: Batch load comments for posts to avoid N+1 queries
+    post_items = [item for item in posts_page if hasattr(item, 'get_item_type') and item.get_item_type() == 'Post']
+    if post_items:
+        post_ids = [item.id for item in post_items]
+        comments_by_post = {}
+        comments_queryset = Comment.objects.filter(
+            post_id__in=post_ids
+        ).order_by('-created_on').select_related('post')
+        
+        for comment in comments_queryset:
+            if comment.post_id not in comments_by_post:
+                comments_by_post[comment.post_id] = []
+            comments_by_post[comment.post_id].append(comment)
+        
+        # Attach comments to posts
+        for post in post_items:
+            post.comments_total = len(comments_by_post.get(post.id, []))
+            post.recent_comments = comments_by_post.get(post.id, [])[:5]
     
     
     context = {
         'posts': posts_page,
+        'comment_form': CommentForm(),  # Include comment form for posts
+        'htmx': True,  # Enable HTMX features for load more posts
     }
     
     return render(request, 'blog/partials/load_more_posts.html', context)
+
+
+def infinite_scroll_posts(request):
+    """HTMX infinite scroll endpoint that loads next 50 posts from cache"""
+    page_param = request.GET.get('page', '1')
+    try:
+        page = int(page_param)
+    except (ValueError, TypeError):
+        page = 1
+    logger.info(f"Infinite scroll loading page {page}")
+    logger.info(f"DEBUG: Infinite scroll view called for page {page}")
+
+    try:
+        # Get posts from cache using the same logic as context processor
+        logger.info(f"DEBUG: Getting cached posts...")
+        posts_data = get_cached_posts(request)
+        posts = posts_data['posts']
+        logger.info(f"DEBUG: Got {len(posts)} posts from cache")
+        
+        logger.info(f"DEBUG: Getting cached comments...")
+        all_comments = get_cached_comments()
+        logger.info(f"DEBUG: Got {len(all_comments)} comments from cache")
+        
+        # Combine posts and comments into a single feed (same as context processor)
+        combined_items = sorted(
+            chain(posts, all_comments),
+            key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+            reverse=True
+        )
+        
+        # For infinite scroll, we need to skip the items already shown on the initial page
+        # The initial page shows 50 items, so we need to skip (page - 1) * 50 items
+        items_per_page = 50
+        start_index = (page - 1) * items_per_page
+        end_index = start_index + items_per_page
+        
+        logger.info(f"DEBUG: Total combined items: {len(combined_items)}")
+        logger.info(f"DEBUG: Page {page}, start_index: {start_index}, end_index: {end_index}")
+        
+        # Get the slice of items for this page
+        page_items = combined_items[start_index:end_index]
+        logger.info(f"DEBUG: Got {len(page_items)} items for this page")
+        
+        # If no items, return empty response
+        if not page_items:
+            logger.info("DEBUG: No items for this page, returning empty response")
+            return HttpResponse('', content_type='text/html')
+        
+        # Process posts the same way as context processor
+        post_items = [item for item in page_items if hasattr(item, 'get_item_type') and item.get_item_type == 'Post']
+        comment_items = [item for item in page_items if not (hasattr(item, 'get_item_type') and item.get_item_type == 'Post')]
+        
+        # Batch load comments for posts (same as context processor)
+        if post_items:
+            post_ids = [item.id for item in post_items]
+            comments_by_post = {}
+            comments_queryset = Comment.objects.filter(
+                post_id__in=post_ids
+            ).order_by('-created_on').select_related('post')
+            
+            for comment in comments_queryset:
+                if comment.post_id not in comments_by_post:
+                    comments_by_post[comment.post_id] = []
+                comments_by_post[comment.post_id].append(comment)
+            
+            # Attach comments to posts
+            for post in post_items:
+                post.comments_total = len(comments_by_post.get(post.id, []))
+                post.recent_comments = comments_by_post.get(post.id, [])[:5]
+        
+        # Process items and preprocess for template efficiency
+        processed_items = list(chain(sorted(
+            post_items + comment_items,
+            key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
+            reverse=True
+        )))
+        
+        # Preprocess posts for template efficiency (same as context processor)
+        processed_items = preprocess_posts_for_template(processed_items)
+        
+        # Check if there are more items after this page
+        has_more = end_index < len(combined_items)
+        
+        context = {
+            'posts': processed_items,
+            'has_more': has_more,
+            'current_page': page,
+            'total_items': len(combined_items),
+            'comment_form': CommentForm(),  # Include comment form for posts
+            'htmx': True,  # Enable HTMX features for infinite scroll posts
+        }
+        
+        logger.info(f"DEBUG: Returning {len(processed_items)} items, has_more: {has_more}")
+        return render(request, 'blog/partials/infinite_scroll_posts.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in infinite_scroll_posts: {e}")
+        return HttpResponse('', content_type='text/html')
 
 
 def reading_flyer(request):
@@ -1252,9 +1364,8 @@ def add_comment(request, post_id, post_type='Post'):
 def custom_csrf_failure(request, reason=""):
     logger.error(f"CSRF failure occurred. Reason: {reason}. Path: {request.path}")
 
-    # Clear the cache
-    cache.clear()
-    logger.info("Cache cleared.")
+    # CSRF failures don't need to clear cache - this was causing unnecessary cache rebuilds
+    # cache.clear()  # Removed - CSRF failures shouldn't affect cached data
 
     # Redirect to the homepage
     return redirect('home')
