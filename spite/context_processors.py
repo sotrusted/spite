@@ -204,7 +204,7 @@ def get_cached_comments():
         
         # Fallback to database if cache is empty
         logger.info("Comment cache empty, fetching from database")
-        return Comment.objects.select_related('post').filter(
+        return Comment.objects.select_related('post', 'parent_comment').filter(
             spam_score__lt=50
         ).order_by('-created_on')
         
@@ -392,7 +392,7 @@ def load_posts(request):
         comments_by_post = {}
         comments_queryset = Comment.objects.filter(
             post_id__in=post_ids
-        ).order_by('-created_on').select_related('post')
+        ).order_by('-created_on').select_related('post', 'parent_comment')
         
         for comment in comments_queryset:
             if comment.post_id not in comments_by_post:

@@ -33,6 +33,47 @@
                 </div>
             {% endif %}
         </div>
+        {% if comment.parent_comment %}
+            <div class="parent-comment" style="margin-left: 10px;">
+                <div class="parent-comment-content">
+                    <span class="reply-to"><strong>{{ comment.parent_comment.name|default:"Anonymous" }}</strong></span>
+                    <p class="parent-comment-content">{{ comment.parent_comment.content|truncatewords:40 }}</p>
+                </div>
+                {% if comment.parent_comment.media_file %}
+                    {% if comment.parent_comment.is_video %}
+                        <div class="video-container">
+                            <video controls autoplay muted loop playsinline>
+                                <source src="{{ comment.parent_comment.media_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    {% elif comment.parent_comment.is_image %}
+                        <div class="image-container">
+                            <img src="{{ comment.parent_comment.media_file.url }}" alt="{{ comment.parent_comment.name }}" loading="lazy">
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if comment.context %}
+                    <div class="context-{{comment.parent_comment.id}}">
+                        <a hx-get="/hx/get-comment-chain/{{comment.parent_comment.id}}" 
+                           hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment.id}}"
+                           hx-swap="innerHTML" 
+                           hx-trigger="click once">
+                            [More]
+                        </a>
+                        <div id="comment-chain-{{comment.id}}-{{comment.parent_comment.id}}">
+                            <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment.id}}" class="htmx-indicator">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
     </div>
     
     <!-- Detail (expanded view) -->
@@ -68,34 +109,34 @@
         {% if comment.parent_comment %}
             <div class="parent-comment" style="margin-left: 10px;">
                 <div class="parent-comment-content">
-                    <span class="reply-to"><strong>{{ comment.parent_comment_name|default:"Anonymous" }}</strong></span>
-                    <p class="parent-comment-content">{{ comment.parent_comment_content }}</p>
+                    <span class="reply-to"><strong>{{ comment.parent_comment.name|default:"Anonymous" }}</strong></span>
+                    <p class="parent-comment-content">{{ comment.parent_comment.content }}</p>
                 </div>
-                {% if comment.parent_comment_media_file %}
-                    {% if comment.parent_comment_is_video %}
+                {% if comment.parent_comment.media_file %}
+                    {% if comment.parent_comment.is_video %}
                         <div class="video-container">
                             <video controls autoplay muted loop playsinline>
-                                <source src="{{ comment.post_media_file_url }}" type="video/mp4">
+                                <source src="{{ comment.parent_comment.media_file.url }}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
-                    {% elif comment.parent_comment_is_image %}
+                    {% elif comment.parent_comment.is_image %}
                         <div class="image-container">
-                            <img src="{{ comment.parent_comment_media_file.url }}" alt="{{ comment.parent_comment_name }}" loading="lazy">
+                            <img src="{{ comment.parent_comment.media_file.url }}" alt="{{ comment.parent_comment.name }}" loading="lazy">
                         </div>
                     {% endif %}
                 {% endif %}
 
                 {% if comment.context %}
-                    <div class="context-{{comment.parent_comment_id}}">
-                        <a hx-get="/hx/get-comment-chain/{{comment.parent_comment_id}}" 
-                           hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment_id}}"
+                    <div class="context-{{comment.parent_comment.id}}">
+                        <a hx-get="/hx/get-comment-chain/{{comment.parent_comment.id}}" 
+                           hx-target="#comment-chain-{{comment.id}}-{{comment.parent_comment.id}}"
                            hx-swap="innerHTML" 
                            hx-trigger="click once">
                             [More]
                         </a>
-                        <div id="comment-chain-{{comment.id}}-{{comment.parent_comment_id}}">
-                            <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment_id}}" class="htmx-indicator">
+                        <div id="comment-chain-{{comment.id}}-{{comment.parent_comment.id}}">
+                            <span id="chain-indicator-{{comment.id}}-{{comment.parent_comment.id}}" class="htmx-indicator">
                                 <div class="spinner-border spinner-border-sm text-secondary" role="status">
                                     <span class="visually-hidden"></span>
                                 </div>

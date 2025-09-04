@@ -283,6 +283,10 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 CSRF_FAILURE_VIEW = 'blog.views.custom_csrf_failure'
+CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr', 'https://sotrusted.net', 'https://www.sotrusted.net']
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_REFERER_CHECK = False
 
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -417,10 +421,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 60.0,
     },
 }
-
-CSRF_TRUSTED_ORIGINS = ['https://spite.fr', 'https://www.spite.fr', 'https://sotrusted.net', 'https://www.sotrusted.net']
-CSRF_USE_SESSIONS = True
-
 
 PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
 PUSHOVER_API_TOKEN = 'apuwdk74tzqpfv35b1sc76vgs1z2g8'

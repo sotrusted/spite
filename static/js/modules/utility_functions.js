@@ -908,6 +908,12 @@ export function addCommentToPage(comment) {
             }
             commentCountElement.textContent = `(${currentCount + 1})`;
         }
+        const toggleReplyButton = document.getElementById(`toggle-reply-${comment.id}`);
+        if (toggleReplyButton) {
+            toggleReplyButton.addEventListener('click', function() {
+                toggleReplyForm(comment.id);
+            });
+        }
     }
 
 

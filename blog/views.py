@@ -665,6 +665,7 @@ class PostCreateView(CreateView):
                     context = {
                         'post': post,
                         'is_new': True,
+                        'comment_form': CommentForm(),
                     }
                     response = render(self.request, 'blog/partials/post.html', context=context)
                     response['HX-Trigger'] = json.dumps({
@@ -1227,7 +1228,7 @@ def hx_get_comment(request, comment_id=None, comment=None, inline=False):
         # Get comment with related post data
         if comment_id and not comment:
             comment = get_object_or_404(
-                Comment.objects.select_related('post'), 
+                Comment.objects.select_related('post', 'parent_comment'), 
                 id=comment_id
             )
         elif not comment and not comment_id:
@@ -1398,7 +1399,7 @@ def get_comment_reply_form_html(request, comment_id):
     """API endpoint to serve a Crispy-rendered CommentForm for a specific post."""
     try:
         # Explicitly get the comment with its related post
-        comment = Comment.objects.select_related('post').get(id=comment_id)
+        comment = Comment.objects.select_related('post', 'parent_comment').get(id=comment_id)
 
 
         if not comment:
