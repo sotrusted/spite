@@ -93,7 +93,8 @@ def refresh_recent_comments(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Post)
 def broadcast_new_post(sender, instance, created, **kwargs):
     logger.info(f"broadcast_new_post signal triggered: created={created}, post_id={instance.id}")
-    if created:  # Only broadcast new posts
+
+    if created or instance.restored:  # Only broadcast new posts
         try:
             logger.info(f"Attempting to broadcast post {instance.id}")
             # Add a small delay to ensure database transaction is committed

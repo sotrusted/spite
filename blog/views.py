@@ -58,7 +58,7 @@ def check_spam(request, content='', author_name=''):
     cache_key = f'post_count_{client_ip}'
     post_count = cache.get(cache_key, 0)
     
-    if post_count > 5:  # Max 5 posts per minute
+    if post_count > 4:  # Max 4 posts per minute - less aggressive
         return True, "Please wait a minute before posting again"
     
     # Increment post count
@@ -91,7 +91,7 @@ def check_spam(request, content='', author_name=''):
         ).ratio()
         
         logger.info(f"Similarity: {similarity}")
-        if similarity > 0.8:  # 80% similarity threshold
+        if similarity > 0.85:  # 85% similarity threshold - less aggressive
             return True, "This content is too similar to a recent post"
     
     # Store this content hash
@@ -159,7 +159,7 @@ class PostCreateView(CreateView):
         cache_key = f'post_count_{client_ip}'
         post_count = cache.get(cache_key, 0)
         
-        if post_count > 5:  # Max 5 posts per minute
+        if post_count > 4:  # Max 4 posts per minute - less aggressive
             return True, "Please wait a minute before posting again"
         
         # Increment post count
@@ -301,84 +301,112 @@ class PostCreateView(CreateView):
             cache_key = f'post_count_{client_ip}'
             post_count = cache.get(cache_key, 0)
             
-            if post_count > 2:  # Reduced from 5 to 2 posts per minute
+            if post_count > 4:  # Increased from 2 to 4 posts per minute - less aggressive
                 logger.info(f"[SpamCheck] Rate limit exceeded for IP {client_ip}")
                 return True, "Please wait a minute before posting again"
             
             # Increment post count
             cache.set(cache_key, post_count + 1, 60)
             
-            # 3. Content checks
+            # 3. Content checks - clean up "None" prefixes and normalize
             content_to_check = f"{title.lower().strip() if title else ''} {content.lower().strip() if content else ''} {display_name.lower().strip() if display_name else ''}"
             content_to_check = ' '.join(content_to_check.split())
             
-            # 4. Enhanced repetitive pattern detection
+            
+            # Skip spam detection for very short content
+            if len(content_to_check) < 10:
+                return False, ""
+            
+            # 4. Enhanced repetitive pattern detection (much less aggressive)
             words = content_to_check.split()
-            if len(words) > 10:
+            if len(words) > 15:  # Only check longer posts
                 word_counts = {}
                 for word in words:
                     if len(word) > 3:
                         word_counts[word] = word_counts.get(word, 0) + 1
                 
-                # Check for excessive repetition
+                # Much more lenient thresholds for word repetition
                 for word, count in word_counts.items():
-                    if count > len(words) * 0.4:  # 40% threshold
-                        spam_score += 40  # Increased from 30
+                    # Skip common words that are often repeated legitimately
+                    common_words = {'the', 'and', 'you', 'are', 'for', 'with', 'this', 'that', 'have', 'will', 'been', 'they', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'also', 'where', 'much', 'some', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'many', 'over', 'such', 'take', 'than', 'them', 'these', 'so', 'use', 'her', 'him', 'two', 'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'water', 'been', 'call', 'who', 'oil', 'sit', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part'}
+                    if word in common_words:
+                        continue
+                    
+                    # Much more lenient thresholds
+                    if len(words) <= 30:
+                        threshold = 0.8  # 80% for very short posts
+                        penalty = 15    # Very low penalty
+                    elif len(words) <= 60:
+                        threshold = 0.7  # 70% for short posts
+                        penalty = 20    # Low penalty
+                    elif len(words) <= 100:
+                        threshold = 0.6  # 60% for medium posts
+                        penalty = 25    # Medium penalty
+                    else:
+                        threshold = 0.5  # 50% for long posts
+                        penalty = 30    # Higher penalty
+                    
+                    if count > len(words) * threshold:
+                        spam_score += penalty
                         spam_reasons.append(f"Excessive repetition of '{word}'")
                         break  # Only count once
             
-            # 5. Enhanced phrase repetition detection
-            if len(content_to_check) > 50:
-                for phrase_len in [10, 15, 20, 30]:
+            # 5. Enhanced phrase repetition detection (much less aggressive)
+            if len(content_to_check) > 100:  # Only check longer content
+                # Much more lenient phrase repetition detection
+                if len(content_to_check) <= 200:
+                    phrase_lengths = [20, 25]  # Longer phrases for short content
+                    min_repetitions = 5        # Much higher threshold
+                    penalty = 25              # Lower penalty
+                elif len(content_to_check) <= 400:
+                    phrase_lengths = [15, 20, 25]
+                    min_repetitions = 4
+                    penalty = 30
+                else:
+                    phrase_lengths = [15, 20, 25, 30]
+                    min_repetitions = 4
+                    penalty = 35
+                
+                for phrase_len in phrase_lengths:
                     if len(content_to_check) > phrase_len:
                         for i in range(0, len(content_to_check) - phrase_len):
                             phrase = content_to_check[i:i+phrase_len]
                             if len(phrase.strip()) > phrase_len * 0.8:
                                 count = content_to_check.count(phrase)
-                                if count >= 3:
-                                    spam_score += 50
+                                if count >= min_repetitions:
+                                    spam_score += penalty
                                     spam_reasons.append(f"Repetitive phrase detected: '{phrase[:20]}...' ({count} times)")
                                     break
                         if spam_score > 0:
                             break
             
-            # 6. Global duplicate check
+            # 6. Global duplicate check (much less aggressive)
             global_key = 'global_recent_posts_fast'
             global_recent = cache.get(global_key, [])
             
             if content_to_check in global_recent[-50:]:
-                spam_score += 80
+                spam_score += 60  # Reduced penalty
                 spam_reasons.append("Exact duplicate of recent content")
             else:
-                # Check for similar content
-                for recent_content in global_recent[-30:]:
-                    if len(recent_content) > 20 and len(content_to_check) > 20:
+                # Check for similar content (much less aggressive threshold)
+                for recent_content in global_recent[-20:]:  # Check fewer recent posts
+                    if len(recent_content) > 30 and len(content_to_check) > 30:  # Only check longer content
                         similarity = SequenceMatcher(None, content_to_check, recent_content).ratio()
-                        if similarity > 0.7:
-                            spam_score += 70
+                        # Much more aggressive similarity threshold - only flag extremely high similarity
+                        if similarity > 0.95:  # Increased from 0.85 to 0.95
+                            spam_score += 40  # Reduced penalty
                             spam_reasons.append(f"Very similar to recent content (similarity: {similarity:.2f})")
                             break
             
-            # 7. IP-specific duplicate check
+            # 7. IP-specific duplicate check (less aggressive)
             recent_posts_key = f'recent_posts_{client_ip}'
             recent_posts = cache.get(recent_posts_key, [])
             
             content_hash = hashlib.md5(content_to_check.encode()).hexdigest()
-            if content_hash in recent_posts:
-                spam_score += 60
+            if recent_posts.count(content_hash) > 5:  # Increased from 3 to 5
+                spam_score += 40  # Reduced penalty
                 spam_reasons.append("You've posted this content recently")
             
-            # 8. Specific spam patterns
-            spam_patterns = [
-                "alex bienstock and peter vack abuse",
-                "women and you support it",
-            ]
-            
-            for pattern in spam_patterns:
-                if pattern in content_to_check:
-                    spam_score += 100
-                    spam_reasons.append(f"Known spam pattern detected: '{pattern}'")
-                    break
             
             # 9. Update caches
             global_recent.append(content_to_check)
@@ -421,13 +449,13 @@ class PostCreateView(CreateView):
                 except Exception as e:
                     logger.warning(f"Error checking image duplicate: {e}")
             
-            # 7. Determine action based on score
-            if spam_score >= 80:  # High spam score - block
+            # 9. Determine action based on score (much less aggressive thresholds)
+            if spam_score >= 120:  # Increased from 100 to 120 - only block really bad spam
                 logger.info(f"[SpamCheck] High spam score {spam_score} for IP {client_ip}: {spam_reasons}")
                 # Track spam attempts for IP blocking
                 self.track_spam_attempt(client_ip, spam_score)
                 return True, f"Content flagged as spam: {'; '.join(spam_reasons)}"
-            elif spam_score >= 30:
+            elif spam_score >= 70:  # Increased from 50 to 70 - hide less content
                 logger.info(f"[SpamCheck] Medium-high spam score {spam_score} for IP {client_ip}: {spam_reasons}")
                 # Track spam attempts for IP blocking
                 self.track_spam_attempt(client_ip, spam_score)
@@ -485,10 +513,10 @@ class PostCreateView(CreateView):
             cutoff_time = time.time() - (24 * 60 * 60)
             attempts = [attempt for attempt in attempts if attempt['timestamp'] > cutoff_time]
             
-            # Check if IP should be blocked (3+ attempts with score >= 50)
-            high_score_attempts = [attempt for attempt in attempts if attempt['score'] >= 50]
+            # Check if IP should be blocked (5+ attempts with score >= 80 - much stricter)
+            high_score_attempts = [attempt for attempt in attempts if attempt['score'] >= 80]
             
-            if len(high_score_attempts) >= 3:
+            if len(high_score_attempts) >= 5:  # Increased from 3 to 5 attempts
                 # Create or update BlockedIP entry
                 blocked_ip, created = BlockedIP.objects.get_or_create(
                     ip_address=client_ip,
@@ -1088,9 +1116,6 @@ def reply_comment(request, comment_id):
     logger.info(f"reply_comment: Received reply to comment {comment_id}")
     try:
         parent_comment = get_object_or_404(Comment, id=comment_id)
-        if not parent_comment:
-            return redirect('post-detail', pk=post.id)
-
         post = parent_comment.post
         logger.info(f"reply_comment: Found parent comment {parent_comment.id} for post {post.id}")
 
@@ -1185,6 +1210,22 @@ def reply_comment(request, comment_id):
                     }
                 })
 
+            # Non-AJAX fallback
+            return redirect('post-detail', pk=post.id)
+        else:
+            # Form is invalid
+            logger.error(f"reply_comment: Form is invalid: {form.errors}")
+            if request.headers.get('HX-Request'):
+                return HttpResponse(
+                    f"<div class='alert alert-danger'>Form validation error: {form.errors}</div>",
+                    status=400
+                )
+            elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Form validation failed',
+                    'errors': form.errors
+                }, status=400)
             # Non-AJAX fallback
             return redirect('post-detail', pk=post.id)
     except Exception as e:

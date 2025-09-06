@@ -212,37 +212,59 @@ class Command(BaseCommand):
         spam_score = 0
         spam_reasons = []
         
-        # Create content string
         content = f"{post.title.lower().strip() if post.title else ''} {post.content.lower().strip() if post.content else ''} {post.display_name.lower().strip() if post.display_name else ''}"
         content = ' '.join(content.split())
         
-        # Check for excessive word repetition
+        # Skip spam detection for very short content
+        if len(content) < 10:
+            return 0, []
+        
+        # Check for excessive word repetition (much less aggressive)
         words = content.split()
-        if len(words) > 10:
+        if len(words) > 15:  # Only check longer posts
             word_counts = {}
             for word in words:
                 if len(word) > 3:
                     word_counts[word] = word_counts.get(word, 0) + 1
             
             for word, count in word_counts.items():
-                if count > len(words) * 0.4:
-                    spam_score += 40
+                # Skip common words that are often repeated legitimately
+                common_words = {'the', 'and', 'you', 'are', 'for', 'with', 'this', 'that', 'have', 'will', 'been', 'they', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'also', 'where', 'much', 'some', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'many', 'over', 'such', 'take', 'than', 'them', 'these', 'so', 'use', 'her', 'him', 'two', 'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'water', 'been', 'call', 'who', 'oil', 'sit', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part'}
+                if word in common_words:
+                    continue
+                
+                # Much more lenient thresholds (consistent with views.py)
+                if len(words) <= 30:
+                    threshold = 0.8  # 80% for very short posts
+                    penalty = 15    # Very low penalty
+                elif len(words) <= 60:
+                    threshold = 0.7  # 70% for short posts
+                    penalty = 20    # Low penalty
+                elif len(words) <= 100:
+                    threshold = 0.6  # 60% for medium posts
+                    penalty = 25    # Medium penalty
+                else:
+                    threshold = 0.5  # 50% for long posts
+                    penalty = 30    # Higher penalty
+                
+                if count > len(words) * threshold:
+                    spam_score += penalty
                     spam_reasons.append(f"Excessive repetition of '{word}'")
                     break
         
-        # Check for repetitive patterns
-        if len(content) > 100:
-            # Look for repeated phrases
-            for seq_len in range(5, min(10, len(words)//2)):
+        # Check for repetitive patterns (much less aggressive)
+        if len(content) > 200:  # Only check longer content
+            # Look for repeated phrases with higher thresholds
+            for seq_len in range(8, min(15, len(words)//2)):  # Longer phrases
                 for i in range(len(words) - seq_len + 1):
                     sequence = ' '.join(words[i:i+seq_len])
-                    if len(sequence) > 20:
+                    if len(sequence) > 30:  # Longer sequences
                         count = content.count(sequence)
-                        if count >= 3:
-                            spam_score += 50
+                        if count >= 5:  # Much higher threshold
+                            spam_score += 30  # Lower penalty
                             spam_reasons.append(f"Repeated phrase: '{sequence[:50]}...'")
                             break
-                if spam_score >= 50:
+                if spam_score >= 30:
                     break
         
         return spam_score, spam_reasons
@@ -252,36 +274,60 @@ class Command(BaseCommand):
         spam_score = 0
         spam_reasons = []
         
-        # Create content string
+        # Create content string - clean up "None" prefixes
         content = f"{comment.name.lower().strip() if comment.name else ''} {comment.content.lower().strip() if comment.content else ''}"
         content = ' '.join(content.split())
+        content = content.replace('none', '').strip()
         
-        # Check for excessive word repetition
+        # Skip spam detection for very short content
+        if len(content) < 10:
+            return 0, []
+        
+        # Check for excessive word repetition (much less aggressive)
         words = content.split()
-        if len(words) > 10:
+        if len(words) > 15:  # Only check longer comments
             word_counts = {}
             for word in words:
                 if len(word) > 3:
                     word_counts[word] = word_counts.get(word, 0) + 1
             
             for word, count in word_counts.items():
-                if count > len(words) * 0.4:
-                    spam_score += 40
+                # Skip common words that are often repeated legitimately
+                common_words = {'the', 'and', 'you', 'are', 'for', 'with', 'this', 'that', 'have', 'will', 'been', 'they', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'also', 'where', 'much', 'some', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'many', 'over', 'such', 'take', 'than', 'them', 'these', 'so', 'use', 'her', 'him', 'two', 'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'water', 'been', 'call', 'who', 'oil', 'sit', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part'}
+                if word in common_words:
+                    continue
+                
+                # Much more lenient thresholds (consistent with views.py)
+                if len(words) <= 30:
+                    threshold = 0.8  # 80% for very short comments
+                    penalty = 15    # Very low penalty
+                elif len(words) <= 60:
+                    threshold = 0.7  # 70% for short comments
+                    penalty = 20    # Low penalty
+                elif len(words) <= 100:
+                    threshold = 0.6  # 60% for medium comments
+                    penalty = 25    # Medium penalty
+                else:
+                    threshold = 0.5  # 50% for long comments
+                    penalty = 30    # Higher penalty
+                
+                if count > len(words) * threshold:
+                    spam_score += penalty
                     spam_reasons.append(f"Excessive repetition of '{word}'")
                     break
         
-        # Check for repetitive patterns
-        if len(content) > 100:
-            for seq_len in range(5, min(10, len(words)//2)):
+        # Check for repetitive patterns (much less aggressive)
+        if len(content) > 200:  # Only check longer content
+            for seq_len in range(8, min(15, len(words)//2)):  # Longer phrases
                 for i in range(len(words) - seq_len + 1):
                     sequence = ' '.join(words[i:i+seq_len])
-                    if len(sequence) > 20:
+                    if len(sequence) > 30:  # Longer sequences
                         count = content.count(sequence)
-                        if count >= 3:
-                            spam_score += 50
+                        if count >= 5:  # Much higher threshold
+                            spam_score += 30  # Lower penalty
                             spam_reasons.append(f"Repeated phrase: '{sequence[:50]}...'")
                             break
-                if spam_score >= 50:
+                if spam_score >= 30:
                     break
         
         return spam_score, spam_reasons

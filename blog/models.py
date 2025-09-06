@@ -97,7 +97,8 @@ class Post(models.Model):
     # Pre-calculated template fields (populated by context processor)
     formatted_date = models.CharField(max_length=50, blank=True, null=True, editable=False)
     excerpt = models.TextField(blank=True, null=True, editable=False)
-
+    reviewed = models.BooleanField(default=False, null=True, blank=True)
+    restored = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return f'{self.id} - {self.title}'
@@ -223,6 +224,8 @@ class Comment(models.Model):
     # Pre-calculated template fields (populated by context processor)
     formatted_date = models.CharField(max_length=50, blank=True, null=True, editable=False)
     excerpt = models.TextField(blank=True, null=True, editable=False)
+    reviewed = models.BooleanField(default=False, null=True, blank=True)
+    restored = models.BooleanField(default=False, null=True, blank=True)
 
     class Meta:
         indexes = [

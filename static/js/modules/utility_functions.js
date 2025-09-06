@@ -218,104 +218,83 @@ function loadReplyForm(commentId) {
             }
         }
         
-        // Handle form submission
+        // Let HTMX handle the form submission, just add some UI enhancements
         const form = replyForm.querySelector('form');
         if (form) {
-            // Remove any existing event listeners to prevent duplicates
-            const newForm = form.cloneNode(true);
-            form.parentNode.replaceChild(newForm, form);
+            // Add HTMX event listeners for better UX
+            form.addEventListener('htmx:beforeRequest', function(e) {
+                log(`HTMX: Starting reply submission for comment ${commentId}`);
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Submitting...';
+                }
+            });
             
-            newForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                submitReplyForm(commentId, newForm);
+            form.addEventListener('htmx:afterRequest', function(e) {
+                log(`HTMX: Reply submission completed for comment ${commentId}`);
+                if (e.detail.successful) {
+                    // Hide the form on successful submission
+                    replyForm.style.display = 'none';
+                    
+                    // Show success message
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'alert alert-success alert-dismissible fade show';
+                    successMsg.innerHTML = `
+                        Reply submitted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    // Insert after the reply button
+                    const replyButton = document.getElementById(`toggle-reply-${commentId}`);
+                    if (replyButton) {
+                        replyButton.parentNode.insertBefore(successMsg, replyButton.nextSibling);
+                        
+                        // Auto-hide after 3 seconds
+                        setTimeout(() => {
+                            successMsg.remove();
+                        }, 3000);
+                    }
+                } else {
+                    // Handle error case
+                    log(`HTMX: Reply submission failed: ${e.detail.xhr.status}`);
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = 'Submit';
+                    }
+                }
             });
         }
     }
 }
 
-function submitReplyForm(commentId, form) {
-    log(`Submitting reply form for comment ${commentId}`);
-    
-    const formData = new FormData(form);
-    const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    
-    // Show loading state
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Submitting...';
-    
-    fetch('/add-comment/comment/' + commentId + '/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text(); // Get HTML response
-    })
-    .then(html => {
-        log(`Reply submitted successfully for comment ${commentId}`);
-        
-        // Hide the form
-        const replyForm = document.getElementById(`reply-form-${commentId}`);
-        if (replyForm) {
-            replyForm.style.display = 'none';
-        }
-        
-        // Show success message
-        const successMsg = document.createElement('div');
-        successMsg.className = 'alert alert-success alert-dismissible fade show';
-        successMsg.innerHTML = `
-            Reply submitted successfully!
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        // Insert after the reply button
-        const replyButton = document.getElementById(`toggle-reply-${commentId}`);
-        if (replyButton) {
-            replyButton.parentNode.insertBefore(successMsg, replyButton.nextSibling);
+// submitReplyForm function removed - now using HTMX for form submission
+
+// Function to handle comment chain minimize/maximize
+function attachCommentChainHandlers() {
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.minimize-chain-btn')) {
+            e.preventDefault();
+            const button = e.target.closest('.minimize-chain-btn');
+            const chainContainer = button.closest('.comment-chain');
             
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                successMsg.remove();
-            }, 3000);
+            if (chainContainer) {
+                const isMinimized = chainContainer.classList.contains('minimized');
+                
+                if (isMinimized) {
+                    // Show chain
+                    chainContainer.classList.remove('minimized');
+                    button.innerHTML = '<i class="fas fa-chevron-up"></i> Minimize';
+                } else {
+                    // Hide chain
+                    chainContainer.classList.add('minimized');
+                    button.innerHTML = '<i class="fas fa-chevron-down"></i> Show Chain';
+                }
+            }
         }
-        
-        // Refresh the comment section to show the new reply
-        const commentSection = document.getElementById(`comment-section-${commentId}`);
-        if (commentSection) {
-            // Trigger a refresh of the comment section
-            // This could be a simple page reload or a more sophisticated refresh
-            location.reload();
-        }
-    })
-    .catch(error => {
-        log(`Error submitting reply: ${error}`, 'error');
-        
-        // Show error message
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'alert alert-danger alert-dismissible fade show';
-        errorMsg.innerHTML = `
-            Error submitting reply: ${error.message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        // Insert after the reply button
-        const replyButton = document.getElementById(`toggle-reply-${commentId}`);
-        if (replyButton) {
-            replyButton.parentNode.insertBefore(errorMsg, replyButton.nextSibling);
-        }
-        
-        // Reset button
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
     });
 }
-
 
 // Function to attach event listeners to copy links
 function attachCopyLinks(id=null) {
@@ -544,6 +523,9 @@ export function attachEventListeners(id=null) {
         attachToggleCommentsButtons();
         log('Toggle comments buttons attached');
 
+        attachCommentChainHandlers();
+        log('Comment chain handlers attached');
+
         attachDetailToggleImages();
         log('Detail toggle images attached');
 
@@ -560,6 +542,9 @@ export function attachEventListeners(id=null) {
 
         attachToggleCommentsButtons(id);
         log(`Toggle comments buttons attached for post ${id}`);
+
+        attachCommentChainHandlers();
+        log('Comment chain handlers attached');
 
         attachDetailToggleImages(id);
         log(`Detail toggle images attached for post ${id}`);

@@ -1,5 +1,10 @@
 {% load custom_filters %}
 <div class="comment-chain">
+    <!-- Minimize button -->
+    <button class="minimize-chain-btn" id="minimize-chain-btn-{{ original_comment_id }}">
+            Minimize
+    </button>
+    
     {% for comment in comment_chain %}
         <div class="comment-wrapper" 
              style="margin-left: {{ forloop.counter1|multiply:10 }}px; border-left: 3px solid {% cycle '#6c757d' '#007bff' '#28a745' '#dc3545' '#ffc107' %};">
