@@ -381,7 +381,7 @@ def load_posts(request):
     
     # Combine posts and comments into a single feed
     combined_items = list(chain(posts_data['posts'], all_comments))
-    
+    combined_items.sort(key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on, reverse=True)
 
 
     # Paginate the combined feed items
@@ -389,7 +389,6 @@ def load_posts(request):
     paginator = Paginator(combined_items, items_per_page) 
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-    page_obj.object_list.sort(key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on, reverse=True)
 
     # Optimize item processing - batch load comments for posts in current page
     post_items = [item for item in page_obj.object_list if hasattr(item, 'get_item_type') and item.get_item_type == 'Post']
