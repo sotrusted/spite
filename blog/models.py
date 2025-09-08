@@ -167,7 +167,7 @@ class Post(models.Model):
         comments = Comment.objects.filter(post=self).order_by('-created_on')
         return comments
 
-    @property
+    @cached_property
     def comment_count(self):
         return self.comments.count()
 
@@ -183,7 +183,7 @@ class Post(models.Model):
     def set_ip_address(self, value):
         storage = SecureIPStorage()
         self.encrypted_ip = storage.encrypt_ip(value)
-
+    
     class Meta:
         indexes = [
             models.Index(fields=['-date_posted']),

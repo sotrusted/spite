@@ -45,6 +45,8 @@ def process_post_chunk(posts_chunk):
     """Process a small chunk of posts to reduce memory usage"""
     return [process_post(post) for post in posts_chunk]
 
+from spite.utils import render_post_fragment, render_comment_fragment
+
 @shared_task
 def cache_posts_data():
     """Cache posts with better memory management"""
@@ -65,6 +67,7 @@ def cache_posts_data():
             'is_image',
             'is_video',
             'spam_score',  # Add spam_score to values
+            'comment_count',
         ).filter(
             spam_score__lt=50  # FILTER OUT SPAM POSTS
         ).order_by('-date_posted')

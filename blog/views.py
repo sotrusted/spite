@@ -48,6 +48,8 @@ from contextlib import contextmanager
 
 logger = logging.getLogger('spite')
 
+ITEMS_PER_PAGE = settings.ITEMS_PER_PAGE
+
 def check_spam(request, content='', author_name=''):
     logger.info("Checking spam")
     client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
@@ -944,7 +946,7 @@ def infinite_scroll_posts(request):
         
         # For infinite scroll, we need to skip the items already shown on the initial page
         # The initial page shows 50 items, so we need to skip (page - 1) * 50 items
-        items_per_page = 50
+        items_per_page = ITEMS_PER_PAGE
         start_index = (page - 1) * items_per_page
         end_index = start_index + items_per_page
         
@@ -968,10 +970,7 @@ def infinite_scroll_posts(request):
         if post_items:
             post_ids = [item.id for item in post_items]
             comments_by_post = {}
-            comments_queryset = Comment.objects.filter(
-                post_id__in=post_ids
-            ).order_by('-created_on').select_related('post')
-            
+            comments_queryset = [comment for comment in all_comments if comment.post_id in post_ids]
             for comment in comments_queryset:
                 if comment.post_id not in comments_by_post:
                     comments_by_post[comment.post_id] = []

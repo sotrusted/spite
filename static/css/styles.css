@@ -468,7 +468,7 @@ form {
 }
 
 .comment { 
-    background-color: #f0e1cc; 
+    background-color: #f1e3cf; 
 }
 
 .comment.item {
@@ -495,13 +495,13 @@ form {
 }
 
 .comment .parent-comment, .comment .parent-post {
-    background-color: #dfd1bf; 
+    background-color: #e6dccf; 
 }
 
 .comment .parent-post.stacked {
     margin-left: 30px;
 
-    background-color: #d5c9b6; 
+    background-color: #e4dbce; 
 }
 
 .highlight {
@@ -584,7 +584,7 @@ form {
 }
 
 .detail.nested {
-    background-color: #c9bcac;
+    background-color: #e1dad0;
 }
 
 .detail .flexbox {
@@ -1690,7 +1690,7 @@ video:focus {
     font-size: 1.1em;
     padding: 10px;
     margin: 15px 0;
-    background-color: #dfd1bf;
+    background-color: #e8d9c6;
 }
 
 .parent-comment-content {
@@ -1899,4 +1899,50 @@ video:focus {
         background-color: rgba(52, 152, 219, 0.1);
         border: 1px solid rgba(52, 152, 219, 0.3);
     }
+}
+
+/* Comment chain minimize button styling */
+.minimize-chain-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.minimize-chain-btn:hover {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.minimize-chain-btn i {
+    font-size: 0.7rem;
+    margin-right: 0.25rem;
+}
+
+.show-more-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.show-more-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.comment-chain {
+    border: 1px solid #646464;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.comment-chain.minimized .comment-wrapper {
+    display: none;
+}
+
+.comment-chain.minimized .d-flex {
+    margin-bottom: 0;
 }

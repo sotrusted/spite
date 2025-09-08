@@ -512,11 +512,8 @@ CELERY_TASK_TIME_LIMIT = 60  # 1 minute max
 CELERY_TASK_SOFT_TIME_LIMIT = 45  # Warn at 45 seconds
 
 
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'Full',
-        'width': '100%',
-    },
-}
 
+CONTENT_LIMIT = 400
+CONTENT_LINES_LIMIT = 5
+
+ITEMS_PER_PAGE = 20

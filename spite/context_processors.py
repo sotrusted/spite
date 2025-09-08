@@ -18,6 +18,12 @@ from django.shortcuts import get_object_or_404
 from spite.utils import cache_large_data
 from django.db.models import Prefetch
 from itertools import islice
+from django.conf import settings
+
+# Import constant variables from settings
+CONTENT_LIMIT = settings.CONTENT_LIMIT
+CONTENT_LINES_LIMIT = settings.CONTENT_LINES_LIMIT
+ITEMS_PER_PAGE = settings.ITEMS_PER_PAGE
 
 def preprocess_posts_for_template(items):
     """Preprocess posts and comments to avoid expensive template operations"""
@@ -26,21 +32,25 @@ def preprocess_posts_for_template(items):
         if hasattr(item, 'get_item_type'):
             if item.get_item_type == 'Post':
                 # Pre-calculate formatted date for posts
-                if hasattr(item, 'date_posted') and item.date_posted:
-                    item.formatted_date = item.date_posted.strftime('%B %d, %Y, %I:%M %p')
+                if not hasattr(item, 'formatted_date'):
+                    if hasattr(item, 'date_posted') and item.date_posted:
+                        item.formatted_date = item.date_posted.strftime('%B %d, %Y, %I:%M %p')
                 
                 # Pre-calculate excerpt for posts
-                if hasattr(item, 'content') and item.content:
-                    item.excerpt = create_excerpt(item.content)
+                if not hasattr(item, 'excerpt'):
+                    if hasattr(item, 'content') and item.content:
+                        item.excerpt = create_excerpt(item.content)
                     
             elif item.get_item_type == 'Comment':
                 # Pre-calculate formatted date for comments
-                if hasattr(item, 'created_on') and item.created_on:
-                    item.formatted_date = item.created_on.strftime('%B %d, %Y, %I:%M %p')
+                if not hasattr(item, 'formatted_date'):
+                    if hasattr(item, 'created_on') and item.created_on:
+                        item.formatted_date = item.created_on.strftime('%B %d, %Y, %I:%M %p')
                 
                 # Pre-calculate excerpt for comments
-                if hasattr(item, 'content') and item.content:
-                    item.excerpt = create_excerpt(item.content)
+                if not hasattr(item, 'excerpt'):
+                    if hasattr(item, 'content') and item.content:
+                        item.excerpt = create_excerpt(item.content)
         else:
             # Fallback for items without get_item_type (shouldn't happen but be safe)
             if hasattr(item, 'date_posted') and item.date_posted:
@@ -53,7 +63,8 @@ def preprocess_posts_for_template(items):
     
     return items
 
-def create_excerpt(content):
+
+def create_excerpt(content, content_limit=CONTENT_LIMIT, content_lines_limit=CONTENT_LINES_LIMIT):
     """Create excerpt with proper line break handling"""
     if not content:
         return ""
@@ -70,9 +81,9 @@ def create_excerpt(content):
         if not line:  # Skip empty lines
             continue
             
-        if total_chars + len(line) > 200:
+        if total_chars + len(line) > content_limit:
             # If adding this line would exceed 200 chars, truncate it
-            remaining_chars = 200 - total_chars
+            remaining_chars = content_limit - total_chars
             if remaining_chars > 3:  # Only add if we have space for "..."
                 excerpt_lines.append(line[:remaining_chars-3] + '...')
             break
@@ -81,7 +92,7 @@ def create_excerpt(content):
             total_chars += len(line)
             
             # Limit to 3 lines max
-            if len(excerpt_lines) >= 3:
+            if len(excerpt_lines) >= content_lines_limit:
                 break
     
     return '\n'.join(excerpt_lines)
@@ -90,7 +101,7 @@ def preprocess_post(post):
     post = get_object_or_404(Post, id=post.id)
     comments = Comment.objects.filter(post=post).order_by('-created_on')
     # Attach comments and total count directly to the post object
-    post.comments_total = comments.count()
+    post.comments_total = post.comment_count
     post.recent_comments = comments
     return post
 
@@ -356,6 +367,7 @@ def load_posts(request):
                     post.comments_total = len(comments_by_pinned_post.get(post.id, []))
                     post.recent_comments = comments_by_pinned_post.get(post.id, [])[:5]
 
+    '''
     # OPTIMIZED: Use cached highlight comments (kept for future use)
     highlight_comments = cache.get('highlight_comments')
     if not highlight_comments:
@@ -363,24 +375,21 @@ def load_posts(request):
             spam_score__lt=50
         ).order_by('-created_on')[:5])
         cache.set('highlight_comments', highlight_comments, 300)  # Cache for 5 minutes
-
+'''
     # Load ALL comments as quote posts from cache
     all_comments = get_cached_comments()
     
     # Combine posts and comments into a single feed
-    combined_items = sorted(
-        chain(posts_data['posts'], all_comments),
-        key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on,
-        reverse=True
-    )
+    combined_items = list(chain(posts_data['posts'], all_comments))
     
 
 
     # Paginate the combined feed items
-    items_per_page = 50
+    items_per_page = ITEMS_PER_PAGE
     paginator = Paginator(combined_items, items_per_page) 
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
+    page_obj.object_list.sort(key=lambda x: x.date_posted if hasattr(x, 'date_posted') else x.created_on, reverse=True)
 
     # Optimize item processing - batch load comments for posts in current page
     post_items = [item for item in page_obj.object_list if hasattr(item, 'get_item_type') and item.get_item_type == 'Post']
@@ -390,10 +399,8 @@ def load_posts(request):
     if post_items:
         post_ids = [item.id for item in post_items]
         comments_by_post = {}
-        comments_queryset = Comment.objects.filter(
-            post_id__in=post_ids
-        ).order_by('-created_on').select_related('post', 'parent_comment')
-        
+        comments_queryset = [comment for comment in all_comments if comment.post_id in post_ids]
+
         for comment in comments_queryset:
             if comment.post_id not in comments_by_post:
                 comments_by_post[comment.post_id] = []
@@ -401,8 +408,8 @@ def load_posts(request):
         
         # Attach comments to posts
         for post in post_items:
-            post.comments_total = len(comments_by_post.get(post.id, []))
             post.recent_comments = comments_by_post.get(post.id, [])[:5]
+            post.comments_total = getattr(post, 'comment_count', 0)  # Use cached countpost.comment_count
     
     # Process items (comments don't need additional processing)
     processed_items = list(chain(sorted(
@@ -417,6 +424,7 @@ def load_posts(request):
     # OPTIMIZED: Preprocess posts for template efficiency
     page_obj.object_list = preprocess_posts_for_template(page_obj.object_list)
     posts_data['pinned_posts'] = preprocess_posts_for_template(posts_data['pinned_posts'])
+
     
     return {
         'days_since_launch': days_since_launch(),
@@ -429,15 +437,18 @@ def load_posts(request):
         'pinned_posts': posts_data['pinned_posts'],
         'spite': cache.get('total_posts_comments', 0),  # Cache this expensive query
         'is_paginated': page_obj.has_other_pages(),
-        'highlight_comments': highlight_comments,
         'is_loading': is_loading,
         'htmx': True,  # Enable HTMX features in templates
     }
 
 def days_since_launch():
+    cached_days_since_launch = cache.get('days_since_launch', 0)
+    if cached_days_since_launch:
+        return cached_days_since_launch
     site_launch_date = datetime(2024, 8, 23)
     current_date = datetime.now()
     days_since = (current_date - site_launch_date).days
+    cache.set('days_since_launch', days_since, 36000)
     return days_since
 
 def get_posts():
