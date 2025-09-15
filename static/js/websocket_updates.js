@@ -119,6 +119,78 @@ export function initCommentWebsocketUpdates() {
 
 }
 
+export function initSiteNotifications() {
+    // Connect to site-wide notifications WebSocket (for chat joins, etc.)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/ws/notifications/`;
+    
+    console.log('Connecting to site notifications:', wsUrl);
+    
+    const notificationsSocket = new WebSocket(wsUrl);
+    
+    notificationsSocket.onopen = function() {
+        console.log('Site notifications WebSocket connected');
+        console.log('Site notifications ready to receive messages');
+    };
+    
+    notificationsSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Site notification received:', data);
+        console.log('Data type:', data.type);
+        
+        switch(data.type) {
+            case 'test_connection':
+                console.log('✅ Site notifications test message received:', data.message);
+                break;
+            case 'chat_user_joined':
+                console.log('Processing chat_user_joined event');
+                // Flash all chat toggle buttons on the page
+                const chatToggles = document.querySelectorAll('#chat-toggle');
+                console.log('Found chat toggles:', chatToggles.length);
+                chatToggles.forEach((toggle, index) => {
+                    console.log(`Flashing toggle ${index}:`, toggle);
+                    flashChatToggle(toggle);
+                });
+                break;
+            default:
+                console.log('Unknown site notification type:', data.type);
+        }
+    };
+    
+    notificationsSocket.onclose = function() {
+        console.log('Site notifications WebSocket closed');
+    };
+    
+    notificationsSocket.onerror = function(error) {
+        console.error('Site notifications WebSocket error:', error);
+    };
+}
+
+// Helper function to flash chat toggle button
+function flashChatToggle(toggle) {
+    if (toggle) {
+        console.log('Flashing chat toggle from site notification');
+        
+        // Remove existing flash class if present
+        toggle.classList.remove('flash');
+        
+        // Force a reflow to ensure the class removal takes effect
+        void toggle.offsetWidth;
+        
+        // Add the flash class to trigger animation
+        toggle.classList.add('flash');
+        
+        // Remove the flash class after animation completes (3 iterations × 2s = 6s)
+        setTimeout(() => {
+            toggle.classList.remove('flash');
+            console.log('Chat toggle flash animation completed');
+        }, 6000); // 2s × 3 iterations = 6 seconds total
+        
+        console.log('Chat toggle flash animation triggered from site notification');
+    }
+}
+
 export function initChatWebsocketUpdates() {
     let chat = null;
     const chatToggle = document.getElementById('chat-toggle');

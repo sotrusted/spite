@@ -422,7 +422,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'content-analysis': {
         'task': 'blog.tasks.run_full_content_analysis',
-        'schedule': 1440.0,  # Run every 24 hours (matches your model setting)
+        'schedule': 300.0,  # Every 5 minutes (aggressive low-priority analysis)
     },
 }
 

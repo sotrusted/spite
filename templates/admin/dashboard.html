@@ -3,26 +3,49 @@
 
 {% block title %}Dashboard | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
+{% block extrahead %}
+    {{ block.super }}
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Prata:wght@400&family=Princess+Sofia&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block extrastyle %}
     {{ block.super }}
     <style>
+        body {
+            background-color: #000;
+            color: antiquewhite;
+            font-family: 'Crimson Text', serif;
+        }
+        
         .dashboard-container {
             max-width: 100%;
             margin: 20px;
-            color: #333;
+            color: antiquewhite;
+            background-color: #000;
+            padding: 20px;
+            border-radius: 8px;
         }
         
         .dashboard-header {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #79aec8;
+            border-bottom: 2px solid #169B62;
         }
         
         .dashboard-header h1 {
-            color: #79aec8;
+            font-family: 'Princess Sofia', cursive;
+            color: #fff;
             font-size: 2.5rem;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .dashboard-header p {
+            font-family: 'Prata', serif;
+            color: rgb(90, 191, 225);
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
         }
         
         .metrics-grid {
@@ -33,18 +56,30 @@
         }
         
         .metric-card {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background: linear-gradient(135deg, antiquewhite 0%, #f5deb3 100%);
+            border: 2px solid #169B62;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: #000;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(22, 155, 98, 0.3);
+            border-color: rgb(90, 191, 225);
         }
         
         .metric-card h3 {
-            color: #417690;
+            color: #000;
             margin-bottom: 15px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Crimson Text', serif;
+            border-bottom: 2px solid #169B62;
+            padding-bottom: 10px;
         }
         
         .metric-row {
@@ -60,12 +95,12 @@
         }
         
         .metric-label {
-            color: #666;
-            font-weight: 500;
+            color: #000;
+            font-weight: 600;
         }
         
         .metric-value {
-            color: #333;
+            color: #169B62;
             font-weight: bold;
             font-size: 1.2rem;
             background: #e3f2fd;
@@ -74,17 +109,21 @@
         }
         
         .chart-container {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background: antiquewhite;
+            border: 2px solid #169B62;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
         .chart-container h3 {
-            color: #417690;
+            color: #000;
             margin-bottom: 15px;
             text-align: center;
+            font-family: 'Crimson Text', serif;
+            font-weight: 700;
+            font-size: 1.4rem;
         }
         
         .chart-canvas {
@@ -176,7 +215,8 @@
 {% block content %}
 <div class="dashboard-container">
     <div class="dashboard-header">
-        <h1>📊 Activity Dashboard</h1>
+        <h1>SPITE Magazine Dashboard</h1>
+        <p>Anyone can analyze for spite</p>
         <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
         <button class="refresh-btn" onclick="exportData()" style="margin-left: 10px;">📊 Export Data</button>
         <div class="last-updated" id="lastUpdated">
@@ -247,6 +287,14 @@
         <canvas id="dailyChart" class="chart-canvas"></canvas>
     </div>
     
+    <!-- Time Series Sentiment Chart -->
+    {% if sentiment_stats.sentiment_trend %}
+    <div class="chart-container">
+        <h3>📈 Sentiment Trend (Last 30 Days)</h3>
+        <canvas id="sentimentTrendChart" class="chart-canvas"></canvas>
+    </div>
+    {% endif %}
+    
     <!-- Analysis Data -->
     {% if sentiment_stats or semantic_stats %}
     <div class="metrics-grid">
@@ -262,23 +310,18 @@
                 <span class="metric-label">Avg Sentiment (7d)</span>
                 <span class="metric-value">{{ sentiment_stats.avg_sentiment_7d|floatformat:2 }}</span>
             </div>
-            {% if sentiment_stats.sentiment_trend %}
-            <div style="margin-top: 15px;">
-                <canvas id="sentimentTrendChart" style="height: 150px;"></canvas>
-            </div>
-            {% endif %}
-            {% if sentiment_stats.hourly_sentiment %}
-            <div class="metric-row">
-                <span class="metric-label">Today's Sentiment</span>
-                <span class="metric-value">
-                    {% with today_avg=sentiment_stats.hourly_sentiment|first %}
-                        {{ today_avg.avg_sentiment|floatformat:2 }}
-                    {% endwith %}
-                </span>
-            </div>
-            {% endif %}
         </div>
         {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Time Series Sentiment Chart -->
+    {% if sentiment_stats.sentiment_trend %}
+    <div class="chart-container">
+        <h3>📈 Sentiment Trend (Last 30 Days)</h3>
+        <canvas id="sentimentTrendChart" class="chart-canvas"></canvas>
+    </div>
+    {% endif %}
         
         <!-- Semantic Analysis -->
         {% if semantic_stats %}
@@ -321,7 +364,6 @@
             {% endfor %}
         </div>
     </div>
-    {% endif %}
     {% endif %}
 
     <!-- Recent Items -->

@@ -64,17 +64,21 @@ class CustomAdminSite(admin.AdminSite):
             comments_hourly = [{'hour': int(item['hour']), 'count': item['count']} for item in comments_hourly_raw]
             
             # Daily data for charts (last 30 days)
-            posts_daily = list(Post.objects.filter(
+            posts_daily_raw = Post.objects.filter(
                 date_posted__gte=now - timedelta(days=30)
             ).extra(
                 select={'day': 'DATE(date_posted)'}
-            ).values('day').annotate(count=Count('id')).order_by('day'))
+            ).values('day').annotate(count=Count('id')).order_by('day')
             
-            comments_daily = list(Comment.objects.filter(
+            comments_daily_raw = Comment.objects.filter(
                 created_on__gte=now - timedelta(days=30)
             ).extra(
                 select={'day': 'DATE(created_on)'}
-            ).values('day').annotate(count=Count('id')).order_by('day'))
+            ).values('day').annotate(count=Count('id')).order_by('day')
+            
+            # Convert dates to strings for Chart.js
+            posts_daily = [{'day': item['day'].isoformat(), 'count': item['count']} for item in posts_daily_raw]
+            comments_daily = [{'day': item['day'].isoformat(), 'count': item['count']} for item in comments_daily_raw]
             
             # Recent posts and comments
             recent_posts = Post.objects.select_related().order_by('-date_posted')[:10]
@@ -130,12 +134,13 @@ class CustomAdminSite(admin.AdminSite):
                     sentiment_stats['sentiment_trend'] = sentiment_trend
                     
                     # Add hourly sentiment for today
+                    from django.db.models import Avg
                     today_sentiment = SentimentAnalysis.objects.filter(
                         analyzed_at__gte=now.replace(hour=0, minute=0, second=0, microsecond=0)
                     ).extra(
                         select={'hour': 'EXTRACT(hour FROM analyzed_at)'}
                     ).values('hour').annotate(
-                        avg_sentiment=Count('sentiment_score')/Count('id'),
+                        avg_sentiment=Avg('sentiment_score'),
                         count=Count('id')
                     ).order_by('hour')
                     

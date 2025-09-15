@@ -5,6 +5,7 @@ export class SpiteChat {
         this.socket = null;
         this.messages = document.getElementById('chat-messages');
         this.input = document.getElementById('chat-input');
+        this.container = document.getElementById('chat-container');
         this._connected = false;
         logToBackend('SpiteChat instance created', 'info');
 
@@ -122,8 +123,6 @@ export class SpiteChat {
                     console.log('Current DOM structure:', document.querySelector('.chat-toggle-btn')?.innerHTML);
                 }
                 break;
-            default:
-                console.warn('Unknown message type:', data.type);
         }
     }
 
@@ -195,4 +194,39 @@ export class SpiteChat {
             logToBackend('Failed to send chat message - socket not ready', 'error');
         }
     }
+
+    // Flash the chat container white when a user joins
+    flashChatContainer() {
+        console.log('flashChatContainer called');
+        console.log('this.container:', this.container);
+        
+        if (this.container) {
+            console.log('Container found, current classes:', this.container.className);
+            
+            // Remove existing flash class if present
+            this.container.classList.remove('flash');
+            
+            // Force a reflow to ensure the class removal takes effect
+            void this.container.offsetWidth;
+            
+            // Add the flash class to trigger animation
+            this.container.classList.add('flash');
+            console.log('Added flash class, new classes:', this.container.className);
+            
+            // Remove the flash class after animation completes
+            setTimeout(() => {
+                this.container.classList.remove('flash');
+                console.log('Removed flash class after timeout');
+            }, 600); // Match the animation duration in CSS
+            
+            console.log('Chat container flash animation triggered');
+            logToBackend('Chat container flashed for user join', 'info');
+        } else {
+            console.warn('Chat container not found for flash animation');
+            console.log('Looking for chat container in DOM...');
+            const foundContainer = document.getElementById('chat-container');
+            console.log('Found via getElementById:', foundContainer);
+        }
+    }
+
 }

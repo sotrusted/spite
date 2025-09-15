@@ -1,7 +1,7 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
 import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing, initSkeletonCleanup, toggleContent, reattachEventListenersForInitialPosts, attachEventListenersToNewPosts } from './modules/utility_functions.js';
 // import { initAjaxPostForm } from './ajax_posts.js';
-import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates } from './websocket_updates.js';
+import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates, initSiteNotifications } from './websocket_updates.js';
 
 logToBackend("Base.js initialized", 'info');
 console.log("Base.js initialized");
@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initChatWebsocketUpdates();
     logToBackend("Chat Websocket updates initialized", 'info');
+
+    initSiteNotifications();
+    logToBackend("Site notifications initialized", 'info');
 
     scrollToElementById('post-list');
 

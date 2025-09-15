@@ -13,6 +13,11 @@ upstream spite_backend {
     keepalive 32;
 }
 
+# ASGI backend for WebSocket connections
+upstream spite_asgi {
+    server 127.0.0.1:8001 fail_timeout=0;
+}
+
 # Rate limiting zone
 limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 

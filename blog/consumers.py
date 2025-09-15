@@ -90,6 +90,31 @@ class CommentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event["message"]))
 
 
+class SiteNotificationConsumer(AsyncWebsocketConsumer):
+    """General purpose WebSocket for site-wide notifications like chat joins, etc."""
+    
+    async def connect(self):
+        # Subscribe to site notifications
+        await self.channel_layer.group_add("site_notifications", self.channel_name)
+        await self.accept()
+        logger.info("User connected to site notifications")
+        
+
+    async def disconnect(self, close_code):
+        # Unsubscribe from site notifications
+        await self.channel_layer.group_discard("site_notifications", self.channel_name)
+        logger.info("User disconnected from site notifications")
+
+    async def chat_user_joined(self, event):
+        """Handle chat user joined notifications"""
+        print(f"DEBUG: SiteNotificationConsumer received chat_user_joined event: {event}")
+        await self.send(text_data=json.dumps({
+            'type': 'chat_user_joined',
+            'message': event.get('message', 'Someone joined the chat')
+        }))
+        print(f"DEBUG: Sent chat_user_joined message to client")
+
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     # Class variables to store waiting users, active chat pairs, and online users
@@ -133,12 +158,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
         logger.info(f"Sent initial user count to client: {len(self.__class__.online_users)}")
         
-        # Then add to groups and broadcast to others
+        # Broadcast chat join to ALL users on the site via site notifications
+        await self.channel_layer.group_send(
+            "site_notifications",
+            {
+                "type": "chat_user_joined",
+                "message": "Someone joined the chat",
+                "user_id": self.user_id
+            }
+        )
+        logger.info(f"Broadcasted chat user_joined to site notifications for {self.user_id}")
+        print(f"DEBUG: Sent chat_user_joined event to site_notifications group for user {self.user_id}")
+        
+        # Then add to groups
         await self.channel_layer.group_add(self.user_id, self.channel_name)
         await self.channel_layer.group_add("chat_updates", self.channel_name)
         logger.info(f"Added user {self.user_id} to groups")
 
-        # Broadcast updated count to all other clients
+        # Broadcast updated count to all clients (including this one now)
         await self.channel_layer.group_send(
             "chat_updates",
             {
@@ -313,6 +350,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'disconnected',
             'message': event['message']
         }))
+
+    async def chat_user_joined(self, event):
+        # Only send to clients that are NOT the user who just joined
+        if hasattr(self, 'user_id') and self.user_id != event.get('exclude_user'):
+            await self.send(text_data=json.dumps({
+                'type': 'user_joined',
+                'message': 'A new user joined the chat'
+            }))
 
     @database_sync_to_async
     def save_chat_message(self, message, sender_id, chat_session, message_type):
