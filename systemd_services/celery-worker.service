@@ -1,0 +1,39 @@
+[Unit]
+Description=Celery Worker Service for SPITE Magazine
+After=network.target
+
+[Service]
+Type=forking
+User=sargent
+Group=sargent
+EnvironmentFile=/home/sargent/spite/.env
+WorkingDirectory=/home/sargent/spite
+ExecStart=/home/sargent/spite/.spite/bin/celery multi start worker1 \
+    -A spite \
+    --pidfile=/home/sargent/spite/logs/celery_worker.pid \
+    --logfile=/home/sargent/spite/logs/celery_worker.log \
+    --loglevel=info \
+    --concurrency=2 \
+    --max-tasks-per-child=50
+ExecStop=/home/sargent/spite/.spite/bin/celery multi stopwait worker1 \
+    --pidfile=/home/sargent/spite/logs/celery_worker.pid
+ExecReload=/home/sargent/spite/.spite/bin/celery multi restart worker1 \
+    -A spite \
+    --pidfile=/home/sargent/spite/logs/celery_worker.pid \
+    --logfile=/home/sargent/spite/logs/celery_worker.log \
+    --loglevel=info
+
+# Create logs directory
+ExecStartPre=/bin/mkdir -p /home/sargent/spite/logs
+ExecStartPre=/bin/chown sargent:sargent /home/sargent/spite/logs
+
+PIDFile=/home/sargent/spite/logs/celery_worker.pid
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/home/sargent/spite/logs/celery_worker_system.log
+StandardError=append:/home/sargent/spite/logs/celery_worker_system.log
+
+[Install]
+WantedBy=multi-user.target

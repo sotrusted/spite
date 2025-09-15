@@ -1996,3 +1996,4 @@ def spam_monitor_view(request):
         return HttpResponse(f"Error: {str(e)}", status=500)
 
 
+

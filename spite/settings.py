@@ -149,7 +149,7 @@ ROOT_URLCONF = 'spite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -419,6 +419,10 @@ CELERY_BEAT_SCHEDULE = {
     'persist-pageviews': {
         'task': 'spite.tasks.persist_pageview_count',
         'schedule': 60.0,
+    },
+    'content-analysis': {
+        'task': 'blog.tasks.run_full_content_analysis',
+        'schedule': 1440.0,  # Run every 24 hours (matches your model setting)
     },
 }
 

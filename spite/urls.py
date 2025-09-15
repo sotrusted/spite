@@ -19,9 +19,11 @@ from django.urls import path, include
 import spite.views as core_views
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings 
+from blog.admin import admin_site
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),  # Custom admin with dashboard
+    path('django-admin/', admin.site.urls),  # Default Django admin (backup)
     path('favicon.ico', core_views.favicon),
     path('',include('blog.urls')),
     path('', include('pwa.urls')),

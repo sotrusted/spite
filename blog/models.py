@@ -15,6 +15,8 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.conf import settings
 from django.core.cache import cache
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 class SecureIPStorage:
     def __init__(self):
@@ -257,7 +259,6 @@ class Comment(models.Model):
     @property
     def post_content(self):
         return self.post.content if self.post and self.post.content else ''
-
     @property
     def parent_comment_id(self):
         return self.parent_comment.id if self.parent_comment else None
@@ -381,6 +382,143 @@ class Comment(models.Model):
             models.Index(fields=['parent_comment']),
         ]
 
+
+
+
+class SentimentAnalysis(models.Model):
+    """Stores sentiment analysis results for posts and comments"""
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    
+    # Sentiment scores (-1 to 1, where -1 is very negative, 1 is very positive)
+    sentiment_score = models.FloatField(help_text="Overall sentiment score (-1 to 1)")
+    confidence = models.FloatField(help_text="Confidence of the sentiment analysis (0 to 1)")
+    
+    # Emotion breakdown (0 to 1 each)
+    emotion_joy = models.FloatField(default=0.0)
+    emotion_anger = models.FloatField(default=0.0)
+    emotion_fear = models.FloatField(default=0.0)
+    emotion_sadness = models.FloatField(default=0.0)
+    
+    # Metadata
+    analyzed_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    analysis_version = models.CharField(max_length=10, default="1.0")
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['-analyzed_at']),
+            models.Index(fields=['sentiment_score', '-analyzed_at']),
+        ]
+        unique_together = ['content_type', 'object_id']  # One analysis per content item
+    
+    def __str__(self):
+        return f"Sentiment for {self.content_object}: {self.sentiment_score:.2f}"
+
+
+class SemanticAnalysis(models.Model):
+    """Stores semantic analysis results aggregated by time periods"""
+    
+    PERIOD_CHOICES = [
+        ('hour', 'Hourly'),
+        ('day', 'Daily'),
+        ('week', 'Weekly'),
+    ]
+    
+    period_type = models.CharField(max_length=10, choices=PERIOD_CHOICES, db_index=True)
+    period_start = models.DateTimeField(db_index=True)
+    
+    # Topic distribution (stored as JSON)
+    # Format: {"politics": 0.3, "technology": 0.2, "entertainment": 0.5}
+    topic_distribution = models.JSONField(default=dict)
+    
+    # Keyword frequency (top 20 keywords)
+    # Format: {"word1": 15, "word2": 12, "word3": 8}
+    keyword_frequency = models.JSONField(default=dict)
+    
+    # Content statistics
+    total_posts = models.PositiveIntegerField(default=0)
+    total_comments = models.PositiveIntegerField(default=0)
+    avg_post_length = models.FloatField(default=0.0)
+    avg_comment_length = models.FloatField(default=0.0)
+    
+    # Sentiment aggregates for the period
+    avg_sentiment = models.FloatField(default=0.0)
+    sentiment_variance = models.FloatField(default=0.0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['period_type', '-period_start']),
+            models.Index(fields=['-created_at']),
+        ]
+        unique_together = ['period_type', 'period_start']
+    
+    def __str__(self):
+        return f"{self.get_period_type_display()} analysis for {self.period_start.date()}"
+
+
+class AnalysisSettings(models.Model):
+    """Configuration for analysis tasks"""
+    
+    # Analysis frequency settings
+    sentiment_analysis_enabled = models.BooleanField(default=True)
+    semantic_analysis_enabled = models.BooleanField(default=True)
+    
+    # Performance settings
+    max_items_per_batch = models.PositiveIntegerField(
+        default=20, 
+        help_text="Maximum number of items to analyze in one batch (kept small for performance)"
+    )
+    analysis_interval_minutes = models.PositiveIntegerField(
+        default=1440, 
+        help_text="Minutes between analysis runs"
+    )
+    
+    # Content filtering
+    min_content_length = models.PositiveIntegerField(
+        default=10, 
+        help_text="Minimum content length to analyze"
+    )
+    exclude_spam = models.BooleanField(
+        default=True, 
+        help_text="Skip analysis of content marked as spam"
+    )
+    
+    # Time limits
+    max_content_age_days = models.PositiveIntegerField(
+        default=7, 
+        help_text="Only analyze content newer than this many days"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Analysis Settings"
+        verbose_name_plural = "Analysis Settings"
+    
+    def __str__(self):
+        return f"Analysis Settings (updated {self.updated_at.strftime('%Y-%m-%d %H:%M')})"
+    
+    @classmethod
+    def get_settings(cls):
+        """Get the current settings or create default ones"""
+        settings, created = cls.objects.get_or_create(
+            id=1,  # Singleton pattern
+            defaults={
+                'sentiment_analysis_enabled': True,
+                'semantic_analysis_enabled': True,
+                'max_items_per_batch': 20,
+                'analysis_interval_minutes': 60,
+                'min_content_length': 10,
+                'exclude_spam': True,
+                'max_content_age_days': 7,
+            }
+        )
+        return settings
 
 class SearchQueryLog(models.Model):
     query = models.CharField(max_length=255)

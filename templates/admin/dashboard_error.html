@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Dashboard Error | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div style="margin: 20px; padding: 20px; background: #ffebee; border: 1px solid #f44336; border-radius: 8px;">
+    <h2 style="color: #d32f2f; margin-bottom: 15px;">⚠️ Dashboard Error</h2>
+    <p style="color: #666; margin-bottom: 20px;">
+        An error occurred while loading the dashboard. Please check the server logs for more details.
+    </p>
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; font-family: monospace; color: #333;">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    <div style="margin-top: 20px;">
+        <a href="{% url 'admin:index' %}" style="background: #417690; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; display: inline-block;">
+            ← Back to Admin Home
+        </a>
+        <a href="{% url 'admin:admin_dashboard' %}" style="background: #f44336; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; display: inline-block; margin-left: 10px;">
+            🔄 Retry Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

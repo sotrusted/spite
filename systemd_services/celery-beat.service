@@ -1,0 +1,30 @@
+[Unit]
+Description=Celery Beat Service for SPITE Magazine (Task Scheduler)
+After=network.target
+
+[Service]
+Type=simple
+User=sargent
+Group=sargent
+EnvironmentFile=/home/sargent/spite/.env
+WorkingDirectory=/home/sargent/spite
+ExecStart=/home/sargent/spite/.spite/bin/celery -A spite beat \
+    --pidfile=/home/sargent/spite/logs/celery_beat.pid \
+    --logfile=/home/sargent/spite/logs/celery_beat.log \
+    --loglevel=info
+ExecStop=/bin/kill -TERM $MAINPID
+
+# Create logs directory
+ExecStartPre=/bin/mkdir -p /home/sargent/spite/logs
+ExecStartPre=/bin/chown sargent:sargent /home/sargent/spite/logs
+
+PIDFile=/home/sargent/spite/logs/celery_beat.pid
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/home/sargent/spite/logs/celery_beat_system.log
+StandardError=append:/home/sargent/spite/logs/celery_beat_system.log
+
+[Install]
+WantedBy=multi-user.target

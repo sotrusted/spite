@@ -157,11 +157,16 @@ function attachToggleContentButtons(id=null) {
 }
 
 
-export function attachToggleReplyButtons(id=null) {
+export function attachToggleReplyButtons(id=null, post_type='comment') {
     log("Attaching toggle reply buttons");
     let toggleReplyButtons;
     if (id) {
-        toggleReplyButtons = document.querySelectorAll(`a[id^="toggle-reply-${id}"]`);
+        if (post_type == 'post') {
+            const container = document.querySelector(`#comment-section-${id}`) || document;
+            toggleReplyButtons = container.querySelectorAll(`a[id^="toggle-reply-${id}"]`);
+        } else {
+            toggleReplyButtons = document.querySelectorAll(`a[id^="toggle-reply-${id}"]`);
+        }
     } else {
         toggleReplyButtons = document.querySelectorAll('a[id^="toggle-reply-"]');
     }
@@ -778,7 +783,7 @@ export function addPostToPage(post) {
             attachToggleContentButtons(postId);
             attachCopyLinks(postId);
             attachToggleCommentsButtons(postId);
-            attachToggleReplyButtons(postId);
+            attachToggleReplyButtons(postId, 'post');
             log(`Event listeners attached for post ${postId} after HTMX swap`);
         }, 50);
     });
@@ -811,7 +816,7 @@ export function addPostToPage(post) {
                 attachToggleCommentsButtons(postId);
                 log(`Toggle comments buttons attached for post ${postId} (fallback)`);
 
-                attachToggleReplyButtons(postId);
+                attachToggleReplyButtons(postId, 'post');
                 log(`Toggle reply buttons attached for post ${postId} (fallback)`);
             } else {
                 log(`Event listeners already attached for post ${postId}`);
@@ -896,7 +901,7 @@ export function addCommentToPage(comment) {
         const toggleReplyButton = document.getElementById(`toggle-reply-${comment.id}`);
         if (toggleReplyButton) {
             toggleReplyButton.addEventListener('click', function() {
-                toggleReplyForm(comment.id);
+                toggleReplyForm(comment.id, 'comment');
             });
         }
     }
@@ -1000,7 +1005,7 @@ function submitCommentForm(formElement, postId) {
         submitButton.value = 'Submitting...';
     }
 
-    const progress = form.querySelector(`.upload-progress-${postId}`);
+    const progress = formElement.querySelector(`.upload-progress-${postId}`);
     
     if (progress) {
         progress.style.display = 'block';
@@ -1039,15 +1044,15 @@ function submitCommentForm(formElement, postId) {
     })
     .catch(error => {
         alert('Error uploading comment. Please try again.');
-        displayFormErrors(formElement, data.errors);
         logToBackend(`Error submitting comment: ${error.message}`, 'error');
     })
     .finally(() => {
         if (submitButton) {
             submitButton.disabled = false;
             submitButton.value = 'Submit';
+        }
+        if (progress) {
             progress.style.display = 'none';
-
         }
     });
 }
@@ -1126,6 +1131,28 @@ function toggleReplyForm(commentId) {
 }
 
 window.toggleReplyForm = toggleReplyForm;
+
+// Function to display form errors
+function displayFormErrors(formElement, errors) {
+    // Remove any existing error messages
+    const existingErrors = formElement.querySelectorAll('.form-error-message');
+    existingErrors.forEach(error => error.remove());
+    
+    // Display new errors
+    if (errors && typeof errors === 'object') {
+        Object.keys(errors).forEach(fieldName => {
+            const field = formElement.querySelector(`[name="${fieldName}"]`);
+            if (field) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'form-error-message text-danger small';
+                errorDiv.textContent = Array.isArray(errors[fieldName]) ? errors[fieldName][0] : errors[fieldName];
+                
+                // Insert error message after the field
+                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+            }
+        });
+    }
+}
 
 
 /**
