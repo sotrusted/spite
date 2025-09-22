@@ -24,9 +24,9 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage
+from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage, AIChatSession, SiteNotification
 from django.contrib import messages
-from blog.forms import PostForm, ReplyForm, CommentForm
+from blog.forms import PostForm, ReplyForm, CommentForm, ChatForm
 from spite.context_processors import get_cached_posts, get_cached_comments, preprocess_posts_for_template, get_posts, get_optimized_posts
 import functools
 from datetime import datetime, timedelta
@@ -1996,4 +1996,57 @@ def spam_monitor_view(request):
         return HttpResponse(f"Error: {str(e)}", status=500)
 
 
+def chat_view(request):
+    logger.info(f"Chat view called")
+    chatForm = ChatForm()
+    if not request.session.session_key:
+        request.session.save()
 
+    context = {
+        'chatForm': chatForm,
+        'ragbot_ws_url': getattr(settings, 'RAGBOT_WS_URL', ''),
+        'ragbot_http_url': getattr(settings, 'RAGBOT_HTTP_URL', ''),
+    }
+    return render(request, 'blog/chat.html', context)
+
+
+@require_POST
+def ragbot_log(request):
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+    session_id = payload.get('session_id') or request.session.session_key
+    if not session_id:
+        request.session.save()
+        session_id = request.session.session_key
+    entry = payload.get('entry') or {}
+
+    if not session_id:
+        return JsonResponse({'error': 'Missing session id'}, status=400)
+
+    message_text = entry.get('message', '').strip()
+    direction = entry.get('direction', 'unknown')
+    metadata = entry.get('meta') or {}
+    if not isinstance(metadata, dict):
+        metadata = {'raw': metadata}
+
+    if not message_text:
+        return JsonResponse({'error': 'Empty message'}, status=400)
+
+    session, _created = AIChatSession.objects.get_or_create(session_id=session_id)
+
+    log_entry = {
+        'direction': direction,
+        'message': message_text,
+        'timestamp': now().isoformat(),
+        'meta': metadata,
+    }
+
+    messages = list(session.messages or [])
+    messages.append(log_entry)
+    session.messages = messages[-100:]
+    session.save(update_fields=['messages', 'updated_at'])
+
+    return JsonResponse({'ok': True})

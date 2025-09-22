@@ -25,6 +25,24 @@ except ImportError:
     logger.warning("TextBlob not available. Install with: pip install textblob")
 
 try:
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+    VADER_AVAILABLE = True
+except ImportError:
+    VADER_AVAILABLE = False
+    logger.warning("VADER Sentiment not available. Install with: pip install vaderSentiment")
+
+try:
+    from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+    TRANSFORMERS_AVAILABLE = True
+    # Check if we have a GPU
+    DEVICE = 0 if torch.cuda.is_available() else -1
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    DEVICE = -1
+    logger.warning("Transformers not available. Install with: pip install transformers torch")
+
+try:
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import LatentDirichletAllocation
     import numpy as np
@@ -60,16 +78,50 @@ except ImportError:
 
 
 class SentimentAnalyzer:
-    """Sentiment analysis using TextBlob with fallback to simple lexicon"""
+    """Modern sentiment analysis using multiple libraries with automatic fallback"""
     
     def __init__(self):
-        self.use_textblob = TEXTBLOB_AVAILABLE
-        if not self.use_textblob:
-            logger.warning("Using fallback sentiment analysis")
+        self.vader_analyzer = None
+        self.transformer_pipeline = None
+        
+        # Initialize VADER (best for social media text)
+        if VADER_AVAILABLE:
+            self.vader_analyzer = SentimentIntensityAnalyzer()
+            logger.info("VADER sentiment analyzer initialized")
+        
+        # Initialize transformer model (most accurate but slower)
+        if TRANSFORMERS_AVAILABLE:
+            try:
+                # Use a lightweight sentiment model
+                self.transformer_pipeline = pipeline(
+                    "sentiment-analysis",
+                    model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+                    device=DEVICE,
+                    return_all_scores=True
+                )
+                logger.info("Transformer sentiment analyzer initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize transformer model: {e}")
+                self.transformer_pipeline = None
+        
+        # Fallback priority: Transformers > VADER > TextBlob
+        self.primary_method = self._determine_primary_method()
+        logger.info(f"Primary sentiment analysis method: {self.primary_method}")
+    
+    def _determine_primary_method(self) -> str:
+        """Determine the best available sentiment analysis method"""
+        if self.transformer_pipeline:
+            return "transformers"
+        elif self.vader_analyzer:
+            return "vader"
+        elif TEXTBLOB_AVAILABLE:
+            return "textblob"
+        else:
+            return "fallback"
     
     def analyze_sentiment(self, text: str) -> Dict[str, float]:
         """
-        Analyze sentiment of text
+        Analyze sentiment of text using the best available library
         Returns dict with sentiment_score, confidence, and emotions
         """
         if not text or len(text.strip()) < 3:
@@ -82,10 +134,100 @@ class SentimentAnalyzer:
                 'emotion_sadness': 0.0
             }
         
-        if self.use_textblob:
-            return self._analyze_with_textblob(text)
-        else:
-            return self._analyze_with_fallback(text)
+        # Clean text for analysis
+        cleaned_text = text.strip()
+        
+        try:
+            if self.primary_method == "transformers":
+                return self._analyze_with_transformers(cleaned_text)
+            elif self.primary_method == "vader":
+                return self._analyze_with_vader(cleaned_text)
+            elif self.primary_method == "textblob":
+                return self._analyze_with_textblob(cleaned_text)
+            else:
+                return self._analyze_with_fallback(cleaned_text)
+        except Exception as e:
+            logger.error(f"Sentiment analysis failed with {self.primary_method}: {e}")
+            # Try fallback methods
+            return self._analyze_with_fallback(cleaned_text)
+    
+    def _analyze_with_transformers(self, text: str) -> Dict[str, float]:
+        """Analyze sentiment using transformer models (RoBERTa)"""
+        try:
+            # Truncate text if too long for the model
+            max_length = 500  # Most models have token limits
+            truncated_text = text[:max_length] if len(text) > max_length else text
+            
+            results = self.transformer_pipeline(truncated_text)
+            
+            # Parse results - expecting format like [{'label': 'POSITIVE', 'score': 0.9}, ...]
+            sentiment_score = 0.0
+            confidence = 0.0
+            
+            for result in results[0]:  # results[0] contains all scores
+                label = result['label'].upper()
+                score = result['score']
+                
+                if label in ['POSITIVE', 'POS']:
+                    sentiment_score = score
+                    confidence = max(confidence, score)
+                elif label in ['NEGATIVE', 'NEG']:
+                    sentiment_score = -score
+                    confidence = max(confidence, score)
+                elif label in ['NEUTRAL']:
+                    # If neutral is highest, keep score near 0
+                    if score > confidence:
+                        sentiment_score = 0.0
+                        confidence = score
+            
+            # Convert to our format
+            emotions = self._extract_emotions_simple(text, sentiment_score)
+            
+            return {
+                'sentiment_score': sentiment_score,
+                'confidence': confidence,
+                'emotion_joy': emotions.get('joy', 0.0),
+                'emotion_anger': emotions.get('anger', 0.0),
+                'emotion_fear': emotions.get('fear', 0.0),
+                'emotion_sadness': emotions.get('sadness', 0.0)
+            }
+            
+        except Exception as e:
+            logger.error(f"Transformer sentiment analysis failed: {e}")
+            return self._analyze_with_vader(text) if self.vader_analyzer else self._analyze_with_textblob(text)
+    
+    def _analyze_with_vader(self, text: str) -> Dict[str, float]:
+        """Analyze sentiment using VADER (Valence Aware Dictionary and sEntiment Reasoner)"""
+        try:
+            scores = self.vader_analyzer.polarity_scores(text)
+            
+            # VADER returns: {'neg': 0.0, 'neu': 0.0, 'pos': 0.0, 'compound': 0.0}
+            # compound score is normalized between -1 and 1
+            sentiment_score = scores['compound']
+            
+            # Calculate confidence based on how far from neutral
+            confidence = abs(sentiment_score)
+            
+            # VADER already gives us positive/negative breakdown
+            emotions = {
+                'joy': scores['pos'],
+                'anger': scores['neg'] * 0.6,  # Part of negative emotion
+                'fear': scores['neg'] * 0.2,   # Part of negative emotion
+                'sadness': scores['neg'] * 0.2  # Part of negative emotion
+            }
+            
+            return {
+                'sentiment_score': sentiment_score,
+                'confidence': confidence,
+                'emotion_joy': emotions['joy'],
+                'emotion_anger': emotions['anger'],
+                'emotion_fear': emotions['fear'],
+                'emotion_sadness': emotions['sadness']
+            }
+            
+        except Exception as e:
+            logger.error(f"VADER sentiment analysis failed: {e}")
+            return self._analyze_with_textblob(text) if TEXTBLOB_AVAILABLE else self._analyze_with_fallback(text)
     
     def _analyze_with_textblob(self, text: str) -> Dict[str, float]:
         """Analyze sentiment using TextBlob"""
@@ -97,7 +239,7 @@ class SentimentAnalyzer:
             subjectivity = blob.sentiment.subjectivity
             
             # Use subjectivity as confidence measure
-            confidence = min(1.0, subjectivity * 1.5)  # Scale subjective text higher
+            confidence = min(1.0, max(0.1, subjectivity))
             
             # Simple emotion mapping based on polarity and word content
             emotions = self._extract_emotions_simple(text, polarity)
@@ -394,8 +536,14 @@ class ContentAnalysisManager:
             # Post
             return f"{content_item.title} {content_item.content or ''}".strip()
         elif hasattr(content_item, 'content'):
-            # Comment
+            # Comment and Post
             return content_item.content or ""
+        elif hasattr(content_item, 'name'):
+            # Comment
+            return content_item.name or ""
+        elif hasattr(content_item, 'display_name'):
+            # Post
+            return content_item.display_name or ""
         return ""
     
     def analyze_sentiment_batch(self, max_items: Optional[int] = None) -> int:
@@ -518,9 +666,21 @@ class ContentAnalysisManager:
             all_text += " " + text
             comment_lengths.append(len(text))
         
+        # Collect individual texts for proper topic modeling
+        individual_texts = []
+        for post in posts:
+            text = self._get_content_text(post).strip()
+            if len(text) > 10:  # Only include substantial content
+                individual_texts.append(text)
+        
+        for comment in comments:
+            text = self._get_content_text(comment).strip()
+            if len(text) > 10:  # Only include substantial content
+                individual_texts.append(text)
+        
         # Generate semantic analysis
         keywords = self.semantic_analyzer.extract_keywords(all_text)
-        topics = self.semantic_analyzer.detect_topics(all_text)
+        topics = self.semantic_analyzer.detect_topics(individual_texts)  # Pass list of texts
         
         # Calculate sentiment aggregates
         post_content_type = ContentType.objects.get_for_model(Post)

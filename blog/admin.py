@@ -6,6 +6,9 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count
 from .models import Post, Comment, SearchQueryLog, ChatMessage, List, BlockedIP, SentimentAnalysis, SemanticAnalysis, AnalysisSettings
+import logging
+
+logger = logging.getLogger('spite')
 
 class CustomAdminSite(admin.AdminSite):
     site_header = "SPITE Magazine Admin"
@@ -86,6 +89,12 @@ class CustomAdminSite(admin.AdminSite):
             
             # Analysis data
             try:
+                # Quick visibility into what exists
+                total_sentiment = SentimentAnalysis.objects.count()
+                total_semantic = SemanticAnalysis.objects.count()
+                logger.info(f"[Dashboard] SentimentAnalysis count: {total_sentiment}")
+                logger.info(f"[Dashboard] SemanticAnalysis count: {total_semantic}")
+
                 # Sentiment analysis stats
                 sentiment_stats = {
                     'total_analyzed': SentimentAnalysis.objects.count(),
@@ -97,17 +106,21 @@ class CustomAdminSite(admin.AdminSite):
                 recent_sentiment = SentimentAnalysis.objects.filter(
                     analyzed_at__gte=now - timedelta(days=30)
                 ).values_list('sentiment_score', 'analyzed_at').order_by('analyzed_at')
+                logger.info(f"[Dashboard] Recent sentiment queryset len: {recent_sentiment.count()}")
+
                 
                 if recent_sentiment:
                     # Calculate 7-day average
-                    recent_7d = [s[0] for s, date in recent_sentiment if date >= now - timedelta(days=7)]
+                    recent_7d = [score for score, date in recent_sentiment if date >= now - timedelta(days=7)]
                     sentiment_stats['avg_sentiment_7d'] = sum(recent_7d) / len(recent_7d) if recent_7d else 0.0
-                    
+                    logger.info(f"[Dashboard] Computed avg_sentiment_7d over {len(recent_7d)} records: {sentiment_stats['avg_sentiment_7d']}")
+
+                        
                     # Group by day for trend (last 30 days)
                     from collections import defaultdict
                     daily_sentiment = defaultdict(list)
-                    for score, date in recent_sentiment:
-                        day = date.date().isoformat()
+                    for score, analyzed_at in recent_sentiment:
+                        day = analyzed_at.date().isoformat()
                         daily_sentiment[day].append(score)
                     
                     # Create time series data for last 30 days
@@ -132,11 +145,12 @@ class CustomAdminSite(admin.AdminSite):
                             })
                     
                     sentiment_stats['sentiment_trend'] = sentiment_trend
+                    logger.info(f"[Dashboard] Built sentiment_trend with {len(sentiment_trend)} days")
                     
-                    # Add hourly sentiment for today
+                    # Add hourly sentiment for recent day (last 24 hours instead of just "today")
                     from django.db.models import Avg
-                    today_sentiment = SentimentAnalysis.objects.filter(
-                        analyzed_at__gte=now.replace(hour=0, minute=0, second=0, microsecond=0)
+                    last_24h_sentiment = SentimentAnalysis.objects.filter(
+                        analyzed_at__gte=now - timedelta(hours=24)
                     ).extra(
                         select={'hour': 'EXTRACT(hour FROM analyzed_at)'}
                     ).values('hour').annotate(
@@ -146,8 +160,9 @@ class CustomAdminSite(admin.AdminSite):
                     
                     sentiment_stats['hourly_sentiment'] = [
                         {'hour': int(item['hour']), 'avg_sentiment': float(item['avg_sentiment']), 'count': item['count']}
-                        for item in today_sentiment
+                        for item in last_24h_sentiment
                     ]
+                    logger.info(f"[Dashboard] Hourly sentiment buckets (last 24h): {len(sentiment_stats['hourly_sentiment'])}")
                 
                 # Semantic analysis stats  
                 semantic_stats = {
@@ -161,6 +176,7 @@ class CustomAdminSite(admin.AdminSite):
                     period_type='day',
                     period_start__gte=now - timedelta(days=7)
                 ).order_by('-period_start')[:7]
+                logger.info(f"[Dashboard] Recent semantic periods fetched: {recent_semantic.count() if hasattr(recent_semantic, 'count') else len(recent_semantic)}")
                 
                 if recent_semantic:
                     # Aggregate topics from recent periods
@@ -185,12 +201,14 @@ class CustomAdminSite(admin.AdminSite):
                     semantic_stats['keyword_cloud'] = dict(
                         sorted(all_keywords.items(), key=lambda x: x[1], reverse=True)[:20]
                     )
+                    logger.info(f"[Dashboard] Built semantic recent_topics: {len(semantic_stats['recent_topics'])}, keyword_cloud: {len(semantic_stats['keyword_cloud'])}")
                 
                 # Analysis settings
                 analysis_settings = AnalysisSettings.get_settings()
                 
             except Exception as e:
                 # Fallback if analysis models not ready
+                logger.exception(f"[Dashboard] Error while building analysis data: {e}")
                 sentiment_stats = {'total_analyzed': 0, 'avg_sentiment_7d': 0.0, 'sentiment_trend': []}
                 semantic_stats = {'total_periods': 0, 'recent_topics': {}, 'keyword_cloud': {}}
                 analysis_settings = None

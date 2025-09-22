@@ -470,6 +470,9 @@ AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME')
 
 IP_ENCRYPTION_KEY = env('IP_ENCRYPTION_KEY')
 
+RAGBOT_WS_URL = env('RAGBOT_WS_URL', default='')
+RAGBOT_HTTP_URL = env('RAGBOT_HTTP_URL', default='http://localhost:8080/chat')
+
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
     MIDDLEWARE = [

@@ -654,3 +654,34 @@ class BlockedIP(models.Model):
 
 class TestPost(models.Model):
     title = models.CharField(max_length=200)
+
+
+class SiteNotification(models.Model):
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"{self.message} - {self.timestamp}"
+    
+    class Meta:
+        db_table = 'site_notifications'
+        indexes = [
+            models.Index(fields=['-timestamp']),
+        ]
+    
+
+class AIChatSession(models.Model):
+    session_id = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    messages = models.JSONField(default=list)
+
+    def __str__(self):
+        return f"AI Chat Session {self.session_id}"
+    
+    class Meta:
+        db_table = 'ai_chat_sessions'
+        indexes = [
+            models.Index(fields=['session_id']),
+        ]

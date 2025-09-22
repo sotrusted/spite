@@ -415,7 +415,10 @@
         const commentsHourly = {{ comments_hourly|safe }};
         
         // Create 24-hour array
-        const hours = Array.from({length: 24}, (_, i) => i);
+        const now = new Date();
+        const currentHour = now.getHours(); // Get current hour as integer
+        const hours = Array.from({length: 24}, (_, i) => (i + currentHour) % 24); // Create hours array with current hour as starting point
+        
         const postsHourlyData = hours.map(hour => {
             const found = postsHourly.find(p => p.hour === hour);
             return found ? found.count : 0;

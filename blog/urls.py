@@ -16,7 +16,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     hx_get_comment_by_id, hx_get_comment_reply_form_html,
                     hx_scroll_to_post_form, toggle_version, hx_get_post, hx_get_post_comment_section,
                     spite_tv, spite_counter, htmx_health_check, htmx_test_post, htmx_debug_view,
-                    spam_monitor_view)
+                    spam_monitor_view, chat_view, ragbot_log)
 
 
 import blog.views as blog_views
@@ -65,6 +65,7 @@ urlpatterns = [
     path('media-flow-standalone/', media_flow_standalone, name='media-flow-standalone'),
     path('loading/', loading_screen, name='loading-screen'),
     path('api/log-js/', log_javascript, name='log_js'),
+    path('api/ragbot/log/', ragbot_log, name='ragbot_log'),
     path('resume/', resume, name='resume'),
     path('api/online-count/', update_online_status, name='online_count'),
     path('api/remove-user/', remove_user, name='remove_user'),
@@ -84,6 +85,7 @@ urlpatterns = [
     path('hx/test-post/', htmx_test_post, name='htmx-test-post'),
     path('hx/debug/', htmx_debug_view, name='htmx-debug'),
     path('spam-monitor/', spam_monitor_view, name='spam-monitor'),
+    path('chat/', chat_view, name='chat'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

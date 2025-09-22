@@ -1,0 +1,139 @@
+{% extends "blog/spite_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<div class="container ragbot-chat-wrapper">
+    <div class="ragbot-chat"
+         data-ragbot-chat-root
+         data-session-id="{{ request.session.session_key }}"
+         data-ragbot-ws-url="{{ ragbot_ws_url|default_if_none:'' }}"
+         data-ragbot-http-url="{{ ragbot_http_url|default_if_none:'' }}"
+         data-ragbot-log-url="{% url 'ragbot_log' %}">
+        <div class="ragbot-chat__header">
+            <h2 class="ragbot-chat__title">Spite RAG Bot</h2>
+            <span class="ragbot-chat__status" data-ragbot-status>Connecting…</span>
+        </div>
+        <div class="ragbot-chat__messages" data-ragbot-messages></div>
+        <form class="ragbot-chat__form" data-ragbot-form>
+            <textarea class="ragbot-chat__input" data-ragbot-input placeholder="Say something spiteful" rows="2"></textarea>
+            <button type="submit" class="btn btn-primary ragbot-chat__send" data-ragbot-send>Send</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+    {{ block.super }}
+    <style>
+        .ragbot-chat-wrapper {
+            margin-top: 2rem;
+        }
+
+        .ragbot-chat {
+            background: #111;
+            color: #f5f5f5;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ragbot-chat__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .ragbot-chat__title {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .ragbot-chat__status {
+            font-size: 0.875rem;
+            color: #9be7ff;
+        }
+
+        .ragbot-chat__messages {
+            min-height: 280px;
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ragbot-message {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            line-height: 1.5;
+        }
+
+        .ragbot-message.outgoing {
+            align-self: flex-end;
+            background: rgba(155, 231, 255, 0.15);
+        }
+
+        .ragbot-message.system {
+            font-size: 0.875rem;
+            text-align: center;
+            color: #ccc;
+            background: transparent;
+            padding: 0.25rem 0;
+        }
+
+        .ragbot-message__meta {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.25rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ragbot-chat__form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .ragbot-chat__input {
+            resize: vertical;
+            min-height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #f5f5f5;
+        }
+
+        .ragbot-chat__input:focus {
+            outline: none;
+            border-color: #9be7ff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .ragbot-chat__send {
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .ragbot-chat__form {
+                grid-template-columns: 1fr;
+            }
+
+            .ragbot-chat__send {
+                width: 100%;
+            }
+        }
+    </style>
+    <script type="module" src="{% static 'js/ragbot_chat.js' %}" defer></script>
+{% endblock %}

@@ -97,3 +97,20 @@ class CommentForm(forms.ModelForm):
             )
         )
     
+
+class ChatForm(forms.Form):
+    query = forms.CharField(label='What\'s your problem', max_length=10000)
+
+    class Meta:
+        fields = ['query']
+
+    def __init__(self, *args, **kwargs):
+        super(ChatForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'POST'
+        self.helper.layout = Layout(
+            Div(
+                Row('query', css_class='form-group col-md-12 mb-0'),
+            ),
+            Submit('submit', 'Submit'),
+        )
