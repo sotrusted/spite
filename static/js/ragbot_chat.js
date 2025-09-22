@@ -31,7 +31,7 @@ class RagbotChatClient {
         this.socket = null;
         this.sessionId = root.dataset.sessionId || createUuid();
         this.socketUrl = buildWebSocketUrl(root.dataset.ragbotWsUrl || '');
-        this.apiUrl = root.dataset.ragbotHttpUrl || 'http://localhost:8080/chat';
+        this.apiUrl = root.dataset.ragbotHttpUrl || '/api/ragbot/chat';
         this.logUrl = root.dataset.ragbotLogUrl || '/api/ragbot/log/';
         this.messagesEl = root.querySelector('[data-ragbot-messages]');
         this.inputEl = root.querySelector('[data-ragbot-input]');
@@ -138,6 +138,7 @@ class RagbotChatClient {
 
         this.setStatus('Awaiting response…');
         try {
+            console.log('Sending HTTP message to', this.apiUrl);
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {

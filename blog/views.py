@@ -2005,7 +2005,7 @@ def chat_view(request):
     context = {
         'chatForm': chatForm,
         'ragbot_ws_url': getattr(settings, 'RAGBOT_WS_URL', ''),
-        'ragbot_http_url': getattr(settings, 'RAGBOT_HTTP_URL', ''),
+        'ragbot_http_url': '/api/ragbot/chat',  # Frontend should use Django proxy
     }
     return render(request, 'blog/chat.html', context)
 
@@ -2050,3 +2050,64 @@ def ragbot_log(request):
     session.save(update_fields=['messages', 'updated_at'])
 
     return JsonResponse({'ok': True})
+
+
+@require_POST
+@csrf_exempt
+def ragbot_chat_api(request):
+    """
+    API endpoint that proxies chat requests to the RAG bot service running on localhost:8080.
+    This allows HTTPS frontend to communicate with HTTP RAG bot service.
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+    query = payload.get('query', '').strip()
+    if not query:
+        return JsonResponse({'error': 'Missing query parameter'}, status=400)
+
+    # Proxy the request to the RAG bot service
+    # Always use the settings value, not what came from the frontend
+    ragbot_url = settings.RAGBOT_HTTP_URL
+    logger.info(f"Using RAG bot URL: {ragbot_url}")
+    
+    try:
+        # Make request to RAG bot service
+        response = requests.post(
+            ragbot_url,
+            json={'query': query},
+            headers={'Content-Type': 'application/json'},
+            timeout=30  # 30 second timeout
+        )
+        
+        if response.status_code == 200:
+            # Try to parse as JSON first
+            try:
+                ragbot_data = response.json()
+                return JsonResponse(ragbot_data)
+            except json.JSONDecodeError:
+                # If not JSON, return as text response
+                return JsonResponse({
+                    'response': response.text,
+                    'session_id': request.session.session_key or 'anonymous'
+                })
+        else:
+            return JsonResponse({
+                'error': f'RAG bot service returned status {response.status_code}'
+            }, status=response.status_code)
+            
+    except requests.exceptions.ConnectionError:
+        return JsonResponse({
+            'error': 'Could not connect to RAG bot service. Is it running?'
+        }, status=503)
+    except requests.exceptions.Timeout:
+        return JsonResponse({
+            'error': 'RAG bot service request timed out'
+        }, status=504)
+    except Exception as e:
+        logger.error(f"Error proxying to RAG bot: {str(e)}")
+        return JsonResponse({
+            'error': 'Internal server error'
+        }, status=500)

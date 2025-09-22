@@ -95,6 +95,11 @@ CORS_ALLOWED_ORIGINS = [
     'https://www.sotrusted.net',
     'https://107.173.0.195',
     'https://107.173.0.196',
+    # Development HTTP origins
+    'http://localhost:8000',
+    'http://localhost:8080',
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:8080',
 ]
 
 # Allow credentials (cookies, authorization headers)
@@ -470,8 +475,9 @@ AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME')
 
 IP_ENCRYPTION_KEY = env('IP_ENCRYPTION_KEY')
 
-RAGBOT_WS_URL = env('RAGBOT_WS_URL', default='')
+# RAG Bot Configuration
 RAGBOT_HTTP_URL = env('RAGBOT_HTTP_URL', default='http://localhost:8080/chat')
+RAGBOT_WS_URL = env('RAGBOT_WS_URL', default='')
 
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', '192.3.30.202', '69.117.220.13']
