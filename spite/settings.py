@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'channels',
     'graphene_django',
     'pwa',
+    'django_celery_beat',
     'meta',
     'compressor',
 ]
