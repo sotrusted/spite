@@ -477,7 +477,7 @@ AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME')
 IP_ENCRYPTION_KEY = env('IP_ENCRYPTION_KEY')
 
 # RAG Bot Configuration
-RAGBOT_HTTP_URL = env('RAGBOT_HTTP_URL', default='http://localhost:8080/chat')
+RAGBOT_HTTP_URL = env('RAGBOT_HTTP_URL', default='http://localhost:8080')
 RAGBOT_WS_URL = env('RAGBOT_WS_URL', default='')
 
 if DEBUG:

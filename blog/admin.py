@@ -5,7 +5,9 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count
-from .models import Post, Comment, SearchQueryLog, ChatMessage, List, BlockedIP, SentimentAnalysis, SemanticAnalysis, AnalysisSettings
+from .models import \
+    Post, Comment, SearchQueryLog, ChatMessage, List, BlockedIP, SentimentAnalysis, \
+         SemanticAnalysis, AnalysisSettings, AIChatSession, SiteNotification
 import logging
 
 logger = logging.getLogger('spite')
@@ -320,3 +322,5 @@ admin.site.register(ChatMessage)
 admin.site.register(List)
 admin.site.register(BlockedIP, BlockedIPAdmin)
 
+admin.site.register(AIChatSession)
+admin.site.register(SiteNotification)   

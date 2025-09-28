@@ -31,12 +31,20 @@ class RagbotChatClient {
         this.socket = null;
         this.sessionId = root.dataset.sessionId || createUuid();
         this.socketUrl = buildWebSocketUrl(root.dataset.ragbotWsUrl || '');
-        this.apiUrl = root.dataset.ragbotHttpUrl || '/api/ragbot/chat';
+        this.apiUrl = root.dataset.ragbotHttpUrl || '/api/ragbot/chat/';
+        this.streamUrl = root.dataset.ragbotStreamUrl || '/api/ragbot/chat/stream/';
         this.logUrl = root.dataset.ragbotLogUrl || '/api/ragbot/log/';
+        this.shareUrl = root.dataset.ragbotShareUrl || '/api/ragbot/share/';
         this.messagesEl = root.querySelector('[data-ragbot-messages]');
         this.inputEl = root.querySelector('[data-ragbot-input]');
         this.formEl = root.querySelector('[data-ragbot-form]');
         this.statusEl = root.querySelector('[data-ragbot-status]');
+        this.clearBtnEl = root.querySelector('[data-ragbot-clear]');
+        this.shareBtnEl = root.querySelector('[data-ragbot-share]');
+        this.streamingAvailable = true; // Try streaming first, fallback if it fails
+        this.currentCitations = [];
+        this.currentMessageElement = null;
+        this.chatHistory = []; // Store conversation history
     }
 
     init() {
@@ -57,11 +65,22 @@ class RagbotChatClient {
             }
         });
 
+        if (this.clearBtnEl) {
+            this.clearBtnEl.addEventListener('click', () => {
+                this.clearHistory();
+            });
+        }
+
+        if (this.shareBtnEl) {
+            this.shareBtnEl.addEventListener('click', () => {
+                this.shareChat();
+            });
+        }
+
         if (this.socketUrl) {
             this.connect();
         } else {
-            this.setStatus('HTTP mode');
-            this.appendSystemMessage('Using HTTP endpoint.');
+            this.setStatus('Ready');
         }
     }
 
@@ -111,14 +130,51 @@ class RagbotChatClient {
             return;
         }
 
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.sendWebSocketMessage(content);
-        } else {
-            this.sendHttpMessage(content);
-        }
+        // Add user message to history
+        this.addToHistory('user', content);
+
         this.appendChatMessage('You', content, 'outgoing');
         this.inputEl.value = '';
         this.logExchange({ direction: 'outgoing', message: content });
+
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.sendWebSocketMessage(content);
+        } else if (this.streamingAvailable) {
+            this.sendStreamingMessage(content);
+        } else {
+            this.sendHttpMessage(content);
+        }
+    }
+
+    addToHistory(role, content) {
+        this.chatHistory.push({
+            role: role, // 'user' or 'assistant'
+            content: content
+        });
+        
+        // Keep only last 20 messages to avoid sending too much data
+        if (this.chatHistory.length > 20) {
+            this.chatHistory = this.chatHistory.slice(-20);
+        }
+    }
+
+    formatChatHistory() {
+        // Format history as expected by the RAG service
+        // You may need to adjust this format based on what the service expects
+        return this.chatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+    }
+
+    clearHistory() {
+        // Clear chat history
+        this.chatHistory = [];
+        
+        // Clear UI messages
+        if (this.messagesEl) {
+            this.messagesEl.innerHTML = '';
+        }
+        
+        // Add confirmation message
+        this.appendSystemMessage('Chat history cleared. Starting fresh conversation.');
     }
 
     sendWebSocketMessage(message) {
@@ -144,12 +200,16 @@ class RagbotChatClient {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query: message }),
+                body: JSON.stringify({ 
+                    query: message,
+                    chat_history: this.formatChatHistory()
+                }),
                 mode: 'cors',
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                console.error(`Regular request failed with status ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const contentType = response.headers.get('content-type') || '';
@@ -165,8 +225,164 @@ class RagbotChatClient {
             console.error('Failed to fetch ragbot response', error);
             this.appendSystemMessage('Failed to reach RAG bot HTTP endpoint.');
         } finally {
-            this.setStatus(this.socket && this.socket.readyState === WebSocket.OPEN ? 'Connected' : 'Idle');
+            this.setStatus(this.socket && this.socket.readyState === WebSocket.OPEN ? 'Connected' : 'Ready');
         }
+    }
+
+    async sendStreamingMessage(message) {
+        if (!this.streamUrl) {
+            this.appendSystemMessage('RAG bot streaming endpoint not configured.');
+            return;
+        }
+
+        this.setStatus('Streaming response…');
+        this.currentCitations = [];
+        this.currentMessageElement = null;
+        
+        try {
+            console.log('Sending streaming message to', this.streamUrl);
+            const csrfToken = getCookie('csrftoken');
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            
+            const response = await fetch(this.streamUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ 
+                    query: message,
+                    chat_history: this.formatChatHistory()
+                }),
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                console.error(`Streaming request failed with status ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let hasReceivedData = false;
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    // Stream completed - finalize the message if we have one
+                    if (this.currentMessageElement && hasReceivedData) {
+                        this.handleStreamingData({ done: true });
+                    }
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n\n');
+                buffer = lines.pop(); // Keep incomplete line in buffer
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const jsonStr = line.substring(6);
+                            console.log('Parsing streaming data:', jsonStr);
+                            
+                            // Try to parse as JSON first
+                            let data;
+                            try {
+                                data = JSON.parse(jsonStr);
+                            } catch (parseError) {
+                                // If not JSON, treat as plain text content
+                                data = jsonStr;
+                            }
+                            
+                            this.handleStreamingData(data);
+                            hasReceivedData = true;
+                        } catch (e) {
+                            console.warn('Failed to handle streaming data:', line, 'Error:', e);
+                        }
+                    } else if (line.trim()) {
+                        console.log('Non-data line received:', line);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to stream ragbot response', error);
+            this.streamingAvailable = false;
+            this.appendSystemMessage('Streaming failed, falling back to regular mode...');
+            // Retry with regular HTTP
+            this.sendHttpMessage(message);
+        } finally {
+            this.setStatus(this.socket && this.socket.readyState === WebSocket.OPEN ? 'Connected' : 'Ready');
+        }
+    }
+
+    handleStreamingData(data) {
+        // Handle error objects
+        if (typeof data === 'object' && data.error) {
+            this.appendSystemMessage(`Error: ${data.error}`);
+            return;
+        }
+
+        // Handle citations objects
+        if (typeof data === 'object' && data.citations) {
+            this.currentCitations = data.citations;
+            return;
+        }
+
+        // Handle done signal
+        if (typeof data === 'object' && data.done) {
+            if (this.currentMessageElement) {
+                // Remove streaming indicator
+                this.currentMessageElement.classList.remove('streaming');
+                const indicator = this.currentMessageElement.querySelector('.streaming-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+                
+                // Add citations if present
+                if (this.currentCitations.length > 0) {
+                    this.addCitationsToMessage(this.currentMessageElement, this.currentCitations);
+                }
+                
+                // Get the complete response text
+                const responseText = this.currentMessageElement.querySelector('.ragbot-message__body')?.textContent || '[streaming completed]';
+                
+                // Add assistant response to history
+                this.addToHistory('assistant', responseText);
+                
+                this.logExchange({ 
+                    direction: 'incoming', 
+                    message: responseText,
+                    citations: this.currentCitations
+                });
+            }
+            this.currentMessageElement = null;
+            this.currentCitations = [];
+            return;
+        }
+
+        // Handle content - either as object with content field or direct string
+        let content = null;
+        if (typeof data === 'object' && data.content) {
+            content = data.content;
+        } else if (typeof data === 'string') {
+            // Direct string content from RAG bot
+            content = data;
+        }
+
+        if (content) {
+            if (!this.currentMessageElement) {
+                this.currentMessageElement = this.createStreamingMessage();
+            }
+            this.appendContentToStreamingMessage(content);
+            return;
+        }
+
+        // Log unexpected data format for debugging
+        console.log('Unexpected streaming data format:', data);
     }
 
     handleIncoming(raw) {
@@ -189,11 +405,89 @@ class RagbotChatClient {
             text = '[no response]';
         }
 
-        this.appendChatMessage('Spite RAG', text, 'incoming');
-        this.logExchange({ direction: 'incoming', message: text });
+        const citations = payload?.citations || [];
+        this.appendChatMessage('Spite RAG', text, 'incoming', citations);
+        this.logExchange({ direction: 'incoming', message: text, citations });
+        
+        // Add assistant response to history
+        this.addToHistory('assistant', text);
     }
 
-    appendChatMessage(author, text, variant) {
+    createStreamingMessage() {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ragbot-message incoming streaming';
+
+        const header = document.createElement('div');
+        header.className = 'ragbot-message__meta';
+        header.innerHTML = `Spite RAG • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span class="streaming-indicator">●</span>`;
+
+        const body = document.createElement('div');
+        body.className = 'ragbot-message__body';
+        body.textContent = '';
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(body);
+
+        this.messagesEl.appendChild(wrapper);
+        this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+        
+        return wrapper;
+    }
+
+    appendContentToStreamingMessage(content) {
+        if (!this.currentMessageElement) return;
+        
+        const body = this.currentMessageElement.querySelector('.ragbot-message__body');
+        if (body) {
+            body.textContent += content;
+            this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+        }
+    }
+
+    addCitationsToMessage(messageElement, citations) {
+        if (!citations || citations.length === 0) return;
+
+        const citationsContainer = document.createElement('div');
+        citationsContainer.className = 'ragbot-citations';
+        
+        const citationsTitle = document.createElement('div');
+        citationsTitle.className = 'ragbot-citations__title';
+        citationsTitle.textContent = 'Sources:';
+        citationsContainer.appendChild(citationsTitle);
+
+        citations.forEach(citation => {
+            const citationEl = document.createElement('div');
+            citationEl.className = 'ragbot-citation';
+            
+            const citationLink = document.createElement('a');
+            citationLink.href = citation.url;
+            citationLink.target = '_blank';
+            citationLink.className = 'ragbot-citation__link';
+            
+            if (citation.type === 'post') {
+                citationLink.innerHTML = `
+                    <span class="ragbot-citation__number">[${citation.citation_number}]</span>
+                    <span class="ragbot-citation__title">${citation.title}</span>
+                    ${citation.display_name || citation.author ? `<span class="ragbot-citation__author">by ${citation.display_name || citation.author}</span>` : ''}
+                    ${citation.content ? `<span class="ragbot-citation__content">${citation.content}</span>` : ''}
+                `;
+            } else if (citation.type === 'comment') {
+                citationLink.innerHTML = `
+                    <span class="ragbot-citation__number">[${citation.citation_number}]</span>
+                    ${citation.name ? `<span class="ragbot-citation__title">${citation.name}</span>` : ''}
+                    ${citation.content ? `<span class="ragbot-citation__content">${citation.content}</span>` : ''}
+                    <span class="ragbot-citation__meta">on post #${citation.post_id}</span>
+                `;
+            }
+            
+            citationEl.appendChild(citationLink);
+            citationsContainer.appendChild(citationEl);
+        });
+
+        messageElement.appendChild(citationsContainer);
+    }
+
+    appendChatMessage(author, text, variant, citations = []) {
         if (!this.messagesEl) {
             return;
         }
@@ -211,6 +505,11 @@ class RagbotChatClient {
 
         wrapper.appendChild(header);
         wrapper.appendChild(body);
+
+        // Add citations if present
+        if (citations && citations.length > 0) {
+            this.addCitationsToMessage(wrapper, citations);
+        }
 
         this.messagesEl.appendChild(wrapper);
         this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
@@ -248,6 +547,63 @@ class RagbotChatClient {
             console.warn('Failed to log ragbot exchange', error);
         });
     }
+
+    async shareChat() {
+        if (!this.shareUrl) {
+            this.appendSystemMessage('Share functionality not available.');
+            return;
+        }
+
+        // Check if there are any messages to share
+        if (this.chatHistory.length === 0) {
+            this.appendSystemMessage('No messages to share. Start a conversation first!');
+            return;
+        }
+
+        const csrfToken = getCookie('csrftoken');
+        if (!csrfToken) {
+            this.appendSystemMessage('Unable to share: missing security token.');
+            return;
+        }
+
+        try {
+            this.setStatus('Creating share link...');
+            
+            const response = await fetch(this.shareUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    session_id: this.sessionId,
+                }),
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            
+            // Copy the share URL to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(data.share_url);
+                this.appendSystemMessage(`Share link copied to clipboard`);
+            } else {
+                // Fallback for older browsers
+                this.appendSystemMessage(`Share this conversation: ${data.share_url}`);
+            }
+
+        } catch (error) {
+            console.error('Failed to create share link', error);
+            this.appendSystemMessage('Failed to create share link. Please try again.');
+        } finally {
+            this.setStatus(this.socket && this.socket.readyState === WebSocket.OPEN ? 'Connected' : 'Ready');
+        }
+    }
+
 }
 
 function bootRagbotChat() {

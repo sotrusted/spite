@@ -23,7 +23,8 @@ class PageViewMiddleware:
                 not any(x in request.path for x in ['/static/', '/media/', '/admin/', 
                                                     '/api/', '/hx/', '/get-csrf-token/', 
                                                     '/robots.txt', '/sitemap.xml', '/sitemap.xml.gz',
-                                                    '/infinite-scroll-posts/', '/serviceworker.js']) and
+                                                    '/infinite-scroll-posts/', '/serviceworker.js',
+                                                    '/post/']) and
                 not request.headers.get('HX-Request') and
                 not request.headers.get('x-requested-with') == 'XMLHttpRequest' and
                 'page=' not in request.GET.urlencode()

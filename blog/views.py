@@ -24,7 +24,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage, AIChatSession, SiteNotification
+from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage, AIChatSession, SiteNotification, SharedChat
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm, ChatForm
 from spite.context_processors import get_cached_posts, get_cached_comments, preprocess_posts_for_template, get_posts, get_optimized_posts
@@ -43,7 +43,7 @@ import lz4
 import pickle
 import time
 import requests
-from django.db import connection
+from django.db import connection, models
 from contextlib import contextmanager
 
 logger = logging.getLogger('spite')
@@ -2005,7 +2005,8 @@ def chat_view(request):
     context = {
         'chatForm': chatForm,
         'ragbot_ws_url': getattr(settings, 'RAGBOT_WS_URL', ''),
-        'ragbot_http_url': '/api/ragbot/chat',  # Frontend should use Django proxy
+        'ragbot_http_url': '/api/ragbot/chat/',  # Frontend should use Django proxy
+        'ragbot_stream_url': '/api/ragbot/chat/stream/',  # Streaming endpoint
     }
     return render(request, 'blog/chat.html', context)
 
@@ -2067,17 +2068,19 @@ def ragbot_chat_api(request):
     query = payload.get('query', '').strip()
     if not query:
         return JsonResponse({'error': 'Missing query parameter'}, status=400)
+    
+    chat_history = payload.get('chat_history', '')
 
     # Proxy the request to the RAG bot service
     # Always use the settings value, not what came from the frontend
-    ragbot_url = settings.RAGBOT_HTTP_URL
+    ragbot_url = f"{settings.RAGBOT_HTTP_URL}/chat"
     logger.info(f"Using RAG bot URL: {ragbot_url}")
     
     try:
         # Make request to RAG bot service
         response = requests.post(
             ragbot_url,
-            json={'query': query},
+            json={'query': query, 'chat_history': chat_history},
             headers={'Content-Type': 'application/json'},
             timeout=30  # 30 second timeout
         )
@@ -2111,3 +2114,130 @@ def ragbot_chat_api(request):
         return JsonResponse({
             'error': 'Internal server error'
         }, status=500)
+
+
+@require_POST
+@csrf_exempt  
+def ragbot_chat_stream_api(request):
+    """
+    Streaming API endpoint that proxies chat requests to the RAG bot service streaming endpoint.
+    Returns Server-Sent Events for real-time streaming responses.
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+    query = payload.get('query', '').strip()
+    if not query:
+        return JsonResponse({'error': 'Missing query parameter'}, status=400)
+    
+    chat_history = payload.get('chat_history', '')
+
+    # Proxy the request to the RAG bot streaming service
+    ragbot_url = f"{settings.RAGBOT_HTTP_URL}/chat/stream"
+    logger.info(f"Using RAG bot streaming URL: {ragbot_url}")
+    
+    def event_stream():
+        try:
+            logger.info(f"Starting streaming request to: {ragbot_url}")
+            # Make streaming request to RAG bot service
+            with requests.post(
+                ragbot_url,
+                json={'query': query, 'chat_history': chat_history},
+                headers={'Content-Type': 'application/json'},
+                stream=True,
+                timeout=30
+            ) as response:
+                
+                logger.info(f"Streaming response status: {response.status_code}")
+                if response.status_code != 200:
+                    error_msg = f'RAG bot service returned status {response.status_code}'
+                    logger.error(error_msg)
+                    yield f"data: {json.dumps({'error': error_msg})}\n\n"
+                    return
+                
+                logger.info("Starting to stream response lines...")
+                # Stream the response
+                for line in response.iter_lines():
+                    if line:
+                        decoded_line = line.decode('utf-8')
+                        logger.debug(f"Received line: {decoded_line[:100]}...")  # Log first 100 chars
+                        if decoded_line.startswith('data: '):
+                            yield f"{decoded_line}\n\n"
+                        else:
+                            # If line doesn't start with 'data: ', add it
+                            yield f"data: {decoded_line}\n\n"
+                        
+        except requests.exceptions.ConnectionError:
+            yield f"data: {json.dumps({'error': 'Could not connect to RAG bot service. Is it running?'})}\n\n"
+        except requests.exceptions.Timeout:
+            yield f"data: {json.dumps({'error': 'RAG bot service request timed out'})}\n\n"
+        except Exception as e:
+            logger.error(f"Error streaming from RAG bot: {str(e)}")
+            yield f"data: {json.dumps({'error': 'Internal server error'})}\n\n"
+    
+    # Return streaming response
+    response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache, no-transform'
+    response['Connection'] = 'keep-alive'
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Headers'] = 'Content-Type'
+    response['X-Accel-Buffering'] = 'no'
+    return response
+
+
+@require_POST
+def share_chat(request):
+    """Create a shareable link for the current chat session"""
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+    session_id = payload.get('session_id') or request.session.session_key
+    if not session_id:
+        return JsonResponse({'error': 'No active chat session'}, status=400)
+
+    try:
+        chat_session = AIChatSession.objects.get(session_id=session_id)
+    except AIChatSession.DoesNotExist:
+        return JsonResponse({'error': 'Chat session not found'}, status=404)
+
+    # Check if there are any messages to share
+    if not chat_session.messages:
+        return JsonResponse({'error': 'No messages to share'}, status=400)
+
+    # Create or get existing shared chat
+    shared_chat, created = SharedChat.objects.get_or_create(
+        chat_session=chat_session,
+        defaults={'is_active': True}
+    )
+
+    return JsonResponse({
+        'share_id': shared_chat.share_id,
+        'share_url': request.build_absolute_uri(shared_chat.get_absolute_url()),
+        'title': shared_chat.title,
+        'created': created
+    })
+
+
+def shared_chat_view(request, share_id):
+    """Display a shared chat conversation"""
+    try:
+        shared_chat = SharedChat.objects.select_related('chat_session').get(
+            share_id=share_id, 
+            is_active=True
+        )
+    except SharedChat.DoesNotExist:
+        return render(request, 'blog/shared_chat_not_found.html', status=404)
+
+    # Increment view count
+    SharedChat.objects.filter(id=shared_chat.id).update(view_count=models.F('view_count') + 1)
+
+    context = {
+        'shared_chat': shared_chat,
+        'messages': shared_chat.chat_session.messages,
+        'page_title': f"Shared Chat: {shared_chat.title}",
+    }
+    return render(request, 'blog/shared_chat.html', context)

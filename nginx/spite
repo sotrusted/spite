@@ -1,0 +1,174 @@
+server {
+    server_name spite.fr www.spite.fr;
+    
+    error_log /var/log/nginx/spite_error.log debug;
+
+    # General settings
+    keepalive_timeout 65;
+    client_max_body_size 50M; # Allow large file uploads
+
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+    send_timeout 300s;
+
+    # Static and media files
+    location /static/ {
+        alias /home/sargent/spite/staticfiles/;
+        access_log off;
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+        add_header Pragma "no-cache";
+        add_header Expires 0;
+
+	add_header 'Access-Control-Allow-Origin' '*';
+    }
+
+
+    location /media/ {
+        alias /home/sargent/spite/media/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+        add_header 'Access-Control-Allow-Origin' '*';
+        # Disable access to sensitive files
+        location ~* \.(php|py|pl|sh|cgi)$ {
+            deny all;
+            return 404;
+        }
+    }
+
+    # Main application proxy
+    location / {
+        proxy_pass http://app_server;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        limit_req zone=mylimit burst=20 nodelay; # Rate limiting
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        # Handle OPTIONS method
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+	    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,X-CSRFToken';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+
+        keepalive_timeout 65;
+    }
+
+    # WebSocket support
+    location /ws/ {
+        error_log /var/log/nginx/ws_error.log debug;
+        proxy_pass http://0.0.0.0:8001;
+        proxy_http_version 1.1;
+
+        # WebSocket specific settings
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Increased timeouts
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        proxy_connect_timeout 75s;
+        
+        # Keep connection alive
+        keepalive_timeout 3600s;
+        keepalive_requests 1000;
+        
+        # Headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        
+        # TCP settings
+        proxy_set_header TCP_NODELAY on;
+        
+        # Buffer settings
+        proxy_buffering off;
+        proxy_buffer_size 8k;
+        
+        # Don't close upstream connection on client disconnect
+        proxy_ignore_client_abort on;
+
+    }
+
+
+    # Add security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Application fallback
+    location @proxy_to_app {
+        proxy_pass http://app_server;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+    }
+    
+    location /all-posts {
+        proxy_pass http://app_server;
+        send_timeout 3600;
+        proxy_read_timeout 3600;    # 1 hour timeout for this specific endpoint
+        proxy_connect_timeout 3600;
+        proxy_send_timeout 3600;
+    }
+    location /log-js/ {
+        proxy_pass http://app_server;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+        proxy_buffering off;
+        proxy_http_version 1.1;
+    }
+
+
+    location /api/ragbot/chat/stream/ {
+        proxy_pass http://app_server;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600;
+        proxy_send_timeout 60s;
+        proxy_connect_timeout 60s;
+        chunked_transfer_encoding on;
+        add_header Cache-Control "no-cache" always;
+        add_header X-Accel-Buffering "no" always;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/spite.fr/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/spite.fr/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+        # Modern SSL settings
+
+    # OCSP Stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    # Add HSTS header
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+
+
+
+
+
+}
+
+
+
+
+
+
+

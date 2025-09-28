@@ -685,3 +685,41 @@ class AIChatSession(models.Model):
         indexes = [
             models.Index(fields=['session_id']),
         ]
+
+
+class SharedChat(models.Model):
+    """Model for shareable chat conversations"""
+    share_id = models.CharField(max_length=32, unique=True, db_index=True)
+    title = models.CharField(max_length=200, blank=True)
+    chat_session = models.ForeignKey(AIChatSession, on_delete=models.CASCADE, related_name='shared_chats')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    view_count = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return f"Shared Chat: {self.title or self.share_id}"
+    
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('shared_chat', kwargs={'share_id': self.share_id})
+    
+    def save(self, *args, **kwargs):
+        if not self.share_id:
+            import secrets
+            self.share_id = secrets.token_urlsafe(24)
+        if not self.title and self.chat_session.messages:
+            # Auto-generate title from first user message
+            for msg in self.chat_session.messages:
+                if msg.get('direction') == 'outgoing':
+                    self.title = msg.get('message', '')[:100]
+                    break
+            if not self.title:
+                self.title = f"Chat from {self.created_at.strftime('%Y-%m-%d')}"
+        super().save(*args, **kwargs)
+    
+    class Meta:
+        db_table = 'shared_chats'
+        indexes = [
+            models.Index(fields=['share_id']),
+            models.Index(fields=['-created_at']),
+        ]
