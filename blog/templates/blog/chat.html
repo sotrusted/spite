@@ -3,6 +3,11 @@
 {% load static %}
 
 {% block content %}
+
+<!-- Notifications -->
+{% for notification in notifications %}
+    {% include 'blog/notification_component.html' with notification=notification %}
+{% endfor %}
 <div class="container ragbot-chat-wrapper">
     <div class="ragbot-chat"
          data-ragbot-chat-root
@@ -11,7 +16,7 @@
          data-ragbot-http-url="{{ ragbot_http_url|default_if_none:'' }}"
          data-ragbot-stream-url="{{ ragbot_stream_url|default_if_none:'' }}"
          data-ragbot-log-url="{% url 'ragbot_log' %}"
-         data-ragbot-share-url="{% url 'share_chat' %}">
+         data-share-url="{{ share_url }}">
         <div class="ragbot-chat__header">
             <h2 class="ragbot-chat__title">Spite RAG Bot</h2>
             <div class="ragbot-chat__controls">
@@ -261,4 +266,19 @@
         }
     </style>
     <script type="module" src="{% static 'js/ragbot_chat.js' %}" defer></script>
+    
+    <!-- Test notification buttons (only in debug mode) -->
+    {% if debug %}
+    <div style="position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px;">
+        <h4 style="color: white; margin: 0 0 10px 0; font-size: 12px;">Test Notifications:</h4>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <a href="{% url 'create_test_notification' %}?type=floating&priority=normal&message=A New Sick Freak has entered the chat" 
+               style="color: #9be7ff; font-size: 11px; text-decoration: none;">Floating Normal</a>
+            <a href="{% url 'create_test_notification' %}?type=floating&priority=chat&message=A New Sick Freak has entered the chat" 
+               style="color: #ffeb3b; font-size: 11px; text-decoration: none;">Chat Priority</a>
+            <a href="{% url 'create_test_notification' %}?type=modal&priority=feature&message=AI Chat - Chat with Jayden" 
+               style="color: #4caf50; font-size: 11px; text-decoration: none;">AI Chat Modal</a>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

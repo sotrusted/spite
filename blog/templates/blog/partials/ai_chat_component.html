@@ -1,0 +1,29 @@
+<div class="container ragbot-chat-wrapper">
+    <div class="ragbot-chat"
+         id="ragbot-chat"
+         data-ragbot-chat-root
+         data-session-id="{{ request.session.session_key }}"
+         data-ragbot-ws-url="{{ ragbot_ws_url|default_if_none:'' }}"
+         data-ragbot-http-url="{{ ragbot_http_url|default_if_none:'' }}"
+         data-ragbot-stream-url="{{ ragbot_stream_url|default_if_none:'' }}"
+         data-ragbot-log-url="{% url 'ragbot_log' %}"
+         data-share-url="{{ share_url }}">
+        <div class="ragbot-chat__header">
+            <h2 class="ragbot-chat__title">Jayden</h2>
+            <div class="ragbot-chat__controls">
+                <button class="ragbot-chat__share-btn" data-ragbot-share title="Share this conversation">
+                    Share
+                </button>
+                <button class="ragbot-chat__clear-btn" data-ragbot-clear title="Clear chat history">
+                    Clear
+                </button>
+                <span class="ragbot-chat__status" data-ragbot-status>Connecting…</span>
+            </div>
+        </div>
+        <div class="ragbot-chat__messages" data-ragbot-messages></div>
+        <form class="ragbot-chat__form" data-ragbot-form>
+            <textarea class="ragbot-chat__input" data-ragbot-input placeholder="Ask Jayden a question" rows="2"></textarea>
+            <button type="submit" class="btn btn-primary ragbot-chat__send" data-ragbot-send>Send</button>
+        </form>
+    </div>
+</div>

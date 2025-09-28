@@ -5,10 +5,9 @@
 <div class="container shared-chat-wrapper">
     <div class="shared-chat">
         <div class="shared-chat__header">
-            <h2 class="shared-chat__title">{{ shared_chat.title }}</h2>
+            <h2 class="shared-chat__title">{{ chat_session.get_title }}</h2>
             <div class="shared-chat__meta">
-                <span class="shared-chat__date">{{ shared_chat.created_at|date:"M j, Y g:i A" }}</span>
-                <span class="shared-chat__views">{{ shared_chat.view_count }} view{{ shared_chat.view_count|pluralize }}</span>
+                <span class="shared-chat__date">{{ chat_session.created_at|date:"M j, Y g:i A" }}</span>
                 <a href="{% url 'chat' %}" class="shared-chat__new-chat">Start New Chat</a>
             </div>
         </div>

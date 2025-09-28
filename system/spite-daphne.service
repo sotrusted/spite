@@ -1,0 +1,15 @@
+[Unit]
+Description=Spite Daphne daemon
+After=network.target
+
+[Service]
+User=sargent
+Group=www-data
+WorkingDirectory=/home/sargent/spite
+Environment="PATH=/home/sargent/spite/.spite/bin"
+ExecStart=/home/sargent/spite/.spite/bin/daphne \
+    -b 0.0.0.0 -p 8001 \
+    spite.asgi:application
+
+[Install]
+WantedBy=multi-user.target

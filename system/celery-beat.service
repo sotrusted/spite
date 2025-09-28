@@ -1,0 +1,29 @@
+[Unit]
+Description=Celery Beat Service
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=sargent
+Group=sargent
+WorkingDirectory=/home/sargent/spite
+Environment=DJANGO_SETTINGS_MODULE=spite.settings
+ExecStart=/home/sargent/spite/.spite/bin/celery -A spite beat --loglevel=info
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=100%
+
+[Install]
+WantedBy=multi-user.target
+
+# Logging
+StandardOutput=append:/home/sargent/spite/logs/celery_beat_system.log
+StandardError=append:/home/sargent/spite/logs/celery_beat_system.log
+

@@ -17,7 +17,7 @@ from .views import (home, PostCreateView, PostDetailView,
                     hx_scroll_to_post_form, toggle_version, hx_get_post, hx_get_post_comment_section,
                     spite_tv, spite_counter, htmx_health_check, htmx_test_post, htmx_debug_view,
                     spam_monitor_view, chat_view, ragbot_log, ragbot_chat_api, ragbot_chat_stream_api,
-                    share_chat, shared_chat_view)
+                    shared_chat_view, create_test_notification)
 
 
 import blog.views as blog_views
@@ -89,8 +89,8 @@ urlpatterns = [
     path('chat/', chat_view, name='chat'),
     path('api/ragbot/chat/', ragbot_chat_api, name='ragbot_chat_api'),
     path('api/ragbot/chat/stream/', ragbot_chat_stream_api, name='ragbot_chat_stream_api'),
-    path('api/ragbot/share/', share_chat, name='share_chat'),
     path('shared-chat/<str:share_id>/', shared_chat_view, name='shared_chat'),
+    path('api/test-notification/', create_test_notification, name='create_test_notification'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,6 +3,12 @@
 {% load static %}
 {% load custom_filters %} 
 {% block content %}
+
+<!-- Notifications -->
+{% for notification in notifications %}
+    {% include 'blog/notification_component.html' with notification=notification %}
+{% endfor %}
+
 <div class="home content"> 
 
     <!-- Mobile Collapsible Shop -->
@@ -79,6 +85,10 @@
 {% block form %}
 {% endblock %}
 
+{% block ai_chat %}
+    {% include 'blog/partials/ai_chat_component.html' %}
+{% endblock %}
+
 {% block feed %}
     {% include 'blog/feed.html' with home=True posts=posts%}
     
@@ -106,4 +116,5 @@
 {% endblock %}
 
 {% block page_scripts %}
+<script type="module" src="{% static 'js/ragbot_chat.js' %}" defer></script>
 {% endblock %}

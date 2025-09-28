@@ -24,7 +24,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, ListView
 from django.views import View
-from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage, AIChatSession, SiteNotification, SharedChat
+from blog.models import Post, Comment, SearchQueryLog, PageView, List, SecureIPStorage, AIChatSession, SiteNotification
 from django.contrib import messages
 from blog.forms import PostForm, ReplyForm, CommentForm, ChatForm
 from spite.context_processors import get_cached_posts, get_cached_comments, preprocess_posts_for_template, get_posts, get_optimized_posts
@@ -131,10 +131,37 @@ def home(request):
         ip_has_submitted = List.objects.filter(ip_address=client_ip).exists()
         # Cache for 7 hours (25200 seconds) - longer cache for better performance
         cache.set(cache_key, ip_has_submitted, 60 * 60 * 7)
+ 
+    chatForm = ChatForm()
+    if not request.session.session_key:
+        request.session.save()
+
+    # Get or create chat session with share URL
+    session_id = request.session.session_key
+    chat_session, created = AIChatSession.objects.get_or_create(session_id=session_id)
+    share_url = request.build_absolute_uri(chat_session.get_share_url())
+
+    # Get active notifications for home page
+    from django.db.models import Q
+    notifications = SiteNotification.objects.filter(
+        is_active=True
+    ).filter(
+        Q(expires_at__isnull=True) | Q(expires_at__gt=now())
+    ).filter(
+        Q(session_key__isnull=True) | ~Q(session_key=session_id)
+    ).order_by('-timestamp')[:1]  # Limit to 3 notifications on home page
 
     return render(request, 'blog/home.html', 
                 {'pageview_count': total_pageviews,
-                 'ip_has_submitted': ip_has_submitted})
+                 'ip_has_submitted': ip_has_submitted,
+                 'chatForm': chatForm,
+                 'share_url': share_url,
+                 'session_id': session_id,
+                 'chat_session': chat_session,
+                'ragbot_http_url': '/api/ragbot/chat/',  # Frontend should use Django proxy
+                'ragbot_stream_url': '/api/ragbot/chat/stream/',  # Streaming endpoint
+                 'notifications': notifications,
+                 })
 
 def all_posts(request):
     _, posts, _ = get_posts()
@@ -2002,11 +2029,29 @@ def chat_view(request):
     if not request.session.session_key:
         request.session.save()
 
+    # Get or create chat session with share URL
+    session_id = request.session.session_key
+    chat_session, created = AIChatSession.objects.get_or_create(session_id=session_id)
+    share_url = request.build_absolute_uri(chat_session.get_share_url())
+
+    # Get active notifications for testing
+    from django.db.models import Q
+    notifications = SiteNotification.objects.filter(
+        is_active=True
+    ).filter(
+        Q(expires_at__isnull=True) | Q(expires_at__gt=now())
+    ).filter(
+        Q(session_key__isnull=True) | ~Q(session_key=session_id)
+    ).order_by('-timestamp')[:5]
+
     context = {
         'chatForm': chatForm,
         'ragbot_ws_url': getattr(settings, 'RAGBOT_WS_URL', ''),
         'ragbot_http_url': '/api/ragbot/chat/',  # Frontend should use Django proxy
         'ragbot_stream_url': '/api/ragbot/chat/stream/',  # Streaming endpoint
+        'share_url': share_url,
+        'notifications': notifications,
+        'debug': True,
     }
     return render(request, 'blog/chat.html', context)
 
@@ -2179,65 +2224,54 @@ def ragbot_chat_stream_api(request):
     
     # Return streaming response
     response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
-    response['Cache-Control'] = 'no-cache, no-transform'
+    response['Cache-Control'] = 'no-cache'
     response['Connection'] = 'keep-alive'
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Headers'] = 'Content-Type'
-    response['X-Accel-Buffering'] = 'no'
     return response
-
-
-@require_POST
-def share_chat(request):
-    """Create a shareable link for the current chat session"""
-    try:
-        payload = json.loads(request.body.decode('utf-8'))
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
-
-    session_id = payload.get('session_id') or request.session.session_key
-    if not session_id:
-        return JsonResponse({'error': 'No active chat session'}, status=400)
-
-    try:
-        chat_session = AIChatSession.objects.get(session_id=session_id)
-    except AIChatSession.DoesNotExist:
-        return JsonResponse({'error': 'Chat session not found'}, status=404)
-
-    # Check if there are any messages to share
-    if not chat_session.messages:
-        return JsonResponse({'error': 'No messages to share'}, status=400)
-
-    # Create or get existing shared chat
-    shared_chat, created = SharedChat.objects.get_or_create(
-        chat_session=chat_session,
-        defaults={'is_active': True}
-    )
-
-    return JsonResponse({
-        'share_id': shared_chat.share_id,
-        'share_url': request.build_absolute_uri(shared_chat.get_absolute_url()),
-        'title': shared_chat.title,
-        'created': created
-    })
 
 
 def shared_chat_view(request, share_id):
     """Display a shared chat conversation"""
     try:
-        shared_chat = SharedChat.objects.select_related('chat_session').get(
+        chat_session = AIChatSession.objects.get(
             share_id=share_id, 
-            is_active=True
+            is_public=True
         )
-    except SharedChat.DoesNotExist:
+    except AIChatSession.DoesNotExist:
         return render(request, 'blog/shared_chat_not_found.html', status=404)
 
-    # Increment view count
-    SharedChat.objects.filter(id=shared_chat.id).update(view_count=models.F('view_count') + 1)
-
     context = {
-        'shared_chat': shared_chat,
-        'messages': shared_chat.chat_session.messages,
-        'page_title': f"Shared Chat: {shared_chat.title}",
+        'chat_session': chat_session,
+        'messages': chat_session.messages,
+        'page_title': f"Shared Chat: {chat_session.get_title()}",
     }
     return render(request, 'blog/shared_chat.html', context)
+
+
+def create_test_notification(request):
+    """Create test notifications for development"""
+    from datetime import timedelta
+    
+    notification_type = request.GET.get('type', 'floating')
+    priority = request.GET.get('priority', 'normal')
+    message = request.GET.get('message', 'This is a test notification')
+    
+    # Set expiration based on type
+    expires_at = None
+    if notification_type == 'modal':
+        expires_at = now() + timedelta(hours=24)
+    
+    notification = SiteNotification.objects.create(
+        message=message,
+        priority=priority,
+        notification_type=notification_type,
+        expires_at=expires_at,
+        is_active=True
+    )
+    
+    return JsonResponse({
+        'success': True,
+        'notification_id': notification.id,
+        'message': f'Created {priority} {notification_type} notification: {message}'
+    })

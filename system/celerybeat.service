@@ -1,0 +1,20 @@
+[Unit]
+Description=Celery Service
+After=network.target
+
+[Service]
+Type=forking
+User=sargent
+Group=sargent
+EnvironmentFile=/home/sargent/spite/.spite
+WorkingDirectory=/home/sargent/spite
+ExecStart=/home/sargent/spite/.spite/bin/celery -A spite worker --loglevel=info --detach
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+StandardOutput=append:/home/sargent/spite/logs/celery_beat_system.log
+StandardError=append:/home/sargent/spite/logs/celery_beat_system.log
+

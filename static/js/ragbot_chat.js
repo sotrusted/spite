@@ -34,7 +34,7 @@ class RagbotChatClient {
         this.apiUrl = root.dataset.ragbotHttpUrl || '/api/ragbot/chat/';
         this.streamUrl = root.dataset.ragbotStreamUrl || '/api/ragbot/chat/stream/';
         this.logUrl = root.dataset.ragbotLogUrl || '/api/ragbot/log/';
-        this.shareUrl = root.dataset.ragbotShareUrl || '/api/ragbot/share/';
+        this.shareUrl = root.dataset.shareUrl;
         this.messagesEl = root.querySelector('[data-ragbot-messages]');
         this.inputEl = root.querySelector('[data-ragbot-input]');
         this.formEl = root.querySelector('[data-ragbot-form]');
@@ -560,49 +560,16 @@ class RagbotChatClient {
             return;
         }
 
-        const csrfToken = getCookie('csrftoken');
-        if (!csrfToken) {
-            this.appendSystemMessage('Unable to share: missing security token.');
-            return;
-        }
-
+        // Try to copy the share URL to clipboard
         try {
-            this.setStatus('Creating share link...');
-            
-            const response = await fetch(this.shareUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                },
-                body: JSON.stringify({
-                    session_id: this.sessionId,
-                }),
-                credentials: 'same-origin',
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            
-            // Copy the share URL to clipboard
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(data.share_url);
-                this.appendSystemMessage(`Share link copied to clipboard`);
-            } else {
-                // Fallback for older browsers
-                this.appendSystemMessage(`Share this conversation: ${data.share_url}`);
-            }
-
+            await navigator.clipboard.writeText(this.shareUrl);
+            this.appendSystemMessage('Share link copied to clipboard!');
         } catch (error) {
-            console.error('Failed to create share link', error);
-            this.appendSystemMessage('Failed to create share link. Please try again.');
-        } finally {
-            this.setStatus(this.socket && this.socket.readyState === WebSocket.OPEN ? 'Connected' : 'Ready');
+            // Fallback: show the URL for manual copying
+            this.appendSystemMessage(`Share this conversation: ${this.shareUrl}`);
         }
     }
+
 
 }
 

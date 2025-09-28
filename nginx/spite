@@ -142,6 +142,10 @@ server {
         chunked_transfer_encoding on;
         add_header Cache-Control "no-cache" always;
         add_header X-Accel-Buffering "no" always;
+        proxy_set_header Accept-Encoding "";
+        gzip off;
+        add_header Cache-Control "no-cache no-transform" always;
+        proxy_request_buffering off;
     }
 
     listen 443 ssl; # managed by Certbot

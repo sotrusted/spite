@@ -1,0 +1,402 @@
+{% load static %}
+
+<!-- Notification Component -->
+<div class="spite-notification" 
+     data-notification-id="{{ notification.id }}"
+     data-notification-type="{{ notification.notification_type }}"
+     data-notification-priority="{{ notification.priority }}"
+     data-expires-at="{{ notification.expires_at|date:'c' }}"
+     style="display: none;">
+    
+    <!-- Modal Backdrop (only for modal type) -->
+    {% if notification.notification_type == 'modal' %}
+    <div class="spite-notification__backdrop"></div>
+    {% endif %}
+    
+    <!-- Notification Content -->
+    <div class="spite-notification__content">
+        <!-- Logo Banner -->
+        <div class="spite-notification__banner">
+            <img src="{% static 'media/spite-logo.webp' %}" 
+                 alt="Spite Magazine" 
+                 class="spite-notification__banner-logo">
+        </div>
+        
+        <div class="spite-notification__header">
+            <img src="{% static 'media/anon.webp' %}" 
+                 alt="Anonymous" 
+                 class="spite-notification__avatar">
+            <div class="spite-notification__meta">
+                <span class="spite-notification__priority">{{ notification.get_priority_display }}</span>
+                <span class="spite-notification__time">{{ notification.timestamp|date:"g:i A" }}</span>
+            </div>
+            <button class="spite-notification__close" data-action="close">×</button>
+        </div>
+        
+        <div class="spite-notification__body">
+            <p class="spite-notification__message">{{ notification.message }}</p>
+        </div>
+        
+        {% if notification.notification_type == 'modal' %}
+        <div class="spite-notification__actions">
+            <button class="spite-notification__btn spite-notification__btn--primary" data-action="minimize">
+                Alright
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Base notification styles */
+.spite-notification {
+    position: fixed;
+    z-index: 10000;
+    font-family: 'Crimson Text', serif;
+}
+
+/* Modal type positioning */
+.spite-notification[data-notification-type="modal"] {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* Floating type positioning */
+.spite-notification[data-notification-type="floating"] {
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+}
+
+/* Chat priority positioning (above chat box) */
+.spite-notification[data-notification-priority="chat"] {
+    bottom: 120px;
+    right: 20px;
+    max-width: 350px;
+}
+
+/* Modal backdrop */
+.spite-notification__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(2px);
+}
+
+/* Notification content container */
+.spite-notification__content {
+    position: relative;
+    background: #111;
+    color: #f5f5f5;
+    border: 2px solid #9be7ff;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Modal content sizing */
+.spite-notification[data-notification-type="modal"] .spite-notification__content {
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Logo Banner */
+.spite-notification__banner {
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid #9be7ff;
+}
+
+.spite-notification__banner-logo {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Header */
+.spite-notification__header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(155, 231, 255, 0.1);
+    border-bottom: 1px solid rgba(155, 231, 255, 0.2);
+}
+
+.spite-notification__avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 1rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.spite-notification__meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.spite-notification__priority {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: bold;
+    color: #9be7ff;
+}
+
+.spite-notification__time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.spite-notification__close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.spite-notification__close:hover {
+    color: #ff6464;
+}
+
+/* Body */
+.spite-notification__body {
+    padding: 1rem;
+}
+
+.spite-notification__message {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+/* Actions (for modal type) */
+.spite-notification__actions {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.spite-notification__btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.spite-notification__btn--primary {
+    background: #9be7ff;
+    color: #111;
+    border-color: #9be7ff;
+}
+
+.spite-notification__btn--primary:hover {
+    background: #7dd3ff;
+}
+
+.spite-notification__btn--secondary {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.spite-notification__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+}
+
+/* Priority-specific styles */
+.spite-notification[data-notification-priority="chat"] .spite-notification__content {
+    border-color: #ffeb3b;
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+}
+
+.spite-notification[data-notification-priority="chat"] .spite-notification__header {
+    background: rgba(255, 235, 59, 0.1);
+    border-bottom-color: rgba(255, 235, 59, 0.2);
+}
+
+.spite-notification[data-notification-priority="chat"] .spite-notification__priority {
+    color: #ffeb3b;
+}
+
+.spite-notification[data-notification-priority="feature"] .spite-notification__content {
+    border-color: #4caf50;
+}
+
+.spite-notification[data-notification-priority="feature"] .spite-notification__header {
+    background: rgba(76, 175, 80, 0.1);
+    border-bottom-color: rgba(76, 175, 80, 0.2);
+}
+
+.spite-notification[data-notification-priority="feature"] .spite-notification__priority {
+    color: #4caf50;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+}
+
+.spite-notification.closing {
+    animation: slideOut 0.2s ease-in forwards;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .spite-notification[data-notification-type="floating"],
+    .spite-notification[data-notification-priority="chat"] {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+    
+    .spite-notification[data-notification-type="modal"] {
+        padding: 0.5rem;
+    }
+    
+    .spite-notification__actions {
+        flex-direction: column;
+    }
+    
+    .spite-notification__btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notification = document.querySelector('[data-notification-id="{{ notification.id }}"]');
+    if (!notification) return;
+    
+    const notificationType = notification.dataset.notificationType;
+    const notificationPriority = notification.dataset.notificationPriority;
+    const expiresAt = notification.dataset.expiresAt;
+    
+    // Check if this is a feature notification that should be remembered
+    if (notificationPriority === 'feature' && notificationType === 'modal') {
+        const cookieName = `spite_notification_${notification.dataset.notificationId}_dismissed`;
+        if (getCookie(cookieName)) {
+            // User has already dismissed this notification
+            return;
+        }
+    }
+    
+    // Check if notification has expired
+    if (expiresAt && new Date(expiresAt) < new Date()) {
+        return;
+    }
+    
+    // Show the notification
+    notification.style.display = notificationType === 'modal' ? 'flex' : 'block';
+    
+    // Auto-hide floating notifications after 8 seconds (except chat priority)
+    if (notificationType === 'floating' && notificationPriority !== 'chat') {
+        setTimeout(() => {
+            closeNotification(notification);
+        }, 8000);
+    }
+    
+    // Auto-hide chat notifications after 5 seconds
+    if (notificationPriority === 'chat') {
+        setTimeout(() => {
+            closeNotification(notification);
+        }, 5000);
+    }
+    
+    // Handle button clicks
+    notification.addEventListener('click', function(e) {
+        const action = e.target.dataset.action;
+        const message = notification.querySelector('.spite-notification__message').textContent;
+        
+        if (action === 'close') {
+            // Special handling for AI Chat notification
+            if (message.includes('AI Chat') || message.includes('Chat with Jayden')) {
+                const aiChatElement = document.querySelector('#ragbot-chat, [data-ragbot-chat-root]');
+                if (aiChatElement) {
+                    aiChatElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            closeNotification(notification);
+        } else if (action === 'minimize') {
+            // Set cookie to remember dismissal for feature notifications
+            if (notificationPriority === 'feature') {
+                const cookieName = `spite_notification_${notification.dataset.notificationId}_dismissed`;
+                setCookie(cookieName, 'true', 365); // Remember for 1 year
+            }
+            
+            // Special handling for AI Chat notification
+            if (message.includes('AI Chat') || message.includes('Chat with Jayden')) {
+                const aiChatElement = document.querySelector('#ragbot-chat, [data-ragbot-chat-root]');
+                if (aiChatElement) {
+                    aiChatElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            closeNotification(notification);
+        }
+    });
+    
+    function closeNotification(notificationEl) {
+        notificationEl.classList.add('closing');
+        setTimeout(() => {
+            notificationEl.remove();
+        }, 200);
+    }
+    
+    // Cookie helper functions
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    
+    function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    }
+});
+</script>

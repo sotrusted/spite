@@ -1,0 +1,28 @@
+[Unit]
+Description=Celery Worker Service
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=sargent
+Group=sargent
+WorkingDirectory=/home/sargent/spite
+Environment=DJANGO_SETTINGS_MODULE=spite.settings
+ExecStart=/home/sargent/spite/.spite/bin/celery -A spite worker --loglevel=info --concurrency=2 --max-tasks-per-child=50
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryLimit=1G
+CPUQuota=200%
+
+StandardOutput=append:/home/sargent/spite/logs/celery_worker_system.log
+StandardError=append:/home/sargent/spite/logs/celery_worker_system.log
+
+[Install]
+WantedBy=multi-user.target
+

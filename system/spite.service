@@ -1,0 +1,25 @@
+[Unit]
+Description=Spite Django Application
+After=network.target
+
+[Service]
+User=sargent
+Group=www-data
+WorkingDirectory=/home/sargent/spite
+Environment="PATH=/home/sargent/spite/.spite/bin"
+EnvironmentFile=/home/sargent/spite/.env
+ExecStart=/home/sargent/spite/.spite/bin/gunicorn \
+    --config /home/sargent/spite/gunicorn_config.py \
+    spite.wsgi:application
+Restart=always
+StandardOutput=append:/var/log/supervisor/spite.log
+StandardError=append:/var/log/supervisor/spite_err.log
+
+
+MemoryHigh=4G
+MemoryMax = 4.5G
+
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
