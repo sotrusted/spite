@@ -2275,3 +2275,33 @@ def create_test_notification(request):
         'notification_id': notification.id,
         'message': f'Created {priority} {notification_type} notification: {message}'
     })
+
+
+def comment_detail_view(request, comment_id):
+    """Display a standalone comment with full context"""
+    try:
+        comment = get_object_or_404(Comment, id=comment_id)
+        
+        # Get the parent post for context
+        post = comment.post
+        
+        # Get comment chain if this comment is part of a thread
+        comment_chain = []
+        current_comment = comment
+        
+        # Build the chain from this comment up to the root
+        while current_comment:
+            comment_chain.insert(0, current_comment)  # Insert at beginning to maintain order
+            current_comment = current_comment.parent_comment
+        
+        context = {
+            'comment': comment,
+            'post': post,
+            'comment_chain': comment_chain,
+            'page_title': f'Comment by {comment.name or "Anonymous"}',
+        }
+        
+        return render(request, 'blog/comment_detail.html', context)
+        
+    except Comment.DoesNotExist:
+        return render(request, 'blog/comment_not_found.html', status=404)

@@ -1,0 +1,109 @@
+{% extends "blog/spite_base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="error-page">
+        <div class="error-content">
+            <h1 class="error-title">💬 Comment Not Found</h1>
+            <p class="error-message">
+                The comment you're looking for doesn't exist or has been removed.
+            </p>
+            <div class="error-actions">
+                <a href="{% url 'home' %}" class="btn btn-primary">Go Home</a>
+                <a href="{% url 'catalog' %}" class="btn btn-secondary">Browse Posts</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+    {{ block.super }}
+    <style>
+        .error-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        }
+
+        .error-content {
+            background: #111;
+            color: #f5f5f5;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #9be7ff;
+        }
+
+        .error-message {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #9be7ff;
+            color: #111;
+        }
+
+        .btn-primary:hover {
+            background: #7dd3ff;
+            text-decoration: none;
+            color: #111;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9be7ff;
+            border-color: #9be7ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(155, 231, 255, 0.1);
+            text-decoration: none;
+            color: #9be7ff;
+        }
+
+        @media (max-width: 768px) {
+            .error-content {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .error-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+

@@ -45,6 +45,11 @@ class RagbotChatClient {
         this.currentCitations = [];
         this.currentMessageElement = null;
         this.chatHistory = []; // Store conversation history
+        
+        // Token throttling for smooth streaming display
+        this.tokenQueue = [];
+        this.isProcessingQueue = false;
+        this.streamingDelay = 50; // milliseconds between tokens (adjust for speed)
     }
 
     init() {
@@ -76,6 +81,9 @@ class RagbotChatClient {
                 this.shareChat();
             });
         }
+
+        // Show welcome message from Jayden
+        this.showWelcomeMessage();
 
         if (this.socketUrl) {
             this.connect();
@@ -328,39 +336,15 @@ class RagbotChatClient {
 
         // Handle citations objects
         if (typeof data === 'object' && data.citations) {
+            console.log('Citations:', data.citations);
             this.currentCitations = data.citations;
             return;
         }
 
         // Handle done signal
         if (typeof data === 'object' && data.done) {
-            if (this.currentMessageElement) {
-                // Remove streaming indicator
-                this.currentMessageElement.classList.remove('streaming');
-                const indicator = this.currentMessageElement.querySelector('.streaming-indicator');
-                if (indicator) {
-                    indicator.remove();
-                }
-                
-                // Add citations if present
-                if (this.currentCitations.length > 0) {
-                    this.addCitationsToMessage(this.currentMessageElement, this.currentCitations);
-                }
-                
-                // Get the complete response text
-                const responseText = this.currentMessageElement.querySelector('.ragbot-message__body')?.textContent || '[streaming completed]';
-                
-                // Add assistant response to history
-                this.addToHistory('assistant', responseText);
-                
-                this.logExchange({ 
-                    direction: 'incoming', 
-                    message: responseText,
-                    citations: this.currentCitations
-                });
-            }
-            this.currentMessageElement = null;
-            this.currentCitations = [];
+            // Wait for all queued tokens to finish displaying before finalizing
+            this.finalizeStreamingMessage();
             return;
         }
 
@@ -377,12 +361,72 @@ class RagbotChatClient {
             if (!this.currentMessageElement) {
                 this.currentMessageElement = this.createStreamingMessage();
             }
-            this.appendContentToStreamingMessage(content);
+            // Add content to queue for throttled display
+            this.queueTokens(content);
             return;
         }
 
         // Log unexpected data format for debugging
         console.log('Unexpected streaming data format:', data);
+    }
+
+    queueTokens(content) {
+        // Add the content chunk to queue (already tokenized by the server)
+        this.tokenQueue.push(content);
+        
+        // Start processing queue if not already running
+        if (!this.isProcessingQueue) {
+            this.processTokenQueue();
+        }
+    }
+
+    async processTokenQueue() {
+        this.isProcessingQueue = true;
+        
+        while (this.tokenQueue.length > 0) {
+            const token = this.tokenQueue.shift();
+            this.appendContentToStreamingMessage(token);
+            
+            // Wait before processing next token (throttling)
+            await new Promise(resolve => setTimeout(resolve, this.streamingDelay));
+        }
+        
+        this.isProcessingQueue = false;
+    }
+
+    async finalizeStreamingMessage() {
+        // Wait for all tokens in queue to be processed
+        while (this.tokenQueue.length > 0 || this.isProcessingQueue) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        
+        if (this.currentMessageElement) {
+            // Remove streaming indicator
+            this.currentMessageElement.classList.remove('streaming');
+            const indicator = this.currentMessageElement.querySelector('.streaming-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+            
+            // Add citations if present
+            if (this.currentCitations.length > 0) {
+                this.addCitationsToMessage(this.currentMessageElement, this.currentCitations);
+            }
+            
+            // Get the complete response text
+            const responseText = this.currentMessageElement.querySelector('.ragbot-message__body')?.textContent || '[streaming completed]';
+            
+            // Add assistant response to history
+            this.addToHistory('assistant', responseText);
+            
+            this.logExchange({ 
+                direction: 'incoming', 
+                message: responseText,
+                citations: this.currentCitations
+            });
+        }
+        this.currentMessageElement = null;
+        this.currentCitations = [];
     }
 
     handleIncoming(raw) {
@@ -524,6 +568,14 @@ class RagbotChatClient {
         node.textContent = text;
         this.messagesEl.appendChild(node);
         this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+    }
+
+    showWelcomeMessage() {
+        // Check if there are already messages to avoid showing welcome multiple times
+        if (this.messagesEl && this.messagesEl.children.length === 0) {
+            const welcomeText = "Hi I'm Jayden! You can ask me any questions about Spite Magazine characters and use me to find posts.";
+            this.appendChatMessage('Jayden', welcomeText, 'incoming', []);
+        }
     }
 
     logExchange(entry) {
