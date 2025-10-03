@@ -4,7 +4,7 @@ import lz4.frame as lz4
 import zlib
 from celery import shared_task
 from django.core.cache import cache
-from blog.models import Post, Summary, Comment
+from blog.models import Post, Summary, Comment, AIChatSession
 from .openai import generate_summary
 from django.db.models import Q
 import logging
@@ -310,3 +310,36 @@ def cleanup_old_caches():
     cache.delete('pinned_posts')
     cache.delete('highlight_comments')
     cache.delete('last_cache_update')
+
+
+@shared_task
+def cleanup_empty_chat_sessions():
+    """
+    Delete AIChatSession instances that have empty messages and are older than 3 hours.
+    This cleans up sessions that were created but never used, while giving users
+    time to use sessions from pages they have open.
+    """
+    try:
+        from django.utils import timezone
+        
+        # Only delete empty sessions older than 3 hours
+        cutoff_time = timezone.now() - datetime.timedelta(hours=3)
+        
+        # Find sessions with empty messages (empty list or None) that are old enough
+        empty_sessions = AIChatSession.objects.filter(
+            Q(messages=[]) | Q(messages__isnull=True),
+            created_at__lt=cutoff_time
+        )
+        
+        count = empty_sessions.count()
+        if count > 0:
+            empty_sessions.delete()
+            logger.info(f"Cleaned up {count} empty AIChatSession instances older than 3 hours")
+        else:
+            logger.info("No old empty AIChatSession instances to clean up")
+            
+        return f"Cleaned up {count} empty chat sessions older than 3 hours"
+        
+    except Exception as e:
+        logger.error(f"Error cleaning up empty chat sessions: {e}")
+        return f"Error: {str(e)}"

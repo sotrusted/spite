@@ -2081,7 +2081,7 @@ def ragbot_log(request):
     if not message_text:
         return JsonResponse({'error': 'Empty message'}, status=400)
 
-    session, _created = AIChatSession.objects.get_or_create(session_id=session_id)
+    session, created = AIChatSession.objects.get_or_create(session_id=session_id)
 
     log_entry = {
         'direction': direction,
@@ -2095,7 +2095,14 @@ def ragbot_log(request):
     session.messages = messages[-100:]
     session.save(update_fields=['messages', 'updated_at'])
 
-    return JsonResponse({'ok': True})
+    response_data = {'ok': True}
+    
+    # If we created a new session (because the old one was cleaned up),
+    # send the new share URL to the frontend
+    if created:
+        response_data['new_share_url'] = request.build_absolute_uri(session.get_share_url())
+
+    return JsonResponse(response_data)
 
 
 @require_POST

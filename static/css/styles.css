@@ -2226,3 +2226,8 @@ video:focus {
         padding: 0.375rem;
     }
 }
+.clipboard-upload-hint {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}

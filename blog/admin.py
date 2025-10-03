@@ -8,6 +8,7 @@ from django.db.models import Count
 from .models import \
     Post, Comment, SearchQueryLog, ChatMessage, List, BlockedIP, SentimentAnalysis, \
          SemanticAnalysis, AnalysisSettings, AIChatSession, SiteNotification
+from axes.models import AccessFailureLog, AccessAttempt, AccessLog
 import logging
 
 logger = logging.getLogger('spite')
@@ -295,7 +296,7 @@ class CustomAdminSite(admin.AdminSite):
             return JsonResponse({'error': str(e)}, status=500)
 
 # Create custom admin site instance
-admin_site = CustomAdminSite(name='custom_admin')
+admin_site = CustomAdminSite(name='admin')
 
 # Register models with custom admin site
 admin_site.register(Post)
@@ -306,6 +307,8 @@ admin_site.register(List)
 admin_site.register(SentimentAnalysis)
 admin_site.register(SemanticAnalysis)
 admin_site.register(AnalysisSettings)
+admin_site.register(AIChatSession)
+admin_site.register(SiteNotification)
 
 class BlockedIPAdmin(admin.ModelAdmin):
     list_display = ('ip_address', 'ip_range', 'reason', 'date_blocked', 'is_permanent', 'expires', 'is_active')
@@ -313,6 +316,11 @@ class BlockedIPAdmin(admin.ModelAdmin):
     search_fields = ('ip_address', 'ip_range', 'reason')
 
 admin_site.register(BlockedIP, BlockedIPAdmin)
+
+# Register axes models with custom admin site
+admin_site.register(AccessFailureLog)
+admin_site.register(AccessAttempt)
+admin_site.register(AccessLog)
 
 # Also register with default admin for compatibility
 admin.site.register(Post)   

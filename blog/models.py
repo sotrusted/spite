@@ -193,6 +193,11 @@ class Post(models.Model):
             # Add index for media fields if you query by them often
             models.Index(fields=['media_file', 'image']),
             models.Index(fields=['spam_score', '-date_posted']),
+            # Additional indexes for search and filtering
+            models.Index(fields=['display_name']),  # For search
+            models.Index(fields=['author', '-date_posted']),  # If filtering by author
+            models.Index(fields=['parent_post']),  # For reply queries
+            models.Index(fields=['is_potentially_spam', '-date_posted']),  # Spam filtering
         ]
 
 
@@ -380,6 +385,9 @@ class Comment(models.Model):
             models.Index(fields=['post', '-created_on']),
             models.Index(fields=['spam_score', '-created_on']),
             models.Index(fields=['parent_comment']),
+            # Additional indexes for search and filtering
+            models.Index(fields=['name']),  # For search
+            models.Index(fields=['is_potentially_spam', '-created_on']),  # Spam filtering
         ]
 
 
@@ -527,6 +535,13 @@ class SearchQueryLog(models.Model):
     encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
     timestamp = models.DateTimeField(default=now)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['-timestamp']),
+            models.Index(fields=['query']),
+            models.Index(fields=['user', '-timestamp']),
+        ]
+
     def __str__(self):
         return f"{self.query} - {self.timestamp}"
 
@@ -547,6 +562,11 @@ class Summary(models.Model):
     summary = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['-timestamp']),
+        ]
+
 class PageView(models.Model):
     count = models.PositiveBigIntegerField(default=0)
 
@@ -555,6 +575,12 @@ class List(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     encrypted_ip = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['ip_address']),  # For duplicate checking
+        ]
 
     @cached_property
     def get_ip_address(self):
@@ -651,6 +677,12 @@ class BlockedIP(models.Model):
 
     class Meta:
         db_table = 'blocked_ips'
+        indexes = [
+            models.Index(fields=['date_blocked']),
+            models.Index(fields=['is_permanent']),
+            models.Index(fields=['expires']),
+            models.Index(fields=['is_permanent', 'expires']),  # Composite for active check
+        ]
 
 class TestPost(models.Model):
     title = models.CharField(max_length=200)

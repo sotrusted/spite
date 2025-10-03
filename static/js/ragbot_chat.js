@@ -595,7 +595,17 @@ class RagbotChatClient {
                 entry,
             }),
             credentials: 'same-origin',
-        }).catch((error) => {
+        })
+        .then(response => response.json())
+        .then(data => {
+            // If the server created a new session (old one was cleaned up),
+            // update our share URL
+            if (data.new_share_url) {
+                this.shareUrl = data.new_share_url;
+                console.log('Updated share URL:', this.shareUrl);
+            }
+        })
+        .catch((error) => {
             console.warn('Failed to log ragbot exchange', error);
         });
     }

@@ -430,6 +430,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'blog.tasks.run_full_content_analysis',
         'schedule': 300.0,  # Every 5 minutes (aggressive low-priority analysis)
     },
+    'cleanup-empty-chat-sessions': {
+        'task': 'spite.tasks.cleanup_empty_chat_sessions',
+        'schedule': 3600.0,  # Run every hour to clean up empty chat sessions
+    },
 }
 
 PUSHOVER_USER_KEY = 'uy1xqcve4jrr2risjt42m717bw228u'
