@@ -1,6 +1,7 @@
 import { logToBackend, refreshCSRFToken, showModalIfNeeded, scrollToElementById } from './modules/load_document_functions.js';
 import { attachEventListeners, processHtmxOnNewElements, setupHtmxProcessing, initSkeletonCleanup, toggleContent, reattachEventListenersForInitialPosts, attachEventListenersToNewPosts } from './modules/utility_functions.js';
 import { initClipboardMediaSupport } from './modules/clipboard_media.js';
+import { initFileInputControls } from './modules/file_input_controls.js';
 // import { initAjaxPostForm } from './ajax_posts.js';
 import { initPostWebsocketUpdates, initCommentWebsocketUpdates, initChatWebsocketUpdates, initSiteNotifications } from './websocket_updates.js';
 
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 
     initClipboardMediaSupport(document);
+    initFileInputControls(document);
 
     // initAjaxPostForm();
     logToBackend("Post form submitted", 'info');
@@ -61,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle infinite scroll posts - attach event listeners when new posts are loaded
     document.addEventListener('htmx:afterSwap', function(event) {
         initClipboardMediaSupport(event.target);
+        initFileInputControls(event.target);
 
         // Check if this is an infinite scroll request (target is #post-list)
         if (event.detail.target && event.detail.target.id === 'post-list') {

@@ -2231,3 +2231,29 @@ video:focus {
     font-size: 0.875rem;
     color: #6c757d;
 }
+.file-input-clear-btn {
+    margin-left: 0.5rem;
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 1.25rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.file-input-clear-btn:hover {
+    color: #a71d2a;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.file-input-clear-btn:focus {
+    outline: 2px solid #6c757d;
+    outline-offset: 1px;
+}
